@@ -1,14 +1,25 @@
 package edu.autonoma.turboclash.main;
 
-import edu.autonoma.turboclash.network.UdpPeer;
+import edu.autonoma.turboclash.network.*;
 
 public class Main {
+
     public static void main(String[] args) {
 
-        UdpPeer peer = new UdpPeer(5000);
-        peer.startListening();
+        UdpPeer peer = new UdpPeer("127.0.0.1", 5001, 5000);
+        peer.iniciar();
 
-        // Prueba local
-        peer.sendMessage("Hola UDP", "127.0.0.1", 5000);
+        // Crear mensaje
+        GameMessage msg = new GameMessage();
+        msg.type = MessageType.MOVEMENT;
+        msg.playerId = "1";
+        msg.playerName = "Heily";
+        msg.posX = 100;
+        msg.posY = 200;
+        msg.score = 10;
+        msg.time = System.currentTimeMillis();
+        msg.event = "none";
+
+        peer.enviar(msg);
     }
 }
