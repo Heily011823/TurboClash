@@ -1,5 +1,8 @@
 package edu.autonoma.turboclash.validation;
 
+import edu.autonoma.turboclash.exception.InvalidMovementException;
+
+
 /**
  * Clase encargada de validar los movimientos dentro del juego.
  *

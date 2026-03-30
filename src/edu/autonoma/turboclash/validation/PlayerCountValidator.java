@@ -1,5 +1,8 @@
 package edu.autonoma.turboclash.validation;
 
+import edu.autonoma.turboclash.exception.InvalidPlayerCountException;
+
+
 /**
  * Clase encargada de validar la cantidad de jugadores.
  *

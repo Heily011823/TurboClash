@@ -1,5 +1,9 @@
 package edu.autonoma.turboclash.validation;
 
+import edu.autonoma.turboclash.exception.InvalidNameException;
+import edu.autonoma.turboclash.exception.DuplicateDataException;
+
+
 /**
  * Clase encargada de validar el nombre del jugador.
  *
@@ -18,7 +22,7 @@ public class PlayerNameValidator {
      * @throws InvalidNameException Se lanza la excepción si el nombre no cumple con las reglas establecidas.
      * @throws DuplicateDataException Se lanza la excepción si el nombre ya está en uso.
      */
-    public static void validate(String name) throws InvalidNameException {
+    public static void validate(String name, String otherName) throws InvalidNameException, DuplicateDataException {
 
         if (name == null || name.trim().isEmpty()) {
             throw new InvalidNameException("El nombre no puede estar vacío");

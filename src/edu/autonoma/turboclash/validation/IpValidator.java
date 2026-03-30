@@ -1,5 +1,8 @@
 package edu.autonoma.turboclash.validation;
 
+import edu.autonoma.turboclash.exception.InvalidIpException;
+
+
 /**
  * Clase encargada de validar direcciones IP.
  *

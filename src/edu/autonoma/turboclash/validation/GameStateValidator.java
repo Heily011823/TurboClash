@@ -1,5 +1,8 @@
 package edu.autonoma.turboclash.validation;
 
+import edu.autonoma.turboclash.exception.InvalidGameStateException;
+
+
 /**
  * Clase encargada de validar el estado de la partida.
  *
