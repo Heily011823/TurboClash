@@ -20,7 +20,7 @@ public class PlayerNameValidator {
             throw new InvalidNameException("El nombre ya está en uso por otro jugador");
         }
 
-        if (name.length() > 20) {
+        if (name.length() > 15) {
             throw new InvalidNameException("El nombre no puede tener más de 15 caracteres");
         }
     }
