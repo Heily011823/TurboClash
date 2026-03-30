@@ -17,7 +17,7 @@ public class PlayerNameValidator {
         }
 
         if (otherName != null && name.equalsIgnoreCase(otherName)) {
-            throw new InvalidNameException("El nombre ya está en uso por otro jugador");
+            throw new DuplicateDataException("El nombre ya está en uso por otro jugador");
         }
 
         if (name.length() > 15) {
