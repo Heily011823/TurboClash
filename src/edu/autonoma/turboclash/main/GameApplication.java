@@ -9,8 +9,7 @@ import java.util.*;
 public class GameApplication {
 
     public void start() {
-
-        // JUGADOR LOCAL
+        // --- CONFIGURACIÓN DEL JUGADOR LOCAL ---
         Car carLocal = new Car("c1", 100, 100, 40, 40);
         Player localPlayer = new Player("p1", "Heily", carLocal);
 
@@ -27,36 +26,43 @@ public class GameApplication {
 
         CollisionManager collision = new CollisionManager();
 
-        // UDP
-        int puertoLocal = 5000;
-
+        // --- CONFIGURACIÓN DE RED (RADMIN VPN) ---
+        int puertoLocal = Integer.parseInt(System.getProperty("puerto", "5000"));
         UdpPeer peer = new UdpPeer(puertoLocal);
 
-        peer.agregarPeer("26.8.193.114", 5001);
-        peer.agregarPeer("26.176.207.113", 5002);
-        peer.agregarPeer("26.14.204.56", 5003);
+        // Agregamos a todos los compañeros según la captura de Radmin
+        // 1. DESKTOP-FMB7FRC
+        if (puertoLocal != 5000)
+            peer.agregarPeer("26.8.193.114", 5000);
+
+        // 2. DESKTOP-U4JVA7D
+        if (puertoLocal != 5001)
+            peer.agregarPeer("26.176.207.113", 5001);
+
+        // 3. LAPTOP-3MG8IKDR
+        if (puertoLocal != 5002)
+            peer.agregarPeer("26.14.204.56", 5002);
+
+        // 4. TU PC (DESKTOP-TD25AUP)
+        if (puertoLocal != 5003)
+            peer.agregarPeer("26.98.94.146", 5003);
 
         List<UdpPeer> peers = new ArrayList<>();
         peers.add(peer);
 
         GameEngine engine = new GameEngine(match, collision, items, obstacles, peers);
 
-        // RECEPCIÓN
+        // --- LÓGICA DE RECEPCIÓN ---
         peer.getReceiver().setListener((msg, ip, port) -> {
-
             switch (msg.type) {
-
                 case PLAYER_JOINED:
-
                     boolean existe = false;
-
                     for (Player p : players) {
                         if (p.getId().equals(msg.playerId)) {
                             existe = true;
                             break;
                         }
                     }
-
                     if (!existe) {
                         Car car = new Car("c_" + msg.playerId, msg.posX, msg.posY, 40, 40);
                         Player nuevo = new Player(msg.playerId, msg.playerName, car);
@@ -65,7 +71,6 @@ public class GameApplication {
                     break;
 
                 case MOVEMENT:
-
                     for (Player p : players) {
                         if (p.getId().equals(msg.playerId)) {
                             p.getCar().moveTo(msg.posX, msg.posY);
@@ -74,7 +79,6 @@ public class GameApplication {
                     break;
 
                 case SCORE_UPDATE:
-
                     for (Player p : players) {
                         if (p.getId().equals(msg.playerId)) {
                             p.setScore(msg.score);
@@ -93,7 +97,7 @@ public class GameApplication {
 
         peer.iniciar();
 
-        //  JOIN
+        // --- ENVIAR MENSAJE DE ENTRADA (JOIN) ---
         GameMessage joinMsg = new GameMessage();
         joinMsg.type = MessageType.PLAYER_JOINED;
         joinMsg.playerId = localPlayer.getId();
@@ -106,9 +110,8 @@ public class GameApplication {
 
         peer.enviarATodos(joinMsg);
 
-        //  LOOP
+        // --- LOOP PRINCIPAL DEL JUEGO ---
         while (!match.isFinished()) {
-
             engine.update();
 
             GameMessage msg = new GameMessage();
@@ -121,16 +124,21 @@ public class GameApplication {
             msg.time = System.currentTimeMillis();
             msg.event = "";
 
-            peer.enviarATodos(msg);
+            try {
+                peer.enviarATodos(msg);
+            } catch (Exception e) {
+                // Si falla el envío a un peer, imprimimos el error pero no matamos el juego
+                System.err.println("Error enviando actualización: " + e.getMessage());
+            }
 
             try {
-                Thread.sleep(16);
+                Thread.sleep(16); // ~60 FPS
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        //  SALIDA
+        // --- SALIDA Y CIERRE ---
         GameMessage leaveMsg = new GameMessage();
         leaveMsg.type = MessageType.PLAYER_LEFT;
         leaveMsg.playerId = localPlayer.getId();
