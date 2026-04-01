@@ -1,56 +1,83 @@
 package edu.autonoma.turboclash.sound;
+
 import javax.sound.sampled.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 
 public class SoundManager {
 
-    // Rutas de sonidos del juego
-    private String collisionSound;
-    private String pointSound;
-    private String startSound;
-    private String endSound;
-    private String winSound;
+    private Clip backgroundClip;
+    private static final String BASE_PATH = "/edu/autonoma/turboclash/sound/";
 
-    public SoundManager(String collisionSound, String pointSound, String startSound, String endSound, String winSound) {
-        this.collisionSound = collisionSound;
-        this.pointSound = pointSound;
-        this.startSound = startSound;
-        this.endSound = endSound;
-        this.winSound = winSound;
+    // Enum de sonidos (NO es variable quemada, es controlado)
+    public enum Sound {
+        COLLISION("CollisionSound.wav"),
+        POINT("CoinSound.wav"),
+        START("StartCountdownSound.wav"),
+        END("GameOverSound.wav"),
+        WIN("WinSound.wav"),
+        BRAKE("BrakeSound.wav"),
+        MENU("Game_Cover_Sound.wav");
+
+        private final String fileName;
+
+        Sound(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
     }
 
-    // Métodos para reproducir eventos del juego
-    public void playCollision() {
-        play(collisionSound);
+    // Música en loop
+    public void playBackground(Sound sound) {
+        try {
+            stopBackground();
+
+            InputStream input = getClass().getResourceAsStream(BASE_PATH + sound.getFileName());
+
+            if (input == null) {
+                System.err.println("No se encontró: " + sound.getFileName());
+                return;
+            }
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(input);
+            backgroundClip = AudioSystem.getClip();
+            backgroundClip.open(audioStream);
+            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
+            backgroundClip.start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void playPoint() {
-        play(pointSound);
+    // Detener música
+    public void stopBackground() {
+        if (backgroundClip != null) {
+            backgroundClip.stop();
+            backgroundClip.close();
+            backgroundClip = null;
+        }
     }
 
-    public void playStart() {
-        play(startSound);
-    }
+    // Efectos
+    public void playEffect(Sound sound) {
+        try {
+            InputStream input = getClass().getResourceAsStream(BASE_PATH + sound.getFileName());
 
-    public void playEnd() {
-        play(endSound);
-    }
+            if (input == null) {
+                System.err.println("No se encontró: " + sound.getFileName());
+                return;
+            }
 
-    public void playWin() {
-        play(winSound);
-    }
-
-    // Método genérico para reproducir audio
-    private void play(String path) {
-        if (path == null || path.isBlank()) return;
-
-        try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(path))) {
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(input);
             Clip clip = AudioSystem.getClip();
             clip.open(audioStream);
             clip.start();
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Error reproduciendo sonido: " + path);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
