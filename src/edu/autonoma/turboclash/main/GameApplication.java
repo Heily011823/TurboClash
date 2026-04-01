@@ -32,20 +32,20 @@ public class GameApplication {
 
         // Agregamos a todos los compañeros según la captura de Radmin
         // 1. DESKTOP-FMB7FRC
-        if (puertoLocal != 5000)
-            peer.agregarPeer("26.8.193.114", 5000);
+        if (puertoLocal != 5001)
+            peer.agregarPeer("26.8.193.114", 5001);
 
         // 2. DESKTOP-U4JVA7D
-        if (puertoLocal != 5001)
-            peer.agregarPeer("26.176.207.113", 5001);
+        if (puertoLocal != 5002)
+            peer.agregarPeer("26.176.207.113", 5002);
 
         // 3. LAPTOP-3MG8IKDR
-        if (puertoLocal != 5002)
-            peer.agregarPeer("26.14.204.56", 5002);
+        if (puertoLocal != 5003)
+            peer.agregarPeer("26.14.204.56", 5003);
 
         // 4. TU PC (DESKTOP-TD25AUP)
-        if (puertoLocal != 5003)
-            peer.agregarPeer("26.98.94.146", 5003);
+        if (puertoLocal != 5004)
+            peer.agregarPeer("26.98.94.146", 5004);
 
         List<UdpPeer> peers = new ArrayList<>();
         peers.add(peer);
