@@ -11,31 +11,39 @@ public class GameEngine {
     private CollisionManager collisionManager;
     private List<Item> items;
     private List<Obstacle> obstacles;
-    private UdpPeer peer;
 
-    public GameEngine(Match match, CollisionManager collisionManager,
-                      List<Item> items, List<Obstacle> obstacles) {
+
+    private List<UdpPeer> peers;
+
+    public GameEngine(Match match,
+                      CollisionManager collisionManager,
+                      List<Item> items,
+                      List<Obstacle> obstacles,
+                      List<UdpPeer> peers) {
 
         this.match = match;
         this.collisionManager = collisionManager;
         this.items = items;
         this.obstacles = obstacles;
+        this.peers = peers;
     }
 
     public void update() {
         if (match.isFinished()) return;
 
-        Player p1 = match.getLocalPlayer();
-        Player p2 = match.getRemotePlayer();
 
-        collisionManager.process(p1, items, obstacles);
-        collisionManager.process(p2, items, obstacles);
+        for (Player p : match.getPlayers()) {
+            collisionManager.process(p, items, obstacles);
+        }
 
         match.check();
     }
 
+
     public void move(Player p, double x, double y) {
-        p.moveCar(x, y);
+        if (p == null) return;
+
+        p.move(x, y);
 
         GameMessage msg = new GameMessage();
         msg.playerId = p.getId();
@@ -43,8 +51,23 @@ public class GameEngine {
         msg.posY = y;
         msg.score = p.getCurrentPoints();
 
-        if (peer != null) {
-            peer.enviar(msg);
+
+        if (peers != null) {
+            for (UdpPeer peer : peers) {
+                peer.enviar(msg);
+            }
+        }
+    }
+
+
+    public void onMessageReceived(GameMessage msg) {
+
+        for (Player p : match.getPlayers()) {
+
+            if (p.getId().equals(msg.playerId)) {
+                p.move(msg.posX, msg.posY);
+                p.updateScore(msg.score);
+            }
         }
     }
 }

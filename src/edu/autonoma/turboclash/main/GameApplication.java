@@ -4,51 +4,140 @@ import edu.autonoma.turboclash.logic.*;
 import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.network.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class GameApplication {
 
     public void start() {
 
-        // Crear carros
-        Car car1 = new Car("c1", 100, 100, 40, 40);
-        Car car2 = new Car("c2", 200, 200, 40, 40);
+        // JUGADOR LOCAL
+        Car carLocal = new Car("c1", 100, 100, 40, 40);
+        Player localPlayer = new Player("p1", "Heily", carLocal);
 
-        // Crear jugadores
-        Player p1 = new Player("p1", "Heily", car1);
-        Player p2 = new Player("p2", "Remote", car2);
+        List<Player> players = new ArrayList<>();
+        players.add(localPlayer);
 
-        // Crear match
-        Match match = new Match(p1, p2, 100);
+        Match match = new Match(localPlayer, players, 100);
 
-        // Items y obstáculos
         List<Item> items = new ArrayList<>();
         items.add(new Item("i1", 150, 150, 20, 20, 10));
 
         List<Obstacle> obstacles = new ArrayList<>();
         obstacles.add(new Obstacle("o1", 300, 300, 30, 30, 5));
 
-        //  Managers
         CollisionManager collision = new CollisionManager();
 
-        //  Engine
-        GameEngine engine = new GameEngine(match, collision, items, obstacles);
+        // UDP
+        int puertoLocal = 5000;
 
-        //  Red (UDP)
-        UdpPeer peer = new UdpPeer("26.8.193.114", 5000, 5001);
+        UdpPeer peer = new UdpPeer(puertoLocal);
+
+        peer.agregarPeer("26.8.193.114", 5001);
+        peer.agregarPeer("26.176.207.113", 5002);
+        peer.agregarPeer("26.14.204.56", 5003);
+
+        List<UdpPeer> peers = new ArrayList<>();
+        peers.add(peer);
+
+        GameEngine engine = new GameEngine(match, collision, items, obstacles, peers);
+
+        // RECEPCIÓN
+        peer.getReceiver().setListener((msg, ip, port) -> {
+
+            switch (msg.type) {
+
+                case PLAYER_JOINED:
+
+                    boolean existe = false;
+
+                    for (Player p : players) {
+                        if (p.getId().equals(msg.playerId)) {
+                            existe = true;
+                            break;
+                        }
+                    }
+
+                    if (!existe) {
+                        Car car = new Car("c_" + msg.playerId, msg.posX, msg.posY, 40, 40);
+                        Player nuevo = new Player(msg.playerId, msg.playerName, car);
+                        players.add(nuevo);
+                    }
+                    break;
+
+                case MOVEMENT:
+
+                    for (Player p : players) {
+                        if (p.getId().equals(msg.playerId)) {
+                            p.getCar().moveTo(msg.posX, msg.posY);
+                        }
+                    }
+                    break;
+
+                case SCORE_UPDATE:
+
+                    for (Player p : players) {
+                        if (p.getId().equals(msg.playerId)) {
+                            p.setScore(msg.score);
+                        }
+                    }
+                    break;
+
+                case PLAYER_LEFT:
+                    players.removeIf(p -> p.getId().equals(msg.playerId));
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
         peer.iniciar();
 
-        // LOOP DEL JUEGO (
+        //  JOIN
+        GameMessage joinMsg = new GameMessage();
+        joinMsg.type = MessageType.PLAYER_JOINED;
+        joinMsg.playerId = localPlayer.getId();
+        joinMsg.playerName = localPlayer.getName();
+        joinMsg.posX = localPlayer.getCar().getX();
+        joinMsg.posY = localPlayer.getCar().getY();
+        joinMsg.score = 0;
+        joinMsg.time = System.currentTimeMillis();
+        joinMsg.event = "";
+
+        peer.enviarATodos(joinMsg);
+
+        //  LOOP
         while (!match.isFinished()) {
+
             engine.update();
 
+            GameMessage msg = new GameMessage();
+            msg.type = MessageType.MOVEMENT;
+            msg.playerId = localPlayer.getId();
+            msg.playerName = localPlayer.getName();
+            msg.posX = localPlayer.getCar().getX();
+            msg.posY = localPlayer.getCar().getY();
+            msg.score = localPlayer.getCurrentPoints();
+            msg.time = System.currentTimeMillis();
+            msg.event = "";
+
+            peer.enviarATodos(msg);
+
             try {
-                Thread.sleep(16); // ~60 FPS
+                Thread.sleep(16);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+
+        //  SALIDA
+        GameMessage leaveMsg = new GameMessage();
+        leaveMsg.type = MessageType.PLAYER_LEFT;
+        leaveMsg.playerId = localPlayer.getId();
+        leaveMsg.playerName = localPlayer.getName();
+
+        peer.enviarATodos(leaveMsg);
+        peer.cerrar();
 
         System.out.println("Ganador: " +
                 (match.getWinner() != null ? match.getWinner().getName() : "Empate"));

@@ -7,16 +7,13 @@ import java.net.InetAddress;
 public class UdpSender {
 
     private DatagramSocket socket;
-    private String ipDestino;
-    private int puertoDestino;
 
-    public UdpSender(DatagramSocket socket, String ipDestino, int puertoDestino) {
+    public UdpSender(DatagramSocket socket) {
         this.socket = socket;
-        this.ipDestino = ipDestino;
-        this.puertoDestino = puertoDestino;
     }
 
-    public void enviarMensaje(GameMessage message) {
+
+    public void enviarMensaje(GameMessage message, String ipDestino, int puertoDestino) {
         try {
             String data = message.serialize();
             byte[] buffer = data.getBytes();
@@ -33,6 +30,7 @@ public class UdpSender {
             socket.send(packet);
 
         } catch (Exception e) {
+            System.out.println("Error enviando mensaje UDP");
             e.printStackTrace();
         }
     }

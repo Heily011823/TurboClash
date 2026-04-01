@@ -26,8 +26,19 @@ public class GameRulesManager {
     public boolean hasWinner(Match game, TimeManager timeManager) {
         if (game == null) return false;
 
-        return checkWinByScore(game.getLocalPlayer())
-                || checkWinByScore(game.getRemotePlayer())
-                || checkWinByTime(timeManager);
+        // Local
+        if (checkWinByScore(game.getLocalPlayer())) {
+            return true;
+        }
+
+        // Remotos (lista)
+        for (Player p : game.getRemotePlayers()) {
+            if (checkWinByScore(p)) {
+                return true;
+            }
+        }
+
+        // Tiempo
+        return checkWinByTime(timeManager);
     }
 }

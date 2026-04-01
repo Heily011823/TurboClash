@@ -1,36 +1,49 @@
 package edu.autonoma.turboclash.model;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Match {
 
-    private final Player p1, p2;
-    private final int targetScore;
+    private Player localPlayer;
+    private List<Player> remotePlayers;
+    private int targetScore;
+
     private boolean finished = false;
     private Player winner;
 
-    public Match(Player p1, Player p2, int target) {
-        this.p1 = p1;
-        this.p2 = p2;
-        this.targetScore = target;
+    public Match(Player localPlayer, List<Player> remotePlayers, int targetScore) {
+        this.localPlayer = localPlayer;
+        this.remotePlayers = remotePlayers;
+        this.targetScore = targetScore;
     }
 
     public void check() {
-        if (p1.getCurrentPoints() >= targetScore ||
-                p2.getCurrentPoints() >= targetScore) {
 
+        if (localPlayer.getCurrentPoints() >= targetScore) {
             finished = true;
+            winner = localPlayer;
+            return;
+        }
 
-            if (p1.getCurrentPoints() > p2.getCurrentPoints()) {
-                winner = p1;
-            } else if (p2.getCurrentPoints() > p1.getCurrentPoints()) {
-                winner = p2;
-            } else {
-                winner = null;
+        for (Player p : remotePlayers) {
+            if (p.getCurrentPoints() >= targetScore) {
+                finished = true;
+                winner = p;
+                return;
             }
         }
     }
 
+    public List<Player> getPlayers() {
+        List<Player> all = new ArrayList<>();
+        all.add(localPlayer);
+        all.addAll(remotePlayers);
+        return all;
+    }
+
+    public Player getLocalPlayer() { return localPlayer; }
+    public List<Player> getRemotePlayers() { return remotePlayers; }
     public boolean isFinished() { return finished; }
     public Player getWinner() { return winner; }
-    public Player getLocalPlayer() { return p1; }
-    public Player getRemotePlayer() { return p2; }
 }

@@ -22,4 +22,13 @@ public class Car extends GameObject {
             posY = y;
         }
     }
+
+
+    public double getX() {
+        return posX;
+    }
+
+    public double getY() {
+        return posY;
+    }
 }
