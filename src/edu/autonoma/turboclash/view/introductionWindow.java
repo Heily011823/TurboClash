@@ -102,12 +102,7 @@ public class introductionWindow extends JFrame {
 
     private void mostrarInformacion() {
         String mensaje = """
-                Bienvenido a Turbo Clash.
-
-                Instrucciones:
-                - Ingresa de 2 a 4 nombres de jugadores.
-                - Debes llenar al menos Jugador 1 y Jugador 2.
-                - Luego presiona "Iniciar Juego".
+                Bienvenido a Turbo Clash.".
                 """;
 
         JOptionPane.showMessageDialog(
