@@ -5,11 +5,11 @@ package edu.autonoma.turboclash.view;
 
 import javax.swing.*;
 
-public class initialWindow extends JFrame {
+public class startWindow extends JFrame {
     public static void main(String[] args) {
-        new initialWindow().setVisible(true);
+        new startWindow().setVisible(true);
     }
-    public initialWindow() {
+    public startWindow() {
         initComponents();
     }
 
@@ -28,17 +28,15 @@ public class initialWindow extends JFrame {
         lblImagen.setBounds(0, 0, 1280, 720);
         contentPane.add(lblImagen);
 
-        // Botón continuar
+        // Botón
         JButton btnContinuar = new JButton("Continuar");
         btnContinuar.setBounds(500, 580, 220, 50);
         lblImagen.add(btnContinuar);
 
         // Acción del botón
         btnContinuar.addActionListener(e -> {
-
-            // Aquí luego puedes abrir otra ventana
-            // new GameWindow().setVisible(true);
-            // dispose();
+            new introductionWindow().setVisible(true);
+            dispose();
         });
 
         // Centrar ventana
