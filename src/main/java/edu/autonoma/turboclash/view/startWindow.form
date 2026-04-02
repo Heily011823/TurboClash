@@ -2,17 +2,25 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="edu.autonoma.turboclash.view.startWindow">
   <grid id="27dc6" binding="panelPrincipal" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="58" y="21" width="395" height="397"/>
+      <xy x="20" y="20" width="500" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <component id="11057" class="javax.swing.JLabel" binding="lblImagen">
+      <component id="b5e60" class="javax.swing.JLabel" binding="ImagenFondo">
+        <constraints border-constraint="West"/>
+        <properties>
+          <horizontalAlignment value="0"/>
+          <preferredSize width="800" height="600"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="50ea5" class="javax.swing.JButton" binding="button1" default-binding="true">
         <constraints border-constraint="Center"/>
         <properties>
-          <icon value="src/edu/autonoma/turboclash/image/start.png"/>
-          <inheritsPopupMenu value="true"/>
-          <text value=""/>
+          <alignmentX value="1.0"/>
+          <alignmentY value="1.0"/>
+          <text value="Button"/>
         </properties>
       </component>
     </children>

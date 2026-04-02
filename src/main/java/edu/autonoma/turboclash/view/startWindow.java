@@ -1,26 +1,31 @@
-/*
- * Created by JFormDesigner on Thu Apr 02 09:39:45 GMT-05:00 2026
- */
-
 package edu.autonoma.turboclash.view;
 
 import javax.swing.*;
 
 public class startWindow extends JFrame {
     private JPanel panelPrincipal;
-    private JLabel lblImagen;
+    private JLabel ImagenFondo;
+    private JButton button1;
     private JButton btnRun;
 
     public startWindow() {
         setContentPane(panelPrincipal);
-        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 600);
         setLocationRelativeTo(null);
 
-        panelPrincipal.setLayout(null);
+        ImageIcon icon = new ImageIcon(
+                getClass().getResource("/edu/autonoma/turboclash/image/Game_Cover.png")
+        );
+        ImagenFondo.setIcon(icon);
+        panelPrincipal.setLayout(null);  // mejor usa el layout que genera el diseñador
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new startWindow().setVisible(true));
+        JFrame frame = new JFrame("startWindow");
+        frame.setContentPane(new startWindow().panelPrincipal);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
     }
 }
