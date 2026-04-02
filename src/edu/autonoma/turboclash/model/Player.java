@@ -26,17 +26,25 @@ public class Player {
         return score.getPoints();
     }
 
-
     public void setScore(int points) {
         this.score.setPoints(points);
+    }
+
+    public void syncFromNetwork(double x, double y, int score) {
+        this.move(x, y);
+        this.setScore(score);
+    }
+
+
+    public void loseLife() {
+        if (car != null) {
+            car.reduceLife();
+        }
     }
 
     // getters
     public Car getCar() { return car; }
     public String getId() { return id; }
     public String getName() { return name; }
-
-    public Score getScore() {
-        return score;
-    }
+    public Score getScore() { return score; }
 }

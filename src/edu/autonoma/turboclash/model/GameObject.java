@@ -19,7 +19,7 @@ public abstract class GameObject {
         this.height = height;
     }
 
-    //  MÉTODO ABSTRACTO (OBLIGATORIO EN HIJOS)
+
     public abstract void draw(Graphics g);
 
     //  COLISIÓN (AABB)
