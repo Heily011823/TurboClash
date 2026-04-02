@@ -1,4 +1,4 @@
 package edu.autonoma.turboclash.view;
 
-public class MainView {
+public class MainWindow {
 }
