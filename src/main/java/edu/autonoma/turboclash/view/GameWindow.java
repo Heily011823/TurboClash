@@ -34,10 +34,10 @@ public class GameWindow {
         carro3 = new JLabel(new ImageIcon(getClass().getResource("/image/Car_Red.png")));
         carro4 = new JLabel(new ImageIcon(getClass().getResource("/image/Car_Yellow.png")));
 
-        carro1.setBounds(50, 100, 100, 50);
+        carro1.setBounds(50, 90, 100, 50);
         carro2.setBounds(50, 180, 100, 50);
-        carro3.setBounds(50, 260, 100, 50);
-        carro4.setBounds(50, 340, 100, 50);
+        carro3.setBounds(50, 290, 100, 50);
+        carro4.setBounds(50, 450, 100, 50);
 
         panel1.add(carro1);
         panel1.add(carro2);
