@@ -1,6 +1,7 @@
 package edu.autonoma.turboclash.view;
 import javax.swing.*;
 import java.awt.*;
+import edu.autonoma.turboclash.view.GameWindowFrame;
 
 public class IntroductionWindow {
     public JPanel panel1;
@@ -31,7 +32,7 @@ public class IntroductionWindow {
             frame.dispose();
 
             // abrir juego
-            new GameWindow();
+            new GameWindowFrame();
         });
     }
 }
