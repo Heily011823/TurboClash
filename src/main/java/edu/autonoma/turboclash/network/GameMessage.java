@@ -10,7 +10,19 @@ public class GameMessage {
     public int score;
     public long time;
     public String event;
+    public GameMessage(MessageType type, String playerId, String playerName,
+                       double posX, double posY, int score, long time, String event) {
+        this.type = type;
+        this.playerId = playerId;
+        this.playerName = playerName;
+        this.posX = posX;
+        this.posY = posY;
+        this.score = score;
+        this.time = time;
+        this.event = event;
+    }
 
+    public GameMessage() {}
 
     public String serialize() {
         return type + "|" +
@@ -23,7 +35,6 @@ public class GameMessage {
                 safe(event);
     }
 
-    // Convierte el String recibido en objeto
     public static GameMessage deserialize(String data) {
 
         if (data == null || data.isEmpty()) {
@@ -32,7 +43,6 @@ public class GameMessage {
 
         String[] parts = data.split("\\|");
 
-        // Validación de estructura
         if (parts.length < 8) {
             throw new IllegalArgumentException("Mensaje UDP inválido: " + data);
         }
@@ -55,7 +65,6 @@ public class GameMessage {
 
         return msg;
     }
-
 
     private String safe(String value) {
         if (value == null) return "";
