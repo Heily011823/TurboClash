@@ -2,6 +2,7 @@ package edu.autonoma.turboclash.view;
 
 import edu.autonoma.turboclash.input.*;
 import edu.autonoma.turboclash.model.Car;
+import edu.autonoma.turboclash.model.Item;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.util.*;
 import java.util.List;
 
 public class GameWindow {
+
 
     public JPanel panel1;
     private JLabel Puntaje;
@@ -20,6 +22,7 @@ public class GameWindow {
     private List<JLabel> carrosLabels = new ArrayList<>();
     private List<JLabel> corazones = new ArrayList<>();
     private List<JLabel> obstaculosLabels = new ArrayList<>();
+    private List<JLabel> itemsLabels = new ArrayList<>();
 
     private final String[] SKINS = {
             "/image/Car_Blue.png", "/image/Car_Red.png",
@@ -30,7 +33,9 @@ public class GameWindow {
         this.keyboardInput = keyboardInput;
         this.mouseInput = mouseInput;
 
+
         panel1.setLayout(null);
+
         panel1.setFocusable(true);
         panel1.requestFocusInWindow();
 
@@ -38,83 +43,101 @@ public class GameWindow {
         initMouse();
     }
 
-    // -------------------- PUNTAJE --------------------
-
     public void actualizarPuntaje(int puntos) {
-        Puntaje.setText("Puntaje: " + puntos);
+        if (Puntaje != null) {
+            Puntaje.setText("Puntaje: " + puntos);
+        }
     }
 
-    // -------------------- CORAZONES --------------------
-
     public void actualizarCorazones(int vidas, Car car) {
-        if (car == null) return;
+        if (car == null || panel1 == null) return;
 
         if (corazones.isEmpty()) {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/image/Health.png"));
-
-            for (int i = 0; i < 3; i++) {
-                JLabel c = new JLabel(new ImageIcon(icon.getImage()
-                        .getScaledInstance(25, 25, Image.SCALE_SMOOTH)));
-                panel1.add(c);
-                panel1.setComponentZOrder(c, 0);
-                corazones.add(c);
+            try {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/image/Health.png"));
+                for (int i = 0; i < 3; i++) {
+                    JLabel c = new JLabel(new ImageIcon(icon.getImage()
+                            .getScaledInstance(25, 25, Image.SCALE_SMOOTH)));
+                    panel1.add(c);
+                    panel1.setComponentZOrder(c, 0); // Al frente
+                    corazones.add(c);
+                }
+            } catch (Exception e) {
+                System.err.println("Error cargando Health.png: " + e.getMessage());
             }
         }
 
-        int x = (int) car.getX();
-        int y = (int) car.getY();
-
         for (int i = 0; i < corazones.size(); i++) {
             JLabel c = corazones.get(i);
-            c.setBounds(x + (i * 30), y - 30, 25, 25);
+            c.setBounds((int) car.getX() + (i * 30), (int) car.getY() - 30, 25, 25);
             c.setVisible(i < vidas);
         }
     }
 
-    // -------------------- CARROS --------------------
-
     public void actualizarCarros(List<Car> cars) {
-
         while (carrosLabels.size() < cars.size()) {
             JLabel lbl = new JLabel();
             carrosLabels.add(lbl);
             panel1.add(lbl);
+            panel1.setComponentZOrder(lbl, 1);
         }
 
         for (int i = 0; i < cars.size(); i++) {
             Car car = cars.get(i);
             JLabel lbl = carrosLabels.get(i);
-
             int idNum = Math.abs(car.getId().hashCode());
 
-            ImageIcon icon = new ImageIcon(getClass().getResource(
-                    SKINS[idNum % SKINS.length]
-            ));
-
-            lbl.setIcon(new ImageIcon(icon.getImage()
-                    .getScaledInstance(100, 50, Image.SCALE_SMOOTH)));
-
-            lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
+            try {
+                ImageIcon icon = new ImageIcon(getClass().getResource(SKINS[idNum % SKINS.length]));
+                lbl.setIcon(new ImageIcon(icon.getImage().getScaledInstance(100, 50, Image.SCALE_SMOOTH)));
+                lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
+                lbl.setVisible(true);
+            } catch (Exception e) {
+                lbl.setText("CAR"); // Fallback si no hay imagen
+            }
         }
     }
 
-    // -------------------- OBSTÁCULOS --------------------
-
-    public void actualizarObstaculos(List<Point> obs) {
-
-        while (obstaculosLabels.size() < obs.size()) {
-            JLabel lbl = new JLabel(new ImageIcon(
-                    new ImageIcon(getClass().getResource("/image/Oil_Spill.png"))
-                            .getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)
-            ));
+    public void actualizarItems(List<Item> items) {
+        while (itemsLabels.size() < items.size()) {
+            JLabel lbl = new JLabel();
+            java.net.URL url = getClass().getResource("/image/Coin.png");
+            if (url != null) {
+                lbl.setIcon(new ImageIcon(new ImageIcon(url).getImage()
+                        .getScaledInstance(30, 30, Image.SCALE_SMOOTH)));
+            }
             panel1.add(lbl);
             panel1.setComponentZOrder(lbl, 2);
-            obstaculosLabels.add(lbl);
+            itemsLabels.add(lbl);
+        }
+
+        for (int i = 0; i < itemsLabels.size(); i++) {
+            JLabel lbl = itemsLabels.get(i);
+            if (i < items.size() && items.get(i).isVisible()) {
+                Item item = items.get(i);
+                lbl.setBounds((int) item.getX(), (int) item.getY(), 30, 30);
+                lbl.setVisible(true);
+            } else {
+                lbl.setVisible(false);
+            }
+        }
+    }
+
+    public void actualizarObstaculos(List<Point> obs) {
+        while (obstaculosLabels.size() < obs.size()) {
+            try {
+                JLabel lbl = new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("/image/Oil_Spill.png"))
+                        .getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+                panel1.add(lbl);
+                panel1.setComponentZOrder(lbl, 3);
+                obstaculosLabels.add(lbl);
+            } catch (Exception e) {
+                System.err.println("Error cargando Oil_Spill.png");
+            }
         }
 
         for (int i = 0; i < obstaculosLabels.size(); i++) {
             JLabel lbl = obstaculosLabels.get(i);
-
             if (i < obs.size()) {
                 Point p = obs.get(i);
                 lbl.setBounds(p.x, p.y, 40, 40);
@@ -123,15 +146,16 @@ public class GameWindow {
                 lbl.setVisible(false);
             }
         }
-    }
 
-    // -------------------- INPUT --------------------
+
+        panel1.revalidate();
+        panel1.repaint();
+    }
 
     private void initKeyboard() {
         panel1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(KeyEvent e) { handle(e.getKeyCode(), true); }
             public void keyReleased(KeyEvent e) { handle(e.getKeyCode(), false); }
-
             private void handle(int k, boolean s) {
                 switch (k) {
                     case KeyEvent.VK_W: case KeyEvent.VK_UP: keyboardInput.setUp(s); break;

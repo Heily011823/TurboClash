@@ -12,6 +12,7 @@ public class GameBootstrap {
 
         String id = String.valueOf(puertoLocal);
 
+        // 1. Crear el carro y el jugador local
         Car car = new Car("car-" + id, 100, 100,
                 GameConstants.CAR_WIDTH, GameConstants.CAR_HEIGHT);
 
@@ -21,19 +22,32 @@ public class GameBootstrap {
         List<Player> remotePlayers = new ArrayList<>();
         Match match = new Match(localPlayer, remotePlayers, GameConstants.DEFAULT_TARGET_SCORE);
 
+        // 2. Configurar lógica de juego
         GameRulesManager rules = new GameRulesManager(GameConstants.DEFAULT_TARGET_SCORE);
         CollisionManager collision = new CollisionManager(rules, GameConstants.COLLISION_COOLDOWN);
 
-        List<Item> items = new ArrayList<>();
+        // 3. Crear los elementos del mundo
+        List<Item> items = createItems();
         List<Obstacle> obstacles = createObstacles();
 
+        // 4. Inicializar el motor del juego
         GameEngine engine = new GameEngine(match, collision, items, obstacles);
 
+        // 5. Configurar red
         UdpPeer peer = createPeer(puertoLocal, remotePlayers);
-
         GameNetworkService network = new GameNetworkService(peer);
 
-        return new GameContext(match, engine, network, obstacles, peer);
+
+        return new GameContext(match, engine, network, obstacles, items, peer);
+    }
+
+    private List<Item> createItems() {
+        List<Item> list = new ArrayList<>();
+        // Estas son las coordenadas donde aparecerán tus monedas
+        list.add(new Item("coin-1", 200, 200, 30, 30, 10));
+        list.add(new Item("coin-2", 400, 300, 30, 30, 10));
+        list.add(new Item("coin-3", 600, 250, 30, 30, 10));
+        return list;
     }
 
     private List<Obstacle> createObstacles() {
@@ -41,12 +55,10 @@ public class GameBootstrap {
 
         list.add(new Obstacle("obs-1", 300, 200, 50, 50));
         list.add(new Obstacle("obs-2", 500, 350, 50, 50));
-
         return list;
     }
 
     private UdpPeer createPeer(int puertoLocal, List<Player> remotePlayers) {
-
         UdpPeer peer = new UdpPeer(puertoLocal);
 
         Map<Integer, String> ips = Map.of(
@@ -66,7 +78,6 @@ public class GameBootstrap {
         peer.getReceiver().setListener((msg, ip, port) -> handler.handle(msg));
 
         peer.iniciar();
-
         return peer;
     }
 }

@@ -4,6 +4,8 @@ import edu.autonoma.turboclash.input.*;
 import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.view.*;
 
+import java.util.List;
+
 public class GameLoop {
 
     private static final int FRAME_DELAY = 16;
@@ -14,30 +16,41 @@ public class GameLoop {
                     MouseInput mouse,
                     int puertoLocal) {
 
+
         boolean usaTeclado = (puertoLocal % 2 != 0);
         ViewSynchronizer viewSync = new ViewSynchronizer();
 
         Player local = context.match.getLocalPlayer();
 
+
         context.network.sendJoin(local);
 
         while (!context.match.isFinished()) {
 
-            // INPUT
-            if (usaTeclado) keyboard.update(local.getCar());
-            else mouse.update(local.getCar());
+            // 1. INPUT: Capturar entrada del usuario
+            if (usaTeclado) {
+                keyboard.update(local.getCar());
+            } else {
+                mouse.update(local.getCar());
+            }
 
-            // LOGIC
             context.engine.update();
 
-            // VIEW
-            viewSync.sync(window, context.match, context.obstacles);
 
-            // NETWORK
+            viewSync.sync(
+                    window,
+                    context.match,
+                    context.obstacles,
+                    context.items
+            );
+
+
             context.network.sendMovement(local);
+
 
             sleep();
         }
+
 
         context.network.sendLeave(local);
         context.peer.cerrar();
@@ -47,7 +60,7 @@ public class GameLoop {
         try {
             Thread.sleep(FRAME_DELAY);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 }
