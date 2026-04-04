@@ -17,7 +17,7 @@ public class StartWindow {
             frame.dispose();
 
             // abrir la siguiente
-            new EndGameWindowFrame();
+            new IntroductionWindowFrame();
         });
     }
 
