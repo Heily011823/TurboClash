@@ -10,7 +10,7 @@ public class GameWindowFrame extends JFrame {
 
         view.panel1.setOpaque(false);
 
-        FondoPanel fondo = new FondoPanel("/image/Track.png");
+        FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
         fondo.setLayout(new java.awt.BorderLayout());
         fondo.add(view.panel1);
 
@@ -19,6 +19,8 @@ public class GameWindowFrame extends JFrame {
         setTitle("Juego");
         setSize(800, 600);
         setLocationRelativeTo(null);
+        setResizable(false);
         setVisible(true);
+
     }
 }

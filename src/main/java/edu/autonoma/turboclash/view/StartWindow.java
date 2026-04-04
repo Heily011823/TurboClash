@@ -1,7 +1,5 @@
 package edu.autonoma.turboclash.view;
 
-import edu.autonoma.turboclash.view.IntroductionWindowFrame;
-
 import javax.swing.*;
 
 public class StartWindow {
@@ -20,4 +18,6 @@ public class StartWindow {
             new IntroductionWindowFrame();
         });
     }
+
+
 }

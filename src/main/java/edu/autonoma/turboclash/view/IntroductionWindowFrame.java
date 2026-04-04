@@ -16,6 +16,8 @@ public class IntroductionWindowFrame extends JFrame {
         setTitle("Introducción");
         setSize(800, 600);
         setLocationRelativeTo(null);
+
+        setResizable(false);
         setVisible(true);
     }
 }
