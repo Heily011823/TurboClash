@@ -10,14 +10,10 @@ public class StartWindow {
 
         btnJugar.addActionListener(e -> {
 
-            // cerrar ventana actual
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(panel1);
             frame.dispose();
 
-            // abrir la siguiente
             new IntroductionWindowFrame();
         });
     }
-
-
 }

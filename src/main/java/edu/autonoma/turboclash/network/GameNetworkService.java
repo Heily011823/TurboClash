@@ -36,8 +36,8 @@ public class GameNetworkService {
         msg.type = type;
         msg.playerId = player.getId();
         msg.playerName = player.getName();
-        msg.posX = player.getCar().getPosX();
-        msg.posY = player.getCar().getPosY();
+        msg.posX = player.getCar().getX();
+        msg.posY = player.getCar().getY();
         msg.time = System.currentTimeMillis();
         msg.event = "";
         return msg;

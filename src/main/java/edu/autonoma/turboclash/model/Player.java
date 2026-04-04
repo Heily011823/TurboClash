@@ -14,9 +14,21 @@ public class Player {
         this.score = new Score();
     }
 
-    public void move(double x, double y) {
-        car.moveTo(x, y);
+
+    public void move(double dx, double dy) {
+        if (car != null) {
+            car.move(dx, dy);
+        }
     }
+
+
+    public void syncFromNetwork(double x, double y, int score) {
+        if (car != null) {
+            car.setPosition(x, y);
+        }
+        this.setScore(score);
+    }
+
 
     public void updateScore(int amount) {
         score.update(amount);
@@ -30,11 +42,6 @@ public class Player {
         this.score.setPoints(points);
     }
 
-    public void syncFromNetwork(double x, double y, int score) {
-        this.move(x, y);
-        this.setScore(score);
-    }
-
 
     public void loseLife() {
         if (car != null) {
@@ -42,7 +49,17 @@ public class Player {
         }
     }
 
-    // getters
+    public int getLives() {
+        return (car != null) ? car.getLives() : 0;
+    }
+
+    public void setLives(int lives) {
+        if (car != null) {
+            car.setLives(lives);
+        }
+    }
+
+
     public Car getCar() { return car; }
     public String getId() { return id; }
     public String getName() { return name; }

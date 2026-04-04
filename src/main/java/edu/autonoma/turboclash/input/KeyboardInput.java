@@ -16,8 +16,8 @@ public class KeyboardInput implements InputHandler {
 
         int speed = 5;
 
-        double newX = car.getPosX();
-        double newY = car.getPosY();
+        double newX = car.getX();
+        double newY = car.getY();
 
         if (up) newY -= speed;
         if (down) newY += speed;

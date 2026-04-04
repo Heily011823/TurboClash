@@ -1,16 +1,18 @@
-
 package edu.autonoma.turboclash.view;
+
 import javax.swing.*;
+import java.awt.*;
 
 public class StartWindowFrame extends JFrame {
 
     public StartWindowFrame() {
+
         StartWindow view = new StartWindow();
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/Game_Cover.png");
 
-        fondo.setLayout(new java.awt.BorderLayout());
+        fondo.setLayout(new BorderLayout());
         fondo.add(view.panel1);
 
         setContentPane(fondo);

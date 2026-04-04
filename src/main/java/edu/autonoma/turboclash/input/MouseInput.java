@@ -13,8 +13,8 @@ public class MouseInput implements InputHandler {
 
     @Override
     public void update(Car car) {
-        double dx = targetX - car.getPosX();
-        double dy = targetY - car.getPosY();
+        double dx = targetX - car.getX();
+        double dy = targetY - car.getY();
 
         car.move(dx * 0.1, dy * 0.1);
     }

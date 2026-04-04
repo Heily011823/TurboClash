@@ -8,6 +8,7 @@ public class GameConstants {
     /** Puntos ganados al recoger una moneda */
     public static final int COIN_VALUE = 20;
 
+    public static final long COLLISION_COOLDOWN = 500;
     /** Puntos perdidos al chocar con un obstáculo */
     public static final int OBSTACLE_PENALTY = 10;
 

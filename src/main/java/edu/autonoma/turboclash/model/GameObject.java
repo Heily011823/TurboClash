@@ -1,6 +1,7 @@
 package edu.autonoma.turboclash.model;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
 public abstract class GameObject {
 
@@ -19,23 +20,36 @@ public abstract class GameObject {
         this.height = height;
     }
 
-
     public abstract void draw(Graphics g);
 
-    //  COLISIÓN (AABB)
+
+    public Rectangle getBounds() {
+        return new Rectangle(
+                (int) posX,
+                (int) posY,
+                width,
+                height
+        );
+    }
+
+
     public boolean collidesWith(GameObject other) {
         if (other == null || !this.visible || !other.visible) return false;
 
-        return this.posX < other.posX + other.width &&
-                this.posX + this.width > other.posX &&
-                this.posY < other.posY + other.height &&
-                this.posY + this.height > other.posY;
+        return this.getBounds().intersects(other.getBounds());
     }
 
-    // GETTERS BÁSICOS
+
+    public void setPosition(double x, double y) {
+        this.posX = x;
+        this.posY = y;
+    }
+
+    public double getX() { return posX; }
+    public double getY() { return posY; }
+
+
     public String getId() { return id; }
-    public double getPosX() { return posX; }
-    public double getPosY() { return posY; }
     public boolean isVisible() { return visible; }
 
     public void setVisible(boolean visible) {
