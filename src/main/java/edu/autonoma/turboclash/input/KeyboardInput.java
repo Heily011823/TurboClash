@@ -13,11 +13,17 @@ public class KeyboardInput implements InputHandler {
 
     @Override
     public void update(Car car) {
+
         int speed = 5;
 
-        if (up) car.move(0, -speed);
-        if (down) car.move(0, speed);
-        if (left) car.move(-speed, 0);
-        if (right) car.move(speed, 0);
+        double newX = car.getPosX();
+        double newY = car.getPosY();
+
+        if (up) newY -= speed;
+        if (down) newY += speed;
+        if (left) newX -= speed;
+        if (right) newX += speed;
+
+        car.moveTo(newX, newY);
     }
 }

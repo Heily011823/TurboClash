@@ -1,9 +1,12 @@
 package edu.autonoma.turboclash.view;
+
+import edu.autonoma.turboclash.main.GameApplication;
+
 import javax.swing.*;
 import java.awt.*;
-import edu.autonoma.turboclash.view.GameWindowFrame;
 
 public class IntroductionWindow {
+
     public JPanel panel1;
     private JButton btnEmpezar;
     private JTextField txtNombre;
@@ -13,13 +16,13 @@ public class IntroductionWindow {
     private JLabel iconInformacion;
 
     public IntroductionWindow() {
+
         ImageIcon iconoOriginal = new ImageIcon(getClass().getResource("/image/Start.png"));
-
-        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(120, 120, java.awt.Image.SCALE_SMOOTH);
-
+        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
         ImageIcon iconoFinal = new ImageIcon(imagenEscalada);
 
         iconInformacion.setIcon(iconoFinal);
+
         btnEmpezar.addActionListener(e -> {
 
             String nombre1 = txtNombre.getText().trim();
@@ -27,12 +30,14 @@ public class IntroductionWindow {
             String nombre3 = txtNombre3.getText().trim();
             String nombre4 = txtNombre4.getText().trim();
 
-            // cerrar ventana actual
+
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(panel1);
             frame.dispose();
 
-            // abrir juego
-            new GameWindowFrame();
+
+            new Thread(() -> {
+                new GameApplication().start();
+            }).start();
         });
     }
 }

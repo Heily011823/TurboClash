@@ -1,12 +1,17 @@
 package edu.autonoma.turboclash.view;
 
+import edu.autonoma.turboclash.input.KeyboardInput;
+import edu.autonoma.turboclash.input.MouseInput;
+
 import javax.swing.*;
 
 public class GameWindowFrame extends JFrame {
 
-    public GameWindowFrame() {
+    private GameWindow view;
 
-        GameWindow view = new GameWindow();
+    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
+
+        view = new GameWindow(keyboardInput, mouseInput);
 
         view.panel1.setOpaque(false);
 
@@ -20,7 +25,16 @@ public class GameWindowFrame extends JFrame {
         setSize(800, 600);
         setLocationRelativeTo(null);
         setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         setVisible(true);
 
+
+        view.panel1.requestFocusInWindow();
+    }
+
+
+    public GameWindow getView() {
+        return view;
     }
 }

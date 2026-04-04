@@ -3,12 +3,22 @@ package edu.autonoma.turboclash.main;
 import edu.autonoma.turboclash.logic.*;
 import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.network.*;
+import edu.autonoma.turboclash.input.*;
+import edu.autonoma.turboclash.view.*;
 
 import java.util.*;
 
 public class GameApplication {
 
     public void start() {
+
+        // --- INPUT ---
+        KeyboardInput keyboardInput = new KeyboardInput();
+        MouseInput mouseInput = new MouseInput();
+
+        // --- VENTANA ---
+        GameWindowFrame frame = new GameWindowFrame(keyboardInput, mouseInput);
+        GameWindow window = frame.getView();
 
         // --- JUGADOR LOCAL ---
         Car carLocal = new Car("c1", 100, 100, 40, 40);
@@ -37,16 +47,18 @@ public class GameApplication {
 
         GameEngine engine = new GameEngine(match, collision, items, obstacles, peers);
 
-        //  Handler (recepción)
-        GameMessageHandler handler = new GameMessageHandler(remotePlayers);
+        // --- CONTROL ---
+        boolean usaTeclado = (puertoLocal == 5001 || puertoLocal == 5002);
 
+        // --- RECEPCIÓN ---
+        GameMessageHandler handler = new GameMessageHandler(remotePlayers);
         peer.getReceiver().setListener((msg, ip, port) -> {
             handler.handle(msg);
         });
 
         peer.iniciar();
 
-        // Servicio de red (envío)
+        // --- RED ENVÍO ---
         GameNetworkService networkService = new GameNetworkService(peer);
 
         // --- JOIN ---
@@ -55,6 +67,14 @@ public class GameApplication {
         // --- LOOP ---
         while (!match.isFinished()) {
 
+            // 🎮 INPUT
+            if (usaTeclado) {
+                keyboardInput.update(localPlayer.getCar());
+            } else {
+                mouseInput.update(localPlayer.getCar());
+            }
+
+            // 🧠 LÓGICA
             engine.update();
 
             Player winner = rules.getWinner(match, null);
@@ -63,6 +83,17 @@ public class GameApplication {
                 break;
             }
 
+            // 🖼️ ACTUALIZAR VISTA
+            List<Car> cars = new ArrayList<>();
+            cars.add(localPlayer.getCar());
+
+            for (Player p : remotePlayers) {
+                cars.add(p.getCar());
+            }
+
+            window.actualizarCarros(cars);
+
+            // 🌐 RED
             networkService.sendMovement(localPlayer);
 
             sleep();
