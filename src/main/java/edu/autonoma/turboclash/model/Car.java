@@ -93,4 +93,13 @@ public class Car extends GameObject {
         this.speedPenaltyEndTime = 0;
         this.finishLineReached = false;
     }
+
+    public void move(double dx, double dy) {
+        if (!active) return;
+
+        this.posX += dx * speedMultiplier;
+        this.posY += dy * speedMultiplier;
+    }
 }
+
+
