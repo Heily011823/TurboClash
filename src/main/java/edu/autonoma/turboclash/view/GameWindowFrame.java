@@ -8,6 +8,7 @@ import javax.swing.*;
 public class GameWindowFrame extends JFrame {
 
     private GameWindow view;
+    private FondoAnimadoPanel fondo; //
 
     public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
 
@@ -15,9 +16,11 @@ public class GameWindowFrame extends JFrame {
 
         view.panel1.setOpaque(false);
 
-        FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
+        fondo = new FondoAnimadoPanel("/image/Track.png");
         fondo.setLayout(new java.awt.BorderLayout());
         fondo.add(view.panel1);
+
+        view.setFondo(fondo);
 
         setContentPane(fondo);
 
@@ -29,10 +32,8 @@ public class GameWindowFrame extends JFrame {
 
         setVisible(true);
 
-
         view.panel1.requestFocusInWindow();
     }
-
 
     public GameWindow getView() {
         return view;

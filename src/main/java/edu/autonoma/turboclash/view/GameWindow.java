@@ -18,7 +18,7 @@ public class GameWindow {
 
     private KeyboardInput keyboardInput;
     private MouseInput mouseInput;
-
+    private FondoAnimadoPanel fondo;
     private List<JLabel> carrosLabels = new ArrayList<>();
     private List<JLabel> corazones = new ArrayList<>();
     private List<JLabel> obstaculosLabels = new ArrayList<>();
@@ -28,6 +28,9 @@ public class GameWindow {
             "/image/Car_Blue.png", "/image/Car_Red.png",
             "/image/Car_Yellow.png", "/image/Car_Brown.png"
     };
+    public void setFondo(FondoAnimadoPanel fondo) {
+        this.fondo = fondo;
+    }
 
     public GameWindow(KeyboardInput keyboardInput, MouseInput mouseInput) {
         this.keyboardInput = keyboardInput;
@@ -81,23 +84,38 @@ public class GameWindow {
             panel1.add(lbl);
             panel1.setComponentZOrder(lbl, 1);
         }
-
         for (int i = 0; i < cars.size(); i++) {
             Car car = cars.get(i);
             JLabel lbl = carrosLabels.get(i);
             int idNum = Math.abs(car.getId().hashCode());
-
             try {
                 ImageIcon icon = new ImageIcon(getClass().getResource(SKINS[idNum % SKINS.length]));
                 lbl.setIcon(new ImageIcon(icon.getImage().getScaledInstance(100, 50, Image.SCALE_SMOOTH)));
-                lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
+                int x = (int) car.getX();
+                int y = (int) car.getY();
+                int anchoCarro = 100;
+                int altoCarro = 50;
+                int anchoPanel = panel1.getWidth();
+                int altoPanel = panel1.getHeight();
+                if (x < 0) x = 0;
+                if (y < 50) y = 50;
+                if (x > anchoPanel - anchoCarro) x = anchoPanel - anchoCarro;
+                if (y > altoPanel - altoCarro) y = altoPanel - altoCarro;
+                lbl.setBounds(x, y, anchoCarro, altoCarro);
                 lbl.setVisible(true);
+                // FINAL DEL JUEGO CUANDO EL CARRO PASE TODA LA META
+                if (fondo != null && fondo.isMetaVisible() && !fondo.isJuegoTerminado()) {
+                    int metaX = fondo.getMetaX();
+                    int anchoMeta = 200;
+                    if (x + anchoCarro >= metaX) {
+                        fondo.terminarJuego();
+                    }
+                }
             } catch (Exception e) {
-                lbl.setText("CAR"); // Fallback si no hay imagen
+                lbl.setText("CAR");
             }
         }
     }
-
     public void actualizarItems(List<Item> items) {
         while (itemsLabels.size() < items.size()) {
             JLabel lbl = new JLabel();
