@@ -1,153 +1,80 @@
 package edu.autonoma.turboclash.logic;
 
-import edu.autonoma.turboclash.model.Match;
 import edu.autonoma.turboclash.model.Player;
 
-
+/**
+ * GameRulesManager: El "Cerebro" de las reglas del juego.
+ * Implementa las 5 reglas principales de TurboClash.
+ */
 public class GameRulesManager {
 
-    private final int scoreToWin;
+    private final int targetScore;
 
-    public GameRulesManager(int scoreToWin) {
-        if (scoreToWin <= 0) {
-            throw new IllegalArgumentException("El puntaje objetivo debe ser mayor que cero.");
-        }
-        this.scoreToWin = scoreToWin;
+    public GameRulesManager(int targetScore) {
+        this.targetScore = targetScore;
     }
 
 
-    // REGLA 1: MONEDAS (+20)
+    // REGLA 1: COLECCIÓN DE MONEDAS
 
-    public void applyCoinReward(Player player) {
-        if (!isValid(player)) return;
-        player.updateScore(GameConstants.COIN_VALUE);
+    public void applyCoinReward(Player p) {
+        if (p == null) return;
+        p.updateScore(GameConstants.COIN_VALUE); // +20 puntos
     }
 
+    // REGLA 2: CHOQUE CON OBSTÁCULOS
 
-    // REGLA 2: OBSTÁCULOS (-10 + velocidad)
-
-    public void applyObstaclePenalty(Player player) {
-        if (!isValid(player)) return;
-
-        player.updateScore(-GameConstants.OBSTACLE_PENALTY);
-        applySpeedDebuff(player);
+    public void applyObstaclePenalty(Player p) {
+        if (p == null) return;
+        p.updateScore(-GameConstants.OBSTACLE_PENALTY); // -10 puntos
+        applySpeedDebuff(p); // Regla 4: Penalización de velocidad
     }
 
-
-    // REGLA 3: COLISIÓN ENTRE JUGADORES (-1 vida)
+    // REGLA 3: COLISIÓN ENTRE JUGADORES
 
     public void handlePlayersCollision(Player p1, Player p2) {
-        if (!isValid(p1) || !isValid(p2)) return;
-
-        // Pierden una vida
-        p1.loseLife();
-        p2.loseLife();
-
-        // Penalización de velocidad
-        applySpeedDebuff(p1);
-        applySpeedDebuff(p2);
-    }
-
-
-    // REGLA 4: DEBUFF DE VELOCIDAD (50% por 2s)
-
-    private void applySpeedDebuff(Player player) {
-        player.getCar().applySpeedModifier(
-                GameConstants.DEBUFF_SPEED_FACTOR,
-                GameConstants.DEBUFF_DURATION_MS
-        );
-    }
-
-
-    // REGLA 5: BONO DE META (+50)
-
-    public void applyFinishBonus(Player player) {
-        if (!isValid(player)) return;
-        player.updateScore(GameConstants.FINISH_LINE_BONUS);
-    }
-
-
-    // CONDICIONES DE VICTORIA
-    // Prioridad 1: Llegar a la meta
-    public boolean checkWinByReachFinish(Player player) {
-        if (!isValid(player)) return false;
-
-        if (player.getCar().hasReachedFinishLine()) {
-            applyFinishBonus(player);
-            return true;
+        if (p1 != null) {
+            p1.loseLife(); // Resta 1 corazón
+            applySpeedDebuff(p1); // Regla 4
         }
-        return false;
-    }
-
-    // Prioridad 2: Puntaje
-    public boolean checkWinByScore(Player player) {
-        return isValid(player) && player.getCurrentPoints() >= scoreToWin;
-    }
-
-
-     //Determina el ganador del juego
-
-    public Player getWinner(Match game, TimeManager timeManager) {
-        if (game == null) return null;
-
-        // 1. META (máxima prioridad)
-        Player winner = checkFinishWinner(game);
-        if (winner != null) return winner;
-
-        // 2. PUNTAJE
-        winner = checkScoreWinner(game);
-        if (winner != null) return winner;
-
-        // 3. TIEMPO
-        if (timeManager != null && timeManager.isTimeUp()) {
-            return determineWinnerByHighestScore(game);
+        if (p2 != null) {
+            p2.loseLife(); // Resta 1 corazón
+            applySpeedDebuff(p2); // Regla 4
         }
-
-        return null;
     }
 
 
-    // MÉTODOS PRIVADOS
+    // REGLA 4: PENALIZACIÓN DE VELOCIDAD (DEBUFF)
 
-
-    private Player checkFinishWinner(Match game) {
-        if (checkWinByReachFinish(game.getLocalPlayer())) {
-            return game.getLocalPlayer();
+    private void applySpeedDebuff(Player p) {
+        if (p != null && p.getCar() != null) {
+            // Reduce al 50% por 2 segundos (definido en GameConstants)
+            p.getCar().applyDebuff(
+                    GameConstants.DEBUFF_SPEED_FACTOR,
+                    GameConstants.DEBUFF_DURATION_MS
+            );
         }
-
-        for (Player p : game.getRemotePlayers()) {
-            if (checkWinByReachFinish(p)) {
-                return p;
-            }
-        }
-        return null;
     }
 
-    private Player checkScoreWinner(Match game) {
-        if (checkWinByScore(game.getLocalPlayer())) {
-            return game.getLocalPlayer();
-        }
 
-        for (Player p : game.getRemotePlayers()) {
-            if (checkWinByScore(p)) {
-                return p;
-            }
+    // REGLA 5: BONO DE META
+
+    public void applyFinishBonus(Player p) {
+        if (p == null || p.getCar() == null) return;
+
+
+        if (!p.getCar().isFinishReached()) {
+            p.updateScore(GameConstants.FINISH_LINE_BONUS); // +50 puntos
+            p.getCar().setFinishReached(true);
         }
-        return null;
     }
 
-    private Player determineWinnerByHighestScore(Match game) {
-        Player winner = game.getLocalPlayer();
+    // VALIDACIÓN DE VICTORIA
 
-        for (Player p : game.getRemotePlayers()) {
-            if (p.getCurrentPoints() > winner.getCurrentPoints()) {
-                winner = p;
-            }
-        }
-        return winner;
-    }
+    public boolean hasWon(Player p) {
+        if (p == null || p.getCar() == null) return false;
 
-    private boolean isValid(Player player) {
-        return player != null;
+        // Gana por puntaje objetivo o por cruzar la meta
+        return p.getCurrentPoints() >= targetScore || p.getCar().isFinishReached();
     }
 }
