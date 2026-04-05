@@ -22,20 +22,7 @@ public class GameStateValidator {
     public static void validateStart(boolean playersConnected) throws InvalidGameStateException {
 
         if (!playersConnected) {
-            throw new InvalidGameStateException("No se puede iniciar el juego sin jugadores");
-        }
-    }
-
-    /**
-     * Valida si la partida puede finalizar.
-     *
-     * @param gameStarted Indica si la partida ha iniciado.
-     * @throws InvalidGameStateException Se lanza la excepción si la partida no ha comenzado.
-     */
-    public static void validateEnd(boolean gameStarted) throws InvalidGameStateException {
-
-        if (!gameStarted) {
-            throw new InvalidGameStateException("No se puede finalizar el juego sin iniciar");
+            throw new InvalidGameStateException("No se puede iniciar el juego sin los 4 jugadores");
         }
     }
 }
