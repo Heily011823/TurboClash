@@ -4,6 +4,9 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.autonoma.turboclash.validation.PortValidator;
+import edu.autonoma.turboclash.exception.InvalidPortException;
+
 public class UdpPeer {
 
     private DatagramSocket socket;
@@ -31,8 +34,15 @@ public class UdpPeer {
     }
 
     public void agregarPeer(String ip, int puerto) {
-        peers.add(new PeerInfo(ip, puerto));
-        System.out.println("Peer agregado: " + ip + ":" + puerto);
+        try {
+            PortValidator.validate(puerto);
+
+            peers.add(new PeerInfo(ip, puerto));
+            System.out.println("Peer agregado: " + ip + ":" + puerto);
+
+        } catch (InvalidPortException e) {
+            System.err.println("Puerto inválido: " + e.getMessage());
+        }
     }
 
     public void iniciar() {
