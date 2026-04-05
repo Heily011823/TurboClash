@@ -1,7 +1,6 @@
 package edu.autonoma.turboclash.network;
 
 import edu.autonoma.turboclash.model.*;
-
 import java.util.List;
 
 public class GameMessageHandler {
@@ -13,17 +12,13 @@ public class GameMessageHandler {
     }
 
     public void handle(GameMessage msg) {
+        if (msg == null) return;
 
         switch (msg.type) {
-
             case PLAYER_JOINED -> handleJoin(msg);
-
             case MOVEMENT -> handleMovement(msg);
-
             case SCORE_UPDATE -> handleScore(msg);
-
             case PLAYER_LEFT -> handleLeft(msg);
-
             default -> {}
         }
     }
@@ -33,7 +28,9 @@ public class GameMessageHandler {
                 .anyMatch(p -> p.getId().equals(msg.playerId));
 
         if (!existe) {
-            Car car = new Car("c_" + msg.playerId, msg.posX, msg.posY, 40, 40);
+
+            Car car = new Car("c_" + msg.playerId, msg.posX, msg.posY, "Red");
+
             Player nuevo = new Player(msg.playerId, msg.playerName, car);
             remotePlayers.add(nuevo);
         }
@@ -42,7 +39,7 @@ public class GameMessageHandler {
     private void handleMovement(GameMessage msg) {
         for (Player p : remotePlayers) {
             if (p.getId().equals(msg.playerId)) {
-                p.getCar().moveTo(msg.posX, msg.posY);
+                p.getCar().setPosition(msg.posX, msg.posY);
             }
         }
     }

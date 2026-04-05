@@ -24,6 +24,6 @@ public class KeyboardInput implements InputHandler {
         if (left) newX -= speed;
         if (right) newX += speed;
 
-        car.moveTo(newX, newY);
+        car.setPosition(newX, newY);
     }
 }
