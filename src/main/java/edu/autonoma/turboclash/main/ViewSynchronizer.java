@@ -2,31 +2,36 @@ package edu.autonoma.turboclash.main;
 
 import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.view.*;
-
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewSynchronizer {
+    private final List<Car> carBuffer = new ArrayList<>();
 
-    public void sync(GameWindow window, Match match, List<Obstacle> obstacles) {
+    public void sync(GameWindow window, Match match, List<Obstacle> obstacles, List<Item> items) {
+        if (window == null || match == null) return;
 
-        Player local = match.getLocalPlayer();
+        Player localPlayer = match.getLocalPlayer();
 
-        window.actualizarPuntaje(local.getCurrentPoints());
-        window.actualizarCorazones(local.getLives(), local.getCar());
+        window.updateScore(localPlayer.getCurrentPoints());
+        window.updateHealth(localPlayer.getLives(), localPlayer.getCar());
+        prepareCarList(localPlayer, match.getRemotePlayers());
+        window.updateCars(carBuffer);
+        window.updateObstacles(obstacles);
+        window.updateItems(items);
 
-        List<Car> cars = new ArrayList<>();
-        cars.add(local.getCar());
-        match.getRemotePlayers().forEach(p -> cars.add(p.getCar()));
-
-        window.actualizarCarros(cars);
-
-        List<Point> puntos = new ArrayList<>();
-        for (Obstacle o : obstacles) {
-            puntos.add(new Point((int) o.getX(), (int) o.getY()));
+        if (window.panel1 != null) {
+            window.panel1.repaint();
         }
+    }
 
-        window.actualizarObstaculos(puntos);
+    private void prepareCarList(Player local, List<Player> remotes) {
+        carBuffer.clear();
+        if (local.getCar() != null) carBuffer.add(local.getCar());
+        if (remotes != null) {
+            for (Player p : remotes) {
+                if (p.getCar() != null) carBuffer.add(p.getCar());
+            }
+        }
     }
 }
