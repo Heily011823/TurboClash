@@ -3,7 +3,10 @@ package edu.autonoma.turboclash.main;
 import edu.autonoma.turboclash.input.*;
 import edu.autonoma.turboclash.logic.GameSpawner; // Importamos el hilito
 import edu.autonoma.turboclash.model.*;
+import edu.autonoma.turboclash.sound.SoundManager;
 import edu.autonoma.turboclash.view.*;
+
+import java.util.List;
 
 public class GameLoop {
 
@@ -25,6 +28,8 @@ public class GameLoop {
 
             context.engine.update();
 
+            detectObstacles(local.getCar(), context.obstacles);
+
             viewSync.sync(window, context.match, context.obstacles, context.engine.getItems());
 
             context.network.sendMovement(local);
@@ -34,6 +39,15 @@ public class GameLoop {
         spawner.stop();
         context.network.sendLeave(local);
         context.peer.cerrar();
+    }
+
+    private void detectObstacles(Car car, List<Obstacle> obstacles) {
+        for (Obstacle obs : obstacles) {
+            if (!obs.isProcessed() && car.getBounds().intersects(obs.getBounds())) {
+                obs.setProcessed(true);
+                SoundManager.getInstance().playEffect(SoundManager.Sound.BRAKE);
+            }
+        }
     }
 
     private void sleep() {
