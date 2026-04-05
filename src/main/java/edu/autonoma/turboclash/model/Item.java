@@ -1,26 +1,19 @@
 package edu.autonoma.turboclash.model;
 
-import java.awt.Graphics;
-
+/**
+ * Item: Represents collectible objects like coins.
+ * Pure model class: contains only data and logic, no rendering.
+ */
 public class Item extends GameObject {
 
-    private final int value;
+    private final int scoreValue = 20;
 
-    public Item(String id, double x, double y, int w, int h, int value) {
-        super(id, x, y, w, h);
-        this.value = Math.max(0, value);
+    public Item(String id, double x, double y, int width, int height) {
+        // We call the parent constructor (GameObject)
+        super(id, x, y, width, height);
     }
 
-    public void applyEffect(Player player) {
-        if (player != null && visible) {
-            player.updateScore(value);
-            visible = false;
-        }
-    }
-
-    @Override
-    public void draw(Graphics g) {
-        if (!visible) return;
-        g.fillOval((int) posX, (int) posY, width, height);
+    public int getScoreValue() {
+        return scoreValue;
     }
 }

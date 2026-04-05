@@ -1,29 +1,28 @@
 package edu.autonoma.turboclash.model;
 
-import edu.autonoma.turboclash.logic.GameConstants;
-import java.awt.Graphics;
-import java.awt.Color;
-
+/**
+ * Obstacle: Represents hazards on the track.
+ * Pure model class: images are handled by the View layer.
+ */
 public class Obstacle extends GameObject {
 
-    private int penalty = GameConstants.OBSTACLE_PENALTY;
+    private final String type; // e.g., "OIL", "BARRIER", "CONE"
+    private boolean processed = false;
 
-    public Obstacle(String id, double x, double y, int w, int h) {
-        super(id, x, y, w, h);
+    public Obstacle(String id, double x, double y, int width, int height, String type) {
+        super(id, x, y, width, height);
+        this.type = type;
     }
 
-
-    public void affectPlayer(Player player) {
-
-        if (player != null && isVisible()) {
-            player.updateScore(-penalty);
-        }
+    public String getType() {
+        return type;
     }
 
-    @Override
-    public void draw(Graphics g) {
-        if (!isVisible()) return; // Usamos el getter heredado
-        g.setColor(Color.RED);
-        g.fillRect((int) posX, (int) posY, width, height);
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 }

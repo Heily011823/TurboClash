@@ -19,30 +19,34 @@ public class Match {
     }
 
     public void check() {
-        if (finished) return; // Si ya terminó, no hace nada
+        if (finished) return;
 
-        // Revisar Jugador Local
-        if (localPlayer.getCurrentPoints() >= targetScore || localPlayer.getCar().hasReachedFinishLine()) {
+        // 1. Revisar Jugador Local
+        // CAMBIO: Se usa isFinishReached() en lugar de hasReachedFinishLine()
+        if (localPlayer.getCurrentPoints() >= targetScore || localPlayer.getCar().isFinishReached()) {
             this.finished = true;
             this.winner = localPlayer;
             return;
         }
 
-        // Revisar Jugadores Remotos
+        // 2. Revisar Jugadores Remotos
         for (Player p : remotePlayers) {
-            if (p.getCurrentPoints() >= targetScore || p.getCar().hasReachedFinishLine()) {
+            // CAMBIO: Se usa isFinishReached() aquí también
+            if (p.getCurrentPoints() >= targetScore || p.getCar().isFinishReached()) {
                 this.finished = true;
                 this.winner = p;
                 return;
             }
         }
     }
+
     public List<Player> getPlayers() {
         List<Player> all = new ArrayList<>();
-        all.add(localPlayer);
-        all.addAll(remotePlayers);
+        if (localPlayer != null) all.add(localPlayer);
+        if (remotePlayers != null) all.addAll(remotePlayers);
         return all;
     }
+
     public void setFinished(Player winner) {
         this.finished = true;
         this.winner = winner;
