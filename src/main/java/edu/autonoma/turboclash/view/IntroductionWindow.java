@@ -1,9 +1,11 @@
 package edu.autonoma.turboclash.view;
 
 import edu.autonoma.turboclash.main.GameApplication;
+import edu.autonoma.turboclash.validation.GameStateValidator;
 import edu.autonoma.turboclash.validation.PlayerNameValidator;
 import edu.autonoma.turboclash.exception.InvalidNameException;
 import edu.autonoma.turboclash.exception.DuplicateDataException;
+import edu.autonoma.turboclash.exception.InvalidGameStateException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,13 +37,18 @@ public class IntroductionWindow {
         try {
             List<String> jugadores = obtenerJugadores();
 
+            boolean todosLlenos = jugadores.stream()
+                    .allMatch(nombre -> !nombre.isEmpty());
+
+            GameStateValidator.validateStart(todosLlenos);
+
             validarJugadores(jugadores);
 
             cerrarVentana();
 
             new Thread(() -> new GameApplication().start()).start();
 
-        } catch (InvalidNameException | DuplicateDataException ex) {
+        } catch (InvalidNameException | DuplicateDataException | InvalidGameStateException ex) {
             mostrarError(ex.getMessage());
         }
     }
