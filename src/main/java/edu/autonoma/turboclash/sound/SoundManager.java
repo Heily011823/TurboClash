@@ -5,10 +5,11 @@ import java.io.InputStream;
 
 public class SoundManager {
 
+    private static SoundManager instance;
     private Clip backgroundClip;
-    private static final String BASE_PATH = "/edu/autonoma/turboclash/sound/";
+    private static final String BASE_PATH = "/sound/";
 
-    // Enum de sonidos (NO es variable quemada, es controlado)
+    // Enum de sonidos
     public enum Sound {
         COLLISION("CollisionSound.wav"),
         POINT("CoinSound.wav"),
@@ -16,7 +17,7 @@ public class SoundManager {
         END("GameOverSound.wav"),
         WIN("WinSound.wav"),
         BRAKE("BrakeSound.wav"),
-        MENU("Game_Cover_Sound.wav");
+        MENU("GameCoverSound.wav");
 
         private final String fileName;
 
@@ -29,6 +30,15 @@ public class SoundManager {
         }
     }
 
+    private SoundManager() {}
+
+    public static SoundManager getInstance() {
+        if (instance == null) {
+                instance = new SoundManager();
+        }
+        return instance;
+    }
+
     // Música en loop
     public void playBackground(Sound sound) {
         try {
@@ -37,7 +47,7 @@ public class SoundManager {
             InputStream input = getClass().getResourceAsStream(BASE_PATH + sound.getFileName());
 
             if (input == null) {
-                System.err.println("No se encontró: " + sound.getFileName());
+                System.err.println("No se encontró: " + BASE_PATH + sound.getFileName());
                 return;
             }
 
@@ -71,10 +81,11 @@ public class SoundManager {
                 return;
             }
 
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(input);
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioStream);
-            clip.start();
+            try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(input)) {
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioStream);
+                clip.start();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

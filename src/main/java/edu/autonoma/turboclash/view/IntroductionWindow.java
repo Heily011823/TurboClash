@@ -6,6 +6,7 @@ import edu.autonoma.turboclash.validation.PlayerNameValidator;
 import edu.autonoma.turboclash.exception.InvalidNameException;
 import edu.autonoma.turboclash.exception.DuplicateDataException;
 import edu.autonoma.turboclash.exception.InvalidGameStateException;
+import edu.autonoma.turboclash.sound.SoundManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +23,7 @@ public class IntroductionWindow {
     private JTextField txtNombre3;
     private JTextField txtNombre4;
     private JLabel iconInformacion;
+    private SoundManager soundManager = SoundManager.getInstance();
 
     public IntroductionWindow() {
 
@@ -45,6 +47,8 @@ public class IntroductionWindow {
             validarJugadores(jugadores);
 
             cerrarVentana();
+
+            SoundManager.getInstance().stopBackground();
 
             new Thread(() -> new GameApplication().start()).start();
 
