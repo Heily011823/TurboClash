@@ -49,6 +49,8 @@ public class GameWindow {
             Puntaje.setForeground(Color.YELLOW);
             Puntaje.setFont(new Font("Arial", Font.BOLD, 24));
             Puntaje.setText("Score: 0");
+
+            Puntaje.setBounds(20, 43, 200, 40);
         }
     }
 
