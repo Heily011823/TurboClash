@@ -1,5 +1,7 @@
 package edu.autonoma.turboclash.network.message;
 
+import edu.autonoma.turboclash.model.CarSkin;
+
 public class GameMessage {
 
     private MessageType type;
@@ -11,10 +13,13 @@ public class GameMessage {
     private long time;
     private String event;
 
+
+    private CarSkin carSkin;
+
     public GameMessage() {}
 
     public GameMessage(MessageType type, String playerId, String playerName,
-                       double posX, double posY, int score, long time, String event) {
+                       double posX, double posY, int score, long time, String event, CarSkin carSkin) {
         this.type = type;
         this.playerId = playerId;
         this.playerName = playerName;
@@ -23,9 +28,10 @@ public class GameMessage {
         this.score = score;
         this.time = time;
         this.event = event;
+        this.carSkin = carSkin;
     }
 
-    // GETTERS Y SETTERS
+
     public MessageType getType() { return type; }
     public void setType(MessageType type) { this.type = type; }
 
@@ -51,6 +57,10 @@ public class GameMessage {
     public void setEvent(String event) { this.event = event; }
 
 
+    public CarSkin getCarSkin() { return carSkin; }
+    public void setCarSkin(CarSkin carSkin) { this.carSkin = carSkin; }
+
+
     public String serialize() {
         return getType() + "|" +
                 safe(playerId) + "|" +
@@ -59,7 +69,8 @@ public class GameMessage {
                 posY + "|" +
                 score + "|" +
                 time + "|" +
-                safe(event);
+                safe(event) + "|" +
+                safe(carSkin != null ? carSkin.name() : "");
     }
 
 
@@ -71,7 +82,7 @@ public class GameMessage {
 
         String[] parts = data.split("\\|");
 
-        if (parts.length < 8) {
+        if (parts.length < 9) {
             throw new IllegalArgumentException("Mensaje UDP inválido: " + data);
         }
 
@@ -87,13 +98,17 @@ public class GameMessage {
             msg.setTime(Long.parseLong(parts[6]));
             msg.setEvent(parts[7]);
 
+
+            if (!parts[8].isEmpty()) {
+                msg.setCarSkin(CarSkin.valueOf(parts[8]));
+            }
+
         } catch (Exception e) {
             throw new IllegalArgumentException("Error al parsear mensaje UDP: " + data, e);
         }
 
         return msg;
     }
-
 
     private String safe(String value) {
         if (value == null) return "";

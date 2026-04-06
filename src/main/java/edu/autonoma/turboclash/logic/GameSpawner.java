@@ -2,6 +2,8 @@ package edu.autonoma.turboclash.logic;
 
 import edu.autonoma.turboclash.model.Item;
 import edu.autonoma.turboclash.model.Obstacle;
+import edu.autonoma.turboclash.model.ObstacleType;
+
 import java.util.List;
 import java.util.Random;
 
@@ -70,10 +72,12 @@ public class GameSpawner implements Runnable {
         double y = 100 + random.nextInt(400);
 
 
-        String[] types = {"CONE", "OIL", "BARRIER"};
-        String selectedType = types[random.nextInt(types.length)];
+        ObstacleType[] types = ObstacleType.values();
+        ObstacleType selectedType = types[random.nextInt(types.length)];
 
         String id = "obs_" + System.currentTimeMillis();
+
+
         obstacles.add(new Obstacle(id, x, y, 45, 45, selectedType));
     }
 }

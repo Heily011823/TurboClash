@@ -31,9 +31,27 @@ public class GameMessageHandler {
 
         if (!existe) {
 
-            Car car = new Car("c_" + msg.getPlayerId(), msg.getPosX(), msg.getPosY(), "Red");
 
-            Player nuevo = new Player(msg.getPlayerId(), msg.getPlayerName(), car);
+            CarSkin skin = msg.getCarSkin();
+
+
+            if (skin == null) {
+                skin = CarSkin.RED;
+            }
+
+            Car car = new Car(
+                    msg.getPlayerId(),
+                    msg.getPosX(),
+                    msg.getPosY(),
+                    skin
+            );
+
+            Player nuevo = new Player(
+                    msg.getPlayerId(),
+                    msg.getPlayerName(),
+                    car
+            );
+
             remotePlayers.add(nuevo);
         }
     }
