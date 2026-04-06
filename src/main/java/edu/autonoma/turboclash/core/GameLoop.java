@@ -1,7 +1,8 @@
-package edu.autonoma.turboclash.main;
+package edu.autonoma.turboclash.core;
 
 import edu.autonoma.turboclash.input.*;
 import edu.autonoma.turboclash.logic.GameSpawner; // Importamos el hilito
+import edu.autonoma.turboclash.view.ViewSynchronizer;
 import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.sound.SoundManager;
 import edu.autonoma.turboclash.view.*;
