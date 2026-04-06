@@ -6,10 +6,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class UdpReceiver {
+public class UdpReceiver implements IMessageReceiver {
 
-    private DatagramSocket socket;
-    private boolean activo;
+    private final DatagramSocket socket;
+    private volatile boolean activo;
 
 
     public interface MessageListener {
@@ -19,18 +19,22 @@ public class UdpReceiver {
     private MessageListener listener;
 
     public UdpReceiver(DatagramSocket socket) {
+        if (socket == null) {
+            throw new IllegalArgumentException("El socket no puede ser nulo");
+        }
         this.socket = socket;
         this.activo = true;
     }
 
-    // Permite conectar con la lógica del juego
+
     public void setListener(MessageListener listener) {
         this.listener = listener;
     }
 
+    @Override
     public void escuchar() {
         try {
-            while (activo) {
+            while (activo && !socket.isClosed()) {
 
                 byte[] buffer = new byte[1024];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -45,7 +49,7 @@ public class UdpReceiver {
                     InetAddress ip = packet.getAddress();
                     int puerto = packet.getPort();
 
-                    System.out.println("Recibido: " + message.type + " de " + message.playerName);
+                    System.out.println("Recibido: " + message.getType() + " de " + message.getPlayerName());
 
 
                     if (listener != null) {
@@ -58,12 +62,17 @@ public class UdpReceiver {
             }
         } catch (Exception e) {
             if (activo) {
-                e.printStackTrace();
+                System.err.println("Error en recepción UDP: " + e.getMessage());
             }
         }
     }
 
+    @Override
     public void detener() {
         activo = false;
+
+        if (!socket.isClosed()) {
+            socket.close();
+        }
     }
 }

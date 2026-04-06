@@ -38,7 +38,7 @@ public class GameEngine {
     }
 
     private void updateWorldObjects() {
-        // Update Items (Coins)
+
         for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
             item.setPosition(item.getX() - WORLD_SPEED, item.getY());
@@ -80,13 +80,13 @@ public class GameEngine {
     public void syncPlayer(GameMessage msg) {
         if (msg == null) return;
         for (Player p : match.getPlayers()) {
-            if (p.getId().equals(msg.playerId)) {
-                p.syncFromNetwork(msg.posX, msg.posY, msg.score);
+            if (p.getId().equals(msg.getPlayerId())) {
+                p.syncFromNetwork(msg.getPosX(), msg.getPosY(), msg.getScore());
             }
         }
     }
 
-    // --- GETTERS ---
+
     public List<Item> getItems() { return items; }
     public List<Obstacle> getObstacles() { return obstacles; }
 }
