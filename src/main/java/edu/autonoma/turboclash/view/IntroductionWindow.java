@@ -1,6 +1,6 @@
 package edu.autonoma.turboclash.view;
 
-import edu.autonoma.turboclash.main.GameApplication;
+import edu.autonoma.turboclash.core.GameApplication;
 import edu.autonoma.turboclash.validation.GameStateValidator;
 import edu.autonoma.turboclash.validation.PlayerNameValidator;
 import edu.autonoma.turboclash.exception.InvalidNameException;
