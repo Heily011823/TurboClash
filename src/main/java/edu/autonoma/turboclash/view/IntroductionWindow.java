@@ -76,7 +76,7 @@ public class IntroductionWindow {
         for (int i = 0; i < jugadores.size(); i++) {
             String actual = jugadores.get(i);
 
-            // Validación individual
+
             PlayerNameValidator.validate(actual, null);
 
             // Validación de duplicados

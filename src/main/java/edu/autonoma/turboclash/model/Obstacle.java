@@ -1,20 +1,18 @@
 package edu.autonoma.turboclash.model;
 
-/**
- * Obstacle: Represents hazards on the track.
- * Pure model class: images are handled by the View layer.
- */
 public class Obstacle extends GameObject {
 
-    private final String type; // e.g., "OIL", "BARRIER", "CONE"
+
+    private final ObstacleType type;
+
     private boolean processed = false;
 
-    public Obstacle(String id, double x, double y, int width, int height, String type) {
+    public Obstacle(String id, double x, double y, int width, int height, ObstacleType type) {
         super(id, x, y, width, height);
         this.type = type;
     }
 
-    public String getType() {
+    public ObstacleType getType() {
         return type;
     }
 
@@ -24,5 +22,9 @@ public class Obstacle extends GameObject {
 
     public void setProcessed(boolean processed) {
         this.processed = processed;
+    }
+
+    public String getImage() {
+        return type.getImage();
     }
 }

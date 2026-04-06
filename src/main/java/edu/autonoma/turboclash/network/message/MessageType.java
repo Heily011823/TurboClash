@@ -3,9 +3,9 @@ package edu.autonoma.turboclash.network.message;
 public enum MessageType {
 
     // Conexión
-    HANDSHAKE,      // primer contacto
-    PLAYER_JOINED,  // jugador confirmado en el juego
-    PLAYER_LEFT,    // jugador salió
+    HANDSHAKE,
+    PLAYER_JOINED,
+    PLAYER_LEFT,
 
     // Juego
     MOVEMENT,
@@ -14,7 +14,7 @@ public enum MessageType {
 
     // Estado
     SCORE_UPDATE,
-    SYNC,           // sincronización general
+    SYNC,
 
     // Control
     GAME_START,

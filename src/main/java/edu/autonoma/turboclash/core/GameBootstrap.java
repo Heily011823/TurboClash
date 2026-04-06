@@ -2,20 +2,24 @@ package edu.autonoma.turboclash.core;
 
 import edu.autonoma.turboclash.logic.*;
 import edu.autonoma.turboclash.model.*;
-import edu.autonoma.turboclash.network.core.GameNetworkService;
-import edu.autonoma.turboclash.network.core.UdpPeer;
+import edu.autonoma.turboclash.network.core.*;
 import edu.autonoma.turboclash.network.handler.GameMessageHandler;
 
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.*;
 
 public class GameBootstrap {
 
-    public GameContext init(int puertoLocal) {
-        String id = String.valueOf(puertoLocal);
+    public GameContext init(int puertoLocal, String playerName) {
 
-        Car car = new Car("car-" + id, 50.0, 300.0, "Blue");
 
-        Player localPlayer = new Player("p-" + id, "Player-" + id, car);
+        String playerId = String.valueOf(puertoLocal);
+        CarSkin skin = CarSkinFactory.fromPort(puertoLocal);
+
+        Car car = new Car(playerId, 50.0, 300.0, skin);
+
+        Player localPlayer = new Player(playerId, playerName, car);
         localPlayer.setLives(GameConstants.INITIAL_LIVES);
 
         List<Player> remotePlayers = new ArrayList<>();
@@ -31,36 +35,62 @@ public class GameBootstrap {
         UdpPeer peer = createPeer(puertoLocal, remotePlayers);
         GameNetworkService network = new GameNetworkService(peer);
 
-
         return new GameContext(match, engine, network, obstacles, items, peer);
     }
 
+
     private List<Item> createItems() {
         List<Item> list = new ArrayList<>();
-        list.add(new Item("coin-1", 400.0, 300.0, 25, 25));
-        list.add(new Item("coin-2", 600.0, 150.0, 25, 25));
-        list.add(new Item("coin-3", 200.0, 450.0, 25, 25));
+
+        list.add(new Item(UUID.randomUUID().toString(), 400.0, 300.0, 25, 25));
+        list.add(new Item(UUID.randomUUID().toString(), 600.0, 150.0, 25, 25));
+        list.add(new Item(UUID.randomUUID().toString(), 200.0, 450.0, 25, 25));
+
         return list;
     }
+
 
     private List<Obstacle> createObstacles() {
         List<Obstacle> list = new ArrayList<>();
-        list.add(new Obstacle("obs-1", 350.0, 250.0, 50, 50, "OIL"));
-        list.add(new Obstacle("obs-2", 550.0, 400.0, 40, 40, "CONE"));
-        list.add(new Obstacle("obs-3", 150.0, 100.0, 60, 30, "BARRIER"));
+
+        list.add(new Obstacle(UUID.randomUUID().toString(), 350.0, 250.0, 50, 50, ObstacleType.OIL));
+        list.add(new Obstacle(UUID.randomUUID().toString(), 550.0, 400.0, 40, 40, ObstacleType.CONE));
+        list.add(new Obstacle(UUID.randomUUID().toString(), 150.0, 100.0, 60, 30, ObstacleType.BARRIER));
+
         return list;
     }
 
+
     private UdpPeer createPeer(int puertoLocal, List<Player> remotePlayers) {
-        UdpPeer peer = new UdpPeer(puertoLocal);
-        Map<Integer, String> ips = Map.of(
-                5001, "26.8.193.114", 5002, "26.176.207.113",
-                5003, "26.14.204.56", 5004, "26.98.94.146"
-        );
-        ips.forEach((p, ip) -> { if (p != puertoLocal) peer.agregarPeer(ip, p); });
-        GameMessageHandler handler = new GameMessageHandler(remotePlayers);
-        peer.getReceiver().setListener((msg, ip, port) -> handler.handle(msg));
-        peer.iniciar();
-        return peer;
+        try {
+
+            DatagramSocket socket = new DatagramSocket(puertoLocal);
+
+
+            IMessageSender sender = new UdpSender(socket);
+            IMessageReceiver receiver = new UdpReceiver(socket);
+
+
+            UdpPeer peer = new UdpPeer(socket, sender, receiver);
+
+
+            Map<Integer, String> peersConfig = NetworkConfig.getPeers();
+            peersConfig.forEach((port, ip) -> {
+                if (port != puertoLocal) {
+                    peer.agregarPeer(ip, port);
+                }
+            });
+
+
+            GameMessageHandler handler = new GameMessageHandler(remotePlayers);
+            peer.getReceiver().setListener((msg, ip, port) -> handler.handle(msg));
+
+            peer.iniciar();
+            return peer;
+
+        } catch (SocketException e) {
+            throw new RuntimeException("No se pudo iniciar el socket en el puerto " + puertoLocal, e);
+        }
     }
+
 }

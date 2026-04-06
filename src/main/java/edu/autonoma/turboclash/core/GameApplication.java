@@ -5,7 +5,7 @@ import edu.autonoma.turboclash.view.*;
 
 public class GameApplication {
 
-    public void start() {
+    public void start(String nombreJugador) {
 
         int puerto = Integer.parseInt(System.getProperty("puerto", "5000"));
 
@@ -16,7 +16,7 @@ public class GameApplication {
         GameWindow window = frame.getView();
 
         GameBootstrap bootstrap = new GameBootstrap();
-        GameContext context = bootstrap.init(puerto);
+        GameContext context = bootstrap.init(puerto, nombreJugador);
 
         GameLoop loop = new GameLoop();
         loop.run(context, window, keyboard, mouse, puerto);
