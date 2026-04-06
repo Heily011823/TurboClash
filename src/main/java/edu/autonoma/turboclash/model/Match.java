@@ -23,7 +23,7 @@ public class Match {
 
         // 1. Revisar Jugador Local
         // CAMBIO: Se usa isFinishReached() en lugar de hasReachedFinishLine()
-        if (localPlayer.getCurrentPoints() >= targetScore || localPlayer.getCar().isFinishReached()) {
+        if (localPlayer.getCar().isFinishReached()) {
             this.finished = true;
             this.winner = localPlayer;
             return;
@@ -32,7 +32,7 @@ public class Match {
         // 2. Revisar Jugadores Remotos
         for (Player p : remotePlayers) {
             // CAMBIO: Se usa isFinishReached() aquí también
-            if (p.getCurrentPoints() >= targetScore || p.getCar().isFinishReached()) {
+            if (p.getCar().isFinishReached()) {
                 this.finished = true;
                 this.winner = p;
                 return;
