@@ -1,14 +1,12 @@
 package edu.autonoma.turboclash.view;
 
-import edu.autonoma.turboclash.input.*;
 import edu.autonoma.turboclash.model.Car;
 import edu.autonoma.turboclash.model.Item;
 import edu.autonoma.turboclash.model.Obstacle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameWindow {
@@ -16,8 +14,7 @@ public class GameWindow {
     public JPanel panel1;
     public JLabel Puntaje;
 
-    private KeyboardInput keyboardInput;
-    private MouseInput mouseInput;
+    private JLabel countdownLabel;
 
     private final List<JLabel> carLabels = new ArrayList<>();
     private final List<JLabel> healthLabels = new ArrayList<>();
@@ -25,23 +22,21 @@ public class GameWindow {
     private final List<JLabel> itemLabels = new ArrayList<>();
 
     private final String[] SKINS = {
-            "/image/Car_Blue.png", "/image/Car_Red.png",
-            "/image/Car_Yellow.png", "/image/Car_Brown.png"
+            "/image/Car_Blue.png",
+            "/image/Car_Red.png",
+            "/image/Car_Yellow.png",
+            "/image/Car_Brown.png"
     };
 
-    public GameWindow(KeyboardInput keyboardInput, MouseInput mouseInput) {
-        this.keyboardInput = keyboardInput;
-        this.mouseInput = mouseInput;
-
+    public GameWindow() {
         if (panel1 != null) {
             panel1.setLayout(null);
             panel1.setFocusable(true);
             panel1.requestFocusInWindow();
-            initKeyboard();
-            initMouse();
         }
 
         initializeScoreUI();
+        initializeCountdownUI();
     }
 
     private void initializeScoreUI() {
@@ -49,25 +44,45 @@ public class GameWindow {
             Puntaje.setForeground(Color.YELLOW);
             Puntaje.setFont(new Font("Arial", Font.BOLD, 24));
             Puntaje.setText("Score: 0");
-
             Puntaje.setBounds(20, 43, 200, 40);
         }
     }
 
+    private void initializeCountdownUI() {
+        countdownLabel = new JLabel("", SwingConstants.CENTER);
+        countdownLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        countdownLabel.setForeground(Color.WHITE);
+        countdownLabel.setBounds(300, 200, 200, 80);
+        countdownLabel.setVisible(false);
+
+        if (panel1 != null) {
+            panel1.add(countdownLabel);
+            panel1.setComponentZOrder(countdownLabel, 0);
+        }
+    }
+
+    public JPanel getPanel() {
+        return panel1;
+    }
+
+    public void requestGameFocus() {
+        if (panel1 != null) {
+            panel1.setFocusable(true);
+            panel1.requestFocusInWindow();
+        }
+    }
+
     public void updateScore(int points) {
-        if (this.Puntaje != null) {
+        if (Puntaje != null) {
             SwingUtilities.invokeLater(() -> {
-                this.Puntaje.setText("Score: " + points);
-
-                panel1.setComponentZOrder(this.Puntaje, 0);
-                this.Puntaje.setSize(250, 40);
-
-                this.Puntaje.setVisible(true);
-
-                this.Puntaje.repaint();
+                Puntaje.setText("Score: " + points);
+                Puntaje.setSize(250, 40);
+                Puntaje.setVisible(true);
+                Puntaje.repaint();
             });
         }
     }
+
     public void updateHealth(int lives, Car car) {
         if (car == null || panel1 == null) return;
 
@@ -88,7 +103,7 @@ public class GameWindow {
 
         for (int i = 0; i < healthLabels.size(); i++) {
             JLabel heart = healthLabels.get(i);
-            heart.setBounds((int)car.getX() + (i * 30), (int)car.getY() - 30, 25, 25);
+            heart.setBounds((int) car.getX() + (i * 30), (int) car.getY() - 30, 25, 25);
             heart.setVisible(i < lives && car.isActive());
         }
     }
@@ -106,7 +121,7 @@ public class GameWindow {
             JLabel lbl = itemLabels.get(i);
             if (i < items.size()) {
                 Item item = items.get(i);
-                lbl.setBounds((int)item.getX(), (int)item.getY(), 30, 30);
+                lbl.setBounds((int) item.getX(), (int) item.getY(), 30, 30);
                 lbl.setVisible(item.isVisible());
             } else {
                 lbl.setVisible(false);
@@ -126,9 +141,10 @@ public class GameWindow {
         for (int i = 0; i < cars.size(); i++) {
             Car car = cars.get(i);
             JLabel lbl = carLabels.get(i);
-            int skinIndex = Math.abs(car.getId().hashCode()) % SKINS.length;
 
+            int skinIndex = i % SKINS.length;
             java.net.URL carUrl = getClass().getResource(SKINS[skinIndex]);
+
             if (carUrl != null) {
                 ImageIcon icon = new ImageIcon(new ImageIcon(carUrl)
                         .getImage().getScaledInstance(100, 50, Image.SCALE_SMOOTH));
@@ -139,7 +155,6 @@ public class GameWindow {
             lbl.setVisible(car.isActive());
         }
     }
-
 
     public void updateObstacles(List<Obstacle> obstacles) {
         if (panel1 == null) return;
@@ -152,18 +167,16 @@ public class GameWindow {
 
         for (int i = 0; i < obstacleLabels.size(); i++) {
             JLabel lbl = obstacleLabels.get(i);
+
             if (i < obstacles.size()) {
                 Obstacle obs = obstacles.get(i);
 
-                // --- CAMBIO DE IMAGEN DINÁMICO ---
-                String imagePath = "/image/Cone.png"; // Por defecto
+                String imagePath = "/image/Cone.png";
                 if ("OIL".equals(obs.getType())) imagePath = "/image/Oil_Spill.png";
                 else if ("BARRIER".equals(obs.getType())) imagePath = "/image/Barrier.png";
 
-                // Aplicamos la imagen correcta
                 lbl.setIcon(getIcon(imagePath, 45, 45));
-
-                lbl.setBounds((int)obs.getX(), (int)obs.getY(), 45, 45);
+                lbl.setBounds((int) obs.getX(), (int) obs.getY(), 45, 45);
                 lbl.setVisible(obs.isVisible());
             } else {
                 lbl.setVisible(false);
@@ -171,7 +184,48 @@ public class GameWindow {
         }
     }
 
-    // Helper para no repetir código de carga de imagen
+    public void prepararInicioCarrera(List<Car> cars) {
+        int startX = 80;
+        int[] lanesY = {100, 190, 280, 370};
+
+        for (int i = 0; i < cars.size() && i < lanesY.length; i++) {
+            cars.get(i).setPosition(startX, lanesY[i]);
+        }
+
+        updateCars(cars);
+
+        for (Car car : cars) {
+            updateHealth(car.getLives(), car);
+        }
+    }
+
+    public void iniciarCuentaRegresiva(Runnable onFinish) {
+        if (countdownLabel == null) return;
+
+        final int[] segundos = {3};
+
+        countdownLabel.setText("3");
+        countdownLabel.setVisible(true);
+        countdownLabel.repaint();
+
+        Timer timer = new Timer(1000, null);
+        timer.addActionListener(e -> {
+            segundos[0]--;
+
+            if (segundos[0] > 0) {
+                countdownLabel.setText(String.valueOf(segundos[0]));
+            } else if (segundos[0] == 0) {
+                countdownLabel.setText("GO!");
+            } else {
+                timer.stop();
+                countdownLabel.setVisible(false);
+                onFinish.run();
+            }
+        });
+
+        timer.start();
+    }
+
     private ImageIcon getIcon(String path, int w, int h) {
         java.net.URL url = getClass().getResource(path);
         if (url == null) return new ImageIcon();
@@ -180,32 +234,5 @@ public class GameWindow {
 
     private JLabel createScalableLabel(String path, int width, int height) {
         return new JLabel(getIcon(path, width, height));
-    }
-
-    private void initKeyboard() {
-        panel1.addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) { processKey(e.getKeyCode(), true); }
-            @Override
-            public void keyReleased(KeyEvent e) { processKey(e.getKeyCode(), false); }
-
-            private void processKey(int code, boolean pressed) {
-                switch (code) {
-                    case KeyEvent.VK_W: case KeyEvent.VK_UP: keyboardInput.setUp(pressed); break;
-                    case KeyEvent.VK_S: case KeyEvent.VK_DOWN: keyboardInput.setDown(pressed); break;
-                    case KeyEvent.VK_A: case KeyEvent.VK_LEFT: keyboardInput.setLeft(pressed); break;
-                    case KeyEvent.VK_D: case KeyEvent.VK_RIGHT: keyboardInput.setRight(pressed); break;
-                }
-            }
-        });
-    }
-
-    private void initMouse() {
-        panel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(java.awt.event.MouseEvent e) {
-                mouseInput.setTarget(e.getX(), e.getY());
-            }
-        });
     }
 }
