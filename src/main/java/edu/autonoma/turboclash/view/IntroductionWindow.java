@@ -1,89 +1,46 @@
 package edu.autonoma.turboclash.view;
 
-import edu.autonoma.turboclash.core.GameApplication;
-import edu.autonoma.turboclash.validation.GameStateValidator;
-import edu.autonoma.turboclash.validation.PlayerNameValidator;
-import edu.autonoma.turboclash.exception.InvalidNameException;
-import edu.autonoma.turboclash.exception.DuplicateDataException;
-import edu.autonoma.turboclash.exception.InvalidGameStateException;
-import edu.autonoma.turboclash.sound.SoundManager;
-
+import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class IntroductionWindow {
 
     public JPanel panel1;
     private JButton btnEmpezar;
     private JTextField txtNombre;
-    private JTextField txtNombre2;
-    private JTextField txtNombre3;
-    private JTextField txtNombre4;
     private JLabel iconInformacion;
-    private SoundManager soundManager = SoundManager.getInstance();
 
-    public IntroductionWindow() {
+    private final IntroductionWindowListener listener;
 
-        ImageIcon iconoOriginal = new ImageIcon(getClass().getResource("/image/Informacion.png"));
-        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
-        iconInformacion.setIcon(new ImageIcon(imagenEscalada));
-
-        btnEmpezar.addActionListener(e -> iniciarJuego());
-    }
+    public IntroductionWindow(IntroductionWindowListener listener) {
+        this.listener = listener;
 
 
-    private void iniciarJuego() {
         try {
-            List<String> jugadores = obtenerJugadores();
+            ImageIcon iconoOriginal = new ImageIcon(getClass().getResource("/image/Informacion.png"));
+            Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+            iconInformacion.setIcon(new ImageIcon(imagenEscalada));
+        } catch (Exception e) {
+            System.err.println("No se pudo cargar el icono: " + e.getMessage());
+        }
 
-            boolean todosLlenos = jugadores.stream()
-                    .allMatch(nombre -> !nombre.isEmpty());
 
-            GameStateValidator.validateStart(todosLlenos);
+        btnEmpezar.addActionListener(e -> {
+            String playerName = txtNombre.getText().trim();
 
-            validarJugadores(jugadores);
+
+            if (playerName.isEmpty()) {
+                JOptionPane.showMessageDialog(panel1, "¡Debes ingresar un nombre!", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
 
             cerrarVentana();
 
-            SoundManager.getInstance().stopBackground();
 
-            new Thread(() -> new GameApplication().start()).start();
-
-        } catch (InvalidNameException | DuplicateDataException | InvalidGameStateException ex) {
-            mostrarError(ex.getMessage());
-        }
-    }
-
-
-    private List<String> obtenerJugadores() {
-        List<String> jugadores = new ArrayList<>();
-
-        jugadores.add(txtNombre.getText().trim());
-        jugadores.add(txtNombre2.getText().trim());
-        jugadores.add(txtNombre3.getText().trim());
-        jugadores.add(txtNombre4.getText().trim());
-
-        return jugadores;
-    }
-
-
-    private void validarJugadores(List<String> jugadores)
-            throws InvalidNameException, DuplicateDataException {
-
-        for (int i = 0; i < jugadores.size(); i++) {
-            String actual = jugadores.get(i);
-
-
-            PlayerNameValidator.validate(actual, null);
-
-            // Validación de duplicados
-            for (int j = i + 1; j < jugadores.size(); j++) {
-                PlayerNameValidator.validate(actual, jugadores.get(j));
-            }
-        }
+            listener.onContinuePressed(playerName);
+        });
     }
 
     private void cerrarVentana() {
@@ -91,14 +48,5 @@ public class IntroductionWindow {
         if (frame != null) {
             frame.dispose();
         }
-    }
-
-    private void mostrarError(String mensaje) {
-        JOptionPane.showMessageDialog(
-                null,
-                mensaje,
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-        );
     }
 }
