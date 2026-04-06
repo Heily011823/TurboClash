@@ -6,20 +6,31 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class UdpSender {
 
-    private DatagramSocket socket;
+public class UdpSender implements IMessageSender {
+
+    private final DatagramSocket socket;
 
     public UdpSender(DatagramSocket socket) {
+        if (socket == null) {
+            throw new IllegalArgumentException("El socket no puede ser nulo");
+        }
         this.socket = socket;
     }
 
-
+    @Override
     public void enviarMensaje(GameMessage message, String ipDestino, int puertoDestino) {
-        try {
-            String data = message.serialize();
-            byte[] buffer = data.getBytes();
 
+        if (message == null) {
+            throw new IllegalArgumentException("El mensaje no puede ser nulo");
+        }
+
+        if (ipDestino == null || ipDestino.isEmpty()) {
+            throw new IllegalArgumentException("IP destino inválida");
+        }
+
+        try {
+            byte[] buffer = serialize(message);
             InetAddress address = InetAddress.getByName(ipDestino);
 
             DatagramPacket packet = new DatagramPacket(
@@ -32,8 +43,11 @@ public class UdpSender {
             socket.send(packet);
 
         } catch (Exception e) {
-            System.out.println("Error enviando mensaje UDP");
-            e.printStackTrace();
+            throw new RuntimeException("Error enviando mensaje UDP", e);
         }
+    }
+
+    private byte[] serialize(GameMessage message) {
+        return message.serialize().getBytes();
     }
 }

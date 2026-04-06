@@ -10,74 +10,62 @@ import edu.autonoma.turboclash.exception.InvalidPortException;
 
 public class UdpPeer {
 
-    private DatagramSocket socket;
-    private int puertoLocal;
+    private final DatagramSocket socket;
+    private final List<PeerInfo> peers;
 
-    private List<PeerInfo> peers = new ArrayList<>();
+    private final IMessageSender sender;
+    private final IMessageReceiver receiver;
 
-    private UdpSender sender;
-    private UdpReceiver receiver;
+    private Thread receiverThread;
 
-    public UdpPeer(int puertoLocal) {
-        this.puertoLocal = puertoLocal;
 
-        try {
-            socket = new DatagramSocket(puertoLocal);
+    public UdpPeer(DatagramSocket socket, IMessageSender sender, IMessageReceiver receiver) {
 
-            sender = new UdpSender(socket);
-            receiver = new UdpReceiver(socket);
-
-            System.out.println("UDP Peer iniciado en puerto: " + puertoLocal);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (socket == null) {
+            throw new IllegalArgumentException("El socket no puede ser nulo");
         }
+
+        this.socket = socket;
+        this.peers = new ArrayList<>();
+        this.sender = sender;
+        this.receiver = receiver;
+
+        System.out.println("UDP Peer iniciado en puerto: " + socket.getLocalPort());
     }
 
     public void agregarPeer(String ip, int puerto) {
         try {
             PortValidator.validate(puerto);
-
             peers.add(new PeerInfo(ip, puerto));
-            System.out.println("Peer agregado: " + ip + ":" + puerto);
-
         } catch (InvalidPortException e) {
             System.err.println("Puerto inválido: " + e.getMessage());
         }
     }
 
     public void iniciar() {
-        new Thread(() -> receiver.escuchar()).start();
+        receiverThread = new Thread(receiver::escuchar);
+        receiverThread.start();
     }
-
 
     public void enviarATodos(GameMessage mensaje) {
         for (PeerInfo peer : peers) {
-            sender.enviarMensaje(mensaje, peer.ip, peer.puerto);
+            sender.enviarMensaje(mensaje, peer.getIp(), peer.getPuerto());
         }
-    }
-
-
-    public void enviar(GameMessage mensaje) {
-        enviarATodos(mensaje);
     }
 
     public void cerrar() {
         receiver.detener();
-        socket.close();
-    }
 
-    public UdpReceiver getReceiver() {
-        return receiver;
-    }
-
-    private static class PeerInfo {
-        String ip;
-        int puerto;
-
-        public PeerInfo(String ip, int puerto) {
-            this.ip = ip;
-            this.puerto = puerto;
+        if (receiverThread != null) {
+            receiverThread.interrupt();
         }
+
+        if (!socket.isClosed()) {
+            socket.close();
+        }
+    }
+
+    public IMessageReceiver getReceiver() {
+        return receiver;
     }
 }

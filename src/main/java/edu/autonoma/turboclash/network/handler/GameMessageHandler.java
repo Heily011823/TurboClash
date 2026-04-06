@@ -16,7 +16,7 @@ public class GameMessageHandler {
     public void handle(GameMessage msg) {
         if (msg == null) return;
 
-        switch (msg.type) {
+        switch (msg.getType()) {
             case PLAYER_JOINED -> handleJoin(msg);
             case MOVEMENT -> handleMovement(msg);
             case SCORE_UPDATE -> handleScore(msg);
@@ -27,34 +27,34 @@ public class GameMessageHandler {
 
     private void handleJoin(GameMessage msg) {
         boolean existe = remotePlayers.stream()
-                .anyMatch(p -> p.getId().equals(msg.playerId));
+                .anyMatch(p -> p.getId().equals(msg.getPlayerId()));
 
         if (!existe) {
 
-            Car car = new Car("c_" + msg.playerId, msg.posX, msg.posY, "Red");
+            Car car = new Car("c_" + msg.getPlayerId(), msg.getPosX(), msg.getPosY(), "Red");
 
-            Player nuevo = new Player(msg.playerId, msg.playerName, car);
+            Player nuevo = new Player(msg.getPlayerId(), msg.getPlayerName(), car);
             remotePlayers.add(nuevo);
         }
     }
 
     private void handleMovement(GameMessage msg) {
         for (Player p : remotePlayers) {
-            if (p.getId().equals(msg.playerId)) {
-                p.getCar().setPosition(msg.posX, msg.posY);
+            if (p.getId().equals(msg.getPlayerId())) {
+                p.getCar().setPosition(msg.getPosX(), msg.getPosY());
             }
         }
     }
 
     private void handleScore(GameMessage msg) {
         for (Player p : remotePlayers) {
-            if (p.getId().equals(msg.playerId)) {
-                p.setScore(msg.score);
+            if (p.getId().equals(msg.getPlayerId())) {
+                p.setScore(msg.getScore());
             }
         }
     }
 
     private void handleLeft(GameMessage msg) {
-        remotePlayers.removeIf(p -> p.getId().equals(msg.playerId));
+        remotePlayers.removeIf(p -> p.getId().equals(msg.getPlayerId()));
     }
 }

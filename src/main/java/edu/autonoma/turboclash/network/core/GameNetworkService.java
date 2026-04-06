@@ -3,45 +3,39 @@ package edu.autonoma.turboclash.network.core;
 import edu.autonoma.turboclash.model.Player;
 import edu.autonoma.turboclash.network.message.GameMessage;
 import edu.autonoma.turboclash.network.message.MessageType;
+import edu.autonoma.turboclash.network.factory.GameMessageFactory;
 
 public class GameNetworkService {
 
-    private UdpPeer peer;
+    private final UdpPeer peer;
+    private final GameMessageFactory messageFactory;
 
-    public GameNetworkService(UdpPeer peer) {
+    public GameNetworkService(UdpPeer peer, GameMessageFactory messageFactory) {
         this.peer = peer;
+        this.messageFactory = messageFactory;
     }
 
     public void sendJoin(Player player) {
-        GameMessage msg = createBaseMessage(player, MessageType.PLAYER_JOINED);
-        peer.enviarATodos(msg);
+        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_JOINED);
+        send(msg);
     }
 
     public void sendMovement(Player player) {
-        GameMessage msg = createBaseMessage(player, MessageType.MOVEMENT);
-        msg.score = player.getCurrentPoints();
-
-        try {
-            peer.enviarATodos(msg);
-        } catch (Exception e) {
-            System.err.println("Error enviando: " + e.getMessage());
-        }
+        GameMessage msg = messageFactory.create(player, MessageType.MOVEMENT);
+        msg.setScore(player.getCurrentPoints()); // ✔ encapsulado
+        send(msg);
     }
 
     public void sendLeave(Player player) {
-        GameMessage msg = createBaseMessage(player, MessageType.PLAYER_LEFT);
-        peer.enviarATodos(msg);
+        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_LEFT);
+        send(msg);
     }
 
-    private GameMessage createBaseMessage(Player player, MessageType type) {
-        GameMessage msg = new GameMessage();
-        msg.type = type;
-        msg.playerId = player.getId();
-        msg.playerName = player.getName();
-        msg.posX = player.getCar().getX();
-        msg.posY = player.getCar().getY();
-        msg.time = System.currentTimeMillis();
-        msg.event = "";
-        return msg;
+    private void send(GameMessage msg) {
+        try {
+            peer.enviarATodos(msg);
+        } catch (Exception e) {
+            System.err.println("Error enviando mensaje: " + e.getMessage());
+        }
     }
 }
