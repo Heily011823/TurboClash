@@ -1,5 +1,8 @@
 package edu.autonoma.turboclash.main;
 
+import edu.autonoma.turboclash.core.GameBootstrap;
+import edu.autonoma.turboclash.core.GameContext;
+import edu.autonoma.turboclash.core.GameLoop;
 import edu.autonoma.turboclash.input.*;
 import edu.autonoma.turboclash.view.*;
 

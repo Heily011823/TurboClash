@@ -1,7 +1,7 @@
-package edu.autonoma.turboclash.main;
+package edu.autonoma.turboclash.view;
 
 import edu.autonoma.turboclash.model.*;
-import edu.autonoma.turboclash.view.*;
+
 import java.util.ArrayList;
 import java.util.List;
 

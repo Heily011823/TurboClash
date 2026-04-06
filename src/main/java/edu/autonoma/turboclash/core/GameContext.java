@@ -1,4 +1,4 @@
-package edu.autonoma.turboclash.main;
+package edu.autonoma.turboclash.core;
 
 import edu.autonoma.turboclash.logic.GameEngine;
 import edu.autonoma.turboclash.model.Item;

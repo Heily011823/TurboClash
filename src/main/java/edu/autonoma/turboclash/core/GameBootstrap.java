@@ -1,4 +1,4 @@
-package edu.autonoma.turboclash.main;
+package edu.autonoma.turboclash.core;
 
 import edu.autonoma.turboclash.logic.*;
 import edu.autonoma.turboclash.model.*;
@@ -28,7 +28,7 @@ public class GameBootstrap {
         UdpPeer peer = createPeer(puertoLocal, remotePlayers);
         GameNetworkService network = new GameNetworkService(peer);
 
-        // AQUÍ ESTABA EL ERROR: Ahora mandamos match, engine, network, obstacles, ITEMS y peer (6 cosas)
+
         return new GameContext(match, engine, network, obstacles, items, peer);
     }
 
