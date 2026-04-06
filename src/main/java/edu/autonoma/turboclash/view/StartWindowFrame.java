@@ -1,13 +1,15 @@
 package edu.autonoma.turboclash.view;
 
+import edu.autonoma.turboclash.navigation.IstartWindowListener;
+
 import javax.swing.*;
 import java.awt.*;
 
-public class StartWindowFrame extends JFrame {
+public class StartWindowFrame extends JFrame implements IstartWindowListener {
 
     public StartWindowFrame() {
 
-        StartWindow view = new StartWindow();
+        StartWindow view = new StartWindow(this);
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/Game_Cover.png");
@@ -23,5 +25,10 @@ public class StartWindowFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         setVisible(true);
+    }
+    @Override
+    public void onPlayPressed() {
+        dispose();
+        new IntroductionWindowFrame();
     }
 }

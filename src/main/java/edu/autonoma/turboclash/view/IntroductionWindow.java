@@ -27,7 +27,7 @@ public class IntroductionWindow {
 
     public IntroductionWindow() {
 
-        ImageIcon iconoOriginal = new ImageIcon(getClass().getResource("/image/Start.png"));
+        ImageIcon iconoOriginal = new ImageIcon(getClass().getResource("/image/Informacion.png"));
         Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
         iconInformacion.setIcon(new ImageIcon(imagenEscalada));
 
