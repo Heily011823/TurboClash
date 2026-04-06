@@ -2,7 +2,10 @@ package edu.autonoma.turboclash.core;
 
 import edu.autonoma.turboclash.logic.*;
 import edu.autonoma.turboclash.model.*;
-import edu.autonoma.turboclash.network.*;
+import edu.autonoma.turboclash.network.core.GameNetworkService;
+import edu.autonoma.turboclash.network.core.UdpPeer;
+import edu.autonoma.turboclash.network.handler.GameMessageHandler;
+
 import java.util.*;
 
 public class GameBootstrap {

@@ -1,4 +1,6 @@
-package edu.autonoma.turboclash.network;
+package edu.autonoma.turboclash.network.core;
+
+import edu.autonoma.turboclash.network.message.GameMessage;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

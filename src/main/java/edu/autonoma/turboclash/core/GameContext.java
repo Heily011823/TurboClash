@@ -4,8 +4,8 @@ import edu.autonoma.turboclash.logic.GameEngine;
 import edu.autonoma.turboclash.model.Item;
 import edu.autonoma.turboclash.model.Match;
 import edu.autonoma.turboclash.model.Obstacle;
-import edu.autonoma.turboclash.network.GameNetworkService;
-import edu.autonoma.turboclash.network.UdpPeer;
+import edu.autonoma.turboclash.network.core.GameNetworkService;
+import edu.autonoma.turboclash.network.core.UdpPeer;
 import java.util.List;
 
 public class GameContext {

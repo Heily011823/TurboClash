@@ -1,4 +1,4 @@
-package edu.autonoma.turboclash.network;
+package edu.autonoma.turboclash.network.message;
 
 public class GameMessage {
 

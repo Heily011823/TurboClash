@@ -1,7 +1,7 @@
 package edu.autonoma.turboclash.logic;
 
 import edu.autonoma.turboclash.model.*;
-import edu.autonoma.turboclash.network.GameMessage;
+import edu.autonoma.turboclash.network.message.GameMessage;
 import java.util.List;
 
 

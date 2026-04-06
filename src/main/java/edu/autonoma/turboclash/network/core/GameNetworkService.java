@@ -1,6 +1,8 @@
-package edu.autonoma.turboclash.network;
+package edu.autonoma.turboclash.network.core;
 
 import edu.autonoma.turboclash.model.Player;
+import edu.autonoma.turboclash.network.message.GameMessage;
+import edu.autonoma.turboclash.network.message.MessageType;
 
 public class GameNetworkService {
 

@@ -1,9 +1,10 @@
-package edu.autonoma.turboclash.network;
+package edu.autonoma.turboclash.network.core;
 
 import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.autonoma.turboclash.network.message.GameMessage;
 import edu.autonoma.turboclash.validation.PortValidator;
 import edu.autonoma.turboclash.exception.InvalidPortException;
 

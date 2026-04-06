@@ -1,6 +1,8 @@
-package edu.autonoma.turboclash.network;
+package edu.autonoma.turboclash.network.handler;
 
 import edu.autonoma.turboclash.model.*;
+import edu.autonoma.turboclash.network.message.GameMessage;
+
 import java.util.List;
 
 public class GameMessageHandler {
