@@ -16,26 +16,24 @@ public class GameNetworkService {
     }
 
     public void sendJoin(Player player) {
-        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_JOINED);
-        send(msg);
+        send(messageFactory.create(player, MessageType.PLAYER_JOINED));
     }
 
     public void sendMovement(Player player) {
         GameMessage msg = messageFactory.create(player, MessageType.MOVEMENT);
-        msg.setScore(player.getCurrentPoints()); // ✔ encapsulado
+        msg.setScore(player.getCurrentPoints());
         send(msg);
     }
 
     public void sendLeave(Player player) {
-        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_LEFT);
-        send(msg);
+        send(messageFactory.create(player, MessageType.PLAYER_LEFT));
     }
 
     private void send(GameMessage msg) {
         try {
             peer.enviarATodos(msg);
         } catch (Exception e) {
-            System.err.println("Error enviando mensaje: " + e.getMessage());
+            throw new RuntimeException("Error enviando mensaje de red", e);
         }
     }
 }

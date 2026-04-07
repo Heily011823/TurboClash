@@ -10,13 +10,7 @@ public class UdpReceiver implements IMessageReceiver {
 
     private final DatagramSocket socket;
     private volatile boolean activo;
-
-
-    public interface MessageListener {
-        void onMessage(GameMessage message, InetAddress ip, int puerto);
-    }
-
-    private MessageListener listener;
+    private IMessageListener listener;
 
     public UdpReceiver(DatagramSocket socket) {
         if (socket == null) {
@@ -26,8 +20,8 @@ public class UdpReceiver implements IMessageReceiver {
         this.activo = true;
     }
 
-
-    public void setListener(MessageListener listener) {
+    @Override
+    public void setListener(IMessageListener listener) {
         this.listener = listener;
     }
 
@@ -46,23 +40,26 @@ public class UdpReceiver implements IMessageReceiver {
                 try {
                     GameMessage message = GameMessage.deserialize(data);
 
-                    InetAddress ip = packet.getAddress();
+                    InetAddress ipAddress = packet.getAddress();
+                    String ip = ipAddress.getHostAddress();
                     int puerto = packet.getPort();
 
-                    System.out.println("Recibido: " + message.getType() + " de " + message.getPlayerName());
-
+                    System.out.println(
+                            "Recibido: " + message.getType() +
+                                    " de " + message.getPlayerName()
+                    );
 
                     if (listener != null) {
                         listener.onMessage(message, ip, puerto);
                     }
 
                 } catch (Exception e) {
-                    System.out.println("Mensaje inválido recibido: " + data);
+                    System.err.println("Mensaje inválido: " + data);
                 }
             }
         } catch (Exception e) {
             if (activo) {
-                System.err.println("Error en recepción UDP: " + e.getMessage());
+                throw new RuntimeException("Error en recepción UDP", e);
             }
         }
     }

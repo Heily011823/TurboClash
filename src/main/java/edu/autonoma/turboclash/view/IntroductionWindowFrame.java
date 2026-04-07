@@ -1,6 +1,9 @@
 package edu.autonoma.turboclash.view;
+
 import javax.swing.*;
+
 import edu.autonoma.turboclash.core.GameApplication;
+import edu.autonoma.turboclash.core.GameBootstrap;
 import edu.autonoma.turboclash.exception.InvalidGameStateException;
 import edu.autonoma.turboclash.exception.InvalidNameException;
 import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
@@ -26,15 +29,17 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
         setResizable(false);
         setVisible(true);
     }
+
     @Override
     public void onContinuePressed(String playerName) {
         try {
+
             GameStateValidator.validateStart(!playerName.isBlank());
             PlayerNameValidator.validate(playerName);
 
             dispose();
 
-            new Thread(() -> new GameApplication().start()).start();
+            startGame(playerName);
 
         } catch (InvalidNameException | InvalidGameStateException ex) {
             JOptionPane.showMessageDialog(
@@ -44,5 +49,14 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
                     JOptionPane.ERROR_MESSAGE
             );
         }
+    }
+
+    private void startGame(String playerName) {
+
+        new Thread(() -> {
+            GameBootstrap bootstrap = new GameBootstrap();
+            GameApplication app = new GameApplication(bootstrap);
+            app.start(playerName);
+        }).start();
     }
 }

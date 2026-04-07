@@ -1,58 +1,86 @@
 package edu.autonoma.turboclash.core;
 
 import edu.autonoma.turboclash.input.*;
-import edu.autonoma.turboclash.logic.GameSpawner; // Importamos el hilito
+import edu.autonoma.turboclash.logic.GameSpawner;
 import edu.autonoma.turboclash.view.ViewSynchronizer;
 import edu.autonoma.turboclash.model.*;
-import edu.autonoma.turboclash.sound.SoundManager;
-import edu.autonoma.turboclash.view.*;
-
-import java.util.List;
+import edu.autonoma.turboclash.view.GameWindow;
 
 public class GameLoop {
 
-    private static final int FRAME_DELAY = 16;
+    private final int frameDelay;
+    private final ObstacleSystem obstacleSystem;
 
-    public void run(GameContext context, GameWindow window, KeyboardInput keyboard, MouseInput mouse, int puertoLocal) {
+    public GameLoop(int frameDelay) {
+        this.frameDelay = frameDelay;
+        this.obstacleSystem = new ObstacleSystem();
+    }
+
+    public void run(GameContext context,
+                    GameWindow window,
+                    KeyboardInput keyboard,
+                    MouseInput mouse,
+                    int puertoLocal) {
 
         boolean usaTeclado = (puertoLocal % 2 != 0);
+
         ViewSynchronizer viewSync = new ViewSynchronizer();
-        Player local = context.match.getLocalPlayer();
-        GameSpawner spawner = new GameSpawner(context.engine.getItems(), context.obstacles);
+        Player local = context.getMatch().getLocalPlayer();
+
+        GameSpawner spawner = new GameSpawner(
+                context.getEngine().getItems(),
+                context.getObstacles()
+        );
+
         spawner.start();
+        context.getNetwork().sendJoin(local);
 
-        context.network.sendJoin(local);
+        while (!context.getMatch().isFinished()) {
 
-        while (!context.match.isFinished()) {
-            if (usaTeclado) keyboard.update(local.getCar());
-            else mouse.update(local.getCar());
+            handleInput(local, keyboard, mouse, usaTeclado);
 
-            context.engine.update();
+            context.getEngine().update();
 
-            detectObstacles(local.getCar(), context.obstacles);
+            obstacleSystem.check(local.getCar(), context.getObstacles());
 
-            viewSync.sync(window, context.match, context.obstacles, context.engine.getItems());
+            viewSync.sync(
+                    window,
+                    context.getMatch(),
+                    context.getObstacles(),
+                    context.getEngine().getItems()
+            );
 
-            context.network.sendMovement(local);
+            context.getNetwork().sendMovement(local);
 
             sleep();
         }
-        spawner.stop();
-        context.network.sendLeave(local);
-        context.peer.cerrar();
+
+        shutdown(context, local, spawner);
     }
 
-    private void detectObstacles(Car car, List<Obstacle> obstacles) {
-        for (Obstacle obs : obstacles) {
-            if (!obs.isProcessed() && car.getBounds().intersects(obs.getBounds())) {
-                obs.setProcessed(true);
-                SoundManager.getInstance().playEffect(SoundManager.Sound.BRAKE);
-            }
+    private void handleInput(Player local,
+                             KeyboardInput keyboard,
+                             MouseInput mouse,
+                             boolean usaTeclado) {
+
+        if (usaTeclado) {
+            keyboard.update(local.getCar());
+        } else {
+            mouse.update(local.getCar());
         }
     }
 
+    private void shutdown(GameContext context, Player local, GameSpawner spawner) {
+        spawner.stop();
+        context.getNetwork().sendLeave(local);
+        context.getPeer().cerrar();
+    }
+
     private void sleep() {
-        try { Thread.sleep(FRAME_DELAY); }
-        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        try {
+            Thread.sleep(frameDelay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
