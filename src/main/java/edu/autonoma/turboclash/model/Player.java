@@ -7,7 +7,7 @@ public class Player {
     private final Car car;
     private final Score score;
 
-    // 🔥 NUEVO: saber si el jugador ya ha tenido puntos
+
     private boolean hasScored;
 
     public Player(String id, String name, Car car) {
@@ -15,7 +15,7 @@ public class Player {
         this.name = name;
         this.car = car;
         this.score = new Score();
-        this.hasScored = false; // inicia en falso
+        this.hasScored = false;
     }
 
 
@@ -70,7 +70,7 @@ public class Player {
         this.score.setPoints(0);
     }
 
-    // 🔥 NUEVO: getter/setter de control
+
     public boolean hasScored() {
         return hasScored;
     }
@@ -80,7 +80,7 @@ public class Player {
     }
 
 
-    // VIDAS
+
 
     public void loseLife() {
         if (car != null) {
@@ -99,7 +99,7 @@ public class Player {
     }
 
 
-    // GETTERS
+
 
     public Car getCar() { return car; }
     public String getId() { return id; }

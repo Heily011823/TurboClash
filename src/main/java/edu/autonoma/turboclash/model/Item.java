@@ -9,7 +9,6 @@ public class Item extends GameObject {
     private final int scoreValue = 20;
 
     public Item(String id, double x, double y, int width, int height) {
-        // We call the parent constructor (GameObject)
         super(id, x, y, width, height);
     }
 

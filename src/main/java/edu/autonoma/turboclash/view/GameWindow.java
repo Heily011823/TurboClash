@@ -29,32 +29,12 @@ public class GameWindow {
         panel1.setOpaque(false);
         panel1.setPreferredSize(new Dimension(1000, 700));
 
-
+        // Solo inicializamos el Puntaje
         Puntaje = createScoreLabel();
         panel1.add(Puntaje);
 
         initializeCountdownUI();
     }
-
-    public void setOnCountdownFinished(Runnable action) {
-        this.onCountdownFinished = action;
-    }
-
-    public void prepareRaceStart(List<Car> cars) {
-        if (cars == null || cars.isEmpty()) return;
-
-        final int startX = 80;
-        final int[] lanesY = {100, 190, 280, 370};
-
-        for (int i = 0; i < cars.size() && i < lanesY.length; i++) {
-            Car car = cars.get(i);
-            car.setPosition(startX, lanesY[i]);
-            updateCarPosition(car);
-        }
-
-        panel1.repaint();
-    }
-
 
     public void updateScore(int points) {
         Puntaje.setText("Puntaje: " + points);
@@ -67,19 +47,9 @@ public class GameWindow {
             return newLbl;
         });
 
-        int width = car.isDebuffed() ? 90 : 100;
-        int height = car.isDebuffed() ? 45 : 50;
-
-        lbl.setBounds((int) car.getX(), (int) car.getY(), width, height);
+        
+        lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
         lbl.setVisible(car.isActive());
-
-        if (car.isDebuffed()) {
-            lbl.setOpaque(true);
-            lbl.setBackground(new Color(0, 0, 0, 80));
-        } else {
-            lbl.setOpaque(false);
-            lbl.setBackground(null);
-        }
 
         updateHealth(car.getLives(), car);
     }
@@ -91,11 +61,14 @@ public class GameWindow {
 
     public void updateHealth(int lives, Car car) {
         for (int i = 0; i < 3; i++) {
-            JLabel heart = healthLabels.computeIfAbsent(i, id -> {
+            final int heartIndex = i;
+
+            JLabel heart = healthLabels.computeIfAbsent(heartIndex, id -> {
                 JLabel lbl = new JLabel(getIcon("/image/Health.png", 25, 25));
                 panel1.add(lbl);
                 return lbl;
             });
+
 
             heart.setBounds((int) car.getX() + (i * 30), (int) car.getY() - 30, 25, 25);
             heart.setVisible(i < lives && car.isActive());
@@ -104,10 +77,21 @@ public class GameWindow {
 
     public void updateObstacles(List<Obstacle> obstacles) {
         obstacleLabels.values().forEach(l -> l.setVisible(false));
-
         for (Obstacle obs : obstacles) {
             JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
-                String path = "/image/" + obs.getType().getImage();
+
+
+                String path;
+                String typeStr = obs.getType().toString();
+
+
+                if ("OIL".equals(typeStr)) {
+                    path = "/image/Oil_Spill.png";
+                } else if ("BARRIER".equals(typeStr)) {
+                    path = "/image/Barrier.png";
+                } else {
+                    path = "/image/Cone.png";
+                }
 
                 JLabel newLbl = new JLabel(getIcon(path, 45, 45));
                 panel1.add(newLbl);
@@ -118,32 +102,42 @@ public class GameWindow {
             lbl.setVisible(obs.isVisible());
         }
     }
-
     public void updateItems(List<Item> items) {
         itemLabels.values().forEach(l -> l.setVisible(false));
-
         for (Item item : items) {
             JLabel lbl = itemLabels.computeIfAbsent(item.getId(), id -> {
                 JLabel newLbl = new JLabel(getIcon("/image/Coin.png", 30, 30));
                 panel1.add(newLbl);
                 return newLbl;
             });
-
             lbl.setBounds((int) item.getX(), (int) item.getY(), 30, 30);
             lbl.setVisible(item.isVisible());
         }
     }
 
+    public void setOnCountdownFinished(Runnable action) {
+        this.onCountdownFinished = action;
+    }
+
+    public void prepareRaceStart(List<Car> cars) {
+        if (cars == null || cars.isEmpty()) return;
+        final int startX = 80;
+        final int[] lanesY = {100, 190, 280, 370};
+        for (int i = 0; i < cars.size() && i < lanesY.length; i++) {
+            Car car = cars.get(i);
+            car.setPosition(startX, lanesY[i]);
+            updateCarPosition(car);
+        }
+        panel1.repaint();
+    }
+
     public void startCountdown() {
         final int[] seconds = {3};
-
         countdownLabel.setText("3");
         countdownLabel.setVisible(true);
-
         Timer timer = new Timer(1000, null);
         timer.addActionListener(e -> {
             seconds[0]--;
-
             if (seconds[0] > 0) {
                 countdownLabel.setText(String.valueOf(seconds[0]));
             } else if (seconds[0] == 0) {
@@ -151,13 +145,9 @@ public class GameWindow {
             } else {
                 timer.stop();
                 countdownLabel.setVisible(false);
-
-                if (onCountdownFinished != null) {
-                    onCountdownFinished.run();
-                }
+                if (onCountdownFinished != null) onCountdownFinished.run();
             }
         });
-
         timer.start();
     }
 

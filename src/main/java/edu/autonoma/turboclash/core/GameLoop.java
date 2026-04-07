@@ -31,6 +31,7 @@ public class GameLoop {
 
         networkSync.join(context, local);
 
+
         while (!context.getMatch().isFinished()) {
 
             if (local != null && local.getCar() != null) {
@@ -44,10 +45,14 @@ public class GameLoop {
 
                 keyboard.update(local.getCar());
                 mouse.update(local.getCar());
+
+
+                window.updateScore(local.getCurrentPoints());
             }
 
 
             context.getEngine().update();
+
 
             obstacleSystem.check(local.getCar(), context.getObstacles());
 
@@ -59,18 +64,18 @@ public class GameLoop {
                     context.getEngine().getItems()
             );
 
-            // red
             networkSync.sync(context, local);
 
             sleep();
         }
-
         shutdown(context, local);
     }
 
     private void shutdown(GameContext context, Player local) {
         networkSync.leave(context, local);
-        context.getPeer().cerrar();
+        if (context.getPeer() != null) {
+            context.getPeer().cerrar();
+        }
     }
 
     private void sleep() {
