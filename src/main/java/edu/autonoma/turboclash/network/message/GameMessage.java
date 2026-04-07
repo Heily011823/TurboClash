@@ -80,7 +80,7 @@ public class GameMessage {
             throw new IllegalArgumentException("Mensaje vacío o nulo");
         }
 
-        String[] parts = data.split("\\|");
+        String[] parts = data.split("\\|", -1);
 
         if (parts.length < 9) {
             throw new IllegalArgumentException("Mensaje UDP inválido: " + data);
