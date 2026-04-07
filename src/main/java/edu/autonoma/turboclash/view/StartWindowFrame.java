@@ -14,7 +14,7 @@ public class StartWindowFrame extends JFrame implements IstartWindowListener, In
         StartWindow view = new StartWindow(this, SoundManager.getInstance());
         view.panel1.setOpaque(false);
 
-        FondoPanel fondo = new FondoPanel("/image/Game_Cover.png");
+        FondoPanel fondo = new FondoPanel("image/Game_Cover.png");
 
         fondo.setLayout(new BorderLayout());
         fondo.add(view.panel1);
