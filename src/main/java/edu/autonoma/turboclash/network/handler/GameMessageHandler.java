@@ -1,78 +1,33 @@
 package edu.autonoma.turboclash.network.handler;
 
-import edu.autonoma.turboclash.model.*;
+import edu.autonoma.turboclash.model.Player;
 import edu.autonoma.turboclash.network.message.GameMessage;
+import edu.autonoma.turboclash.network.message.MessageType;
+import edu.autonoma.turboclash.network.strategy.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameMessageHandler {
 
-    private List<Player> remotePlayers;
+    private final Map<MessageType, IMessageStrategy> strategies = new HashMap<>();
 
     public GameMessageHandler(List<Player> remotePlayers) {
-        this.remotePlayers = remotePlayers;
+
+        strategies.put(MessageType.PLAYER_JOINED, new JoinStrategy(remotePlayers));
+        strategies.put(MessageType.MOVEMENT, new MoveStrategy(remotePlayers));
+        strategies.put(MessageType.SCORE_UPDATE, new ScoreStrategy(remotePlayers));
+        strategies.put(MessageType.PLAYER_LEFT, new LeaveStrategy(remotePlayers));
     }
 
     public void handle(GameMessage msg) {
         if (msg == null) return;
 
-        switch (msg.getType()) {
-            case PLAYER_JOINED -> handleJoin(msg);
-            case MOVEMENT -> handleMovement(msg);
-            case SCORE_UPDATE -> handleScore(msg);
-            case PLAYER_LEFT -> handleLeft(msg);
-            default -> {}
+        IMessageStrategy strategy = strategies.get(msg.getType());
+
+        if (strategy != null) {
+            strategy.handle(msg);
         }
-    }
-
-    private void handleJoin(GameMessage msg) {
-        boolean existe = remotePlayers.stream()
-                .anyMatch(p -> p.getId().equals(msg.getPlayerId()));
-
-        if (!existe) {
-
-
-            CarSkin skin = msg.getCarSkin();
-
-
-            if (skin == null) {
-                skin = CarSkin.RED;
-            }
-
-            Car car = new Car(
-                    msg.getPlayerId(),
-                    msg.getPosX(),
-                    msg.getPosY(),
-                    skin
-            );
-
-            Player nuevo = new Player(
-                    msg.getPlayerId(),
-                    msg.getPlayerName(),
-                    car
-            );
-
-            remotePlayers.add(nuevo);
-        }
-    }
-
-    private void handleMovement(GameMessage msg) {
-        for (Player p : remotePlayers) {
-            if (p.getId().equals(msg.getPlayerId())) {
-                p.getCar().setPosition(msg.getPosX(), msg.getPosY());
-            }
-        }
-    }
-
-    private void handleScore(GameMessage msg) {
-        for (Player p : remotePlayers) {
-            if (p.getId().equals(msg.getPlayerId())) {
-                p.setScore(msg.getScore());
-            }
-        }
-    }
-
-    private void handleLeft(GameMessage msg) {
-        remotePlayers.removeIf(p -> p.getId().equals(msg.getPlayerId()));
     }
 }

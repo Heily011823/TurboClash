@@ -5,25 +5,19 @@ import edu.autonoma.turboclash.network.message.GameMessage;
 
 import java.util.List;
 
-public class MoveStrategy implements IMessageStrategy {
+public class ScoreStrategy implements IMessageStrategy {
 
     private final List<Player> players;
 
-    public MoveStrategy(List<Player> players) {
+    public ScoreStrategy(List<Player> players) {
         this.players = players;
     }
 
     @Override
     public void handle(GameMessage message) {
-
         for (Player p : players) {
             if (p.getId().equals(message.getPlayerId())) {
-                p.syncFromNetwork(
-                        message.getPosX(),
-                        message.getPosY(),
-                        message.getScore()
-                );
-
+                p.setScore(message.getScore());
                 break;
             }
         }

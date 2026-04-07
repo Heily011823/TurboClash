@@ -26,7 +26,7 @@ public class Player {
         if (car != null) {
             car.setPosition(x, y);
         }
-        this.setScore(score);
+        this.score.setPoints(score);
     }
 
 
