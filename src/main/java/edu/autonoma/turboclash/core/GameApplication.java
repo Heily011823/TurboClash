@@ -4,6 +4,7 @@ import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.input.*;
 import edu.autonoma.turboclash.view.*;
 
+
 public class GameApplication {
 
     private final GameBootstrap bootstrap;
@@ -14,41 +15,29 @@ public class GameApplication {
         this.config = config;
     }
 
-    public void start(String nombreJugador) {
-
-        int puerto = getPuerto();
+    public void start(String playerName) {
 
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
 
-        GameWindowFrame frame = new GameWindowFrame(keyboard, mouse);
-        GameWindow window = frame.getView();
-
-        GameContext context = bootstrap.init(puerto, nombreJugador);
-
-        GameLoop loop = new GameLoop(config.getFrameDelay());
+        GameWindowFrame mainFrame = new GameWindowFrame(keyboard, mouse);
+        GameWindow view = mainFrame.getGameView();
 
 
-        new Thread(() -> {
-            loop.run(context, window, keyboard, mouse, puerto);
-        }).start();
+        int port = config.getMinPort();
+        GameContext context = bootstrap.init(port, playerName);
 
 
-        window.requestGameFocus();
+        view.prepararInicioCarrera(context.getCars());
+
+
+        launchGameLoop(context, view, keyboard, mouse, port);
     }
 
-    private int getPuerto() {
-        int puerto = Integer.parseInt(
-                System.getProperty("puerto", String.valueOf(config.getMinPort()))
-        );
-
-        if (!config.isValidPort(puerto)) {
-            throw new IllegalArgumentException(
-                    "Puerto inválido. Usa entre "
-                            + config.getMinPort() + " y " + config.getMaxPort()
-            );
-        }
-
-        return puerto;
+    private void launchGameLoop(GameContext ctx, GameWindow view, KeyboardInput k, MouseInput m, int port) {
+        GameLoop loop = new GameLoop(config.getFrameDelay());
+        Thread gameThread = new Thread(() -> loop.run(ctx, view, k, m, port));
+        gameThread.setName("GameLoop-Thread");
+        gameThread.start();
     }
 }
