@@ -26,7 +26,7 @@ public class GameWindowFrame extends JFrame {
         view.requestGameFocus();
 
         if (countdownAction != null) {
-            view.iniciarCuentaRegresiva();
+            view.startCountdown();
         }
     }
 
@@ -61,7 +61,7 @@ public class GameWindowFrame extends JFrame {
 
     public void setCountdownAction(Runnable countdownAction) {
         this.countdownAction = countdownAction;
-        view.iniciarCuentaRegresiva();
+        view.startCountdown();
     }
 
     public GameWindow getView() {

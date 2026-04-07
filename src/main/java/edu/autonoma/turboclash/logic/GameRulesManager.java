@@ -2,10 +2,6 @@ package edu.autonoma.turboclash.logic;
 
 import edu.autonoma.turboclash.model.Player;
 
-/**
- * GameRulesManager: El "Cerebro" de las reglas del juego.
- * Implementa las 5 reglas principales de TurboClash.
- */
 public class GameRulesManager {
 
     private final int targetScore;
@@ -15,40 +11,57 @@ public class GameRulesManager {
     }
 
 
-    // REGLA 1: COLECCIÓN DE MONEDAS
+    // MONEDAS
 
     public void applyCoinReward(Player p) {
         if (p == null) return;
-        p.updateScore(GameConstants.COIN_VALUE); // +20 puntos
+
+        p.updateScore(GameConstants.COIN_VALUE);
+        p.setHasScored(true);
     }
 
-    // REGLA 2: CHOQUE CON OBSTÁCULOS
+
+    // OBSTÁCULOS
 
     public void applyObstaclePenalty(Player p) {
         if (p == null) return;
-        p.updateScore(-GameConstants.OBSTACLE_PENALTY); // -10 puntos
-        applySpeedDebuff(p); // Regla 4: Penalización de velocidad
+
+        p.updateScore(-GameConstants.OBSTACLE_PENALTY);
+
+        checkZeroLifeRule(p);
+        applySpeedDebuff(p);
     }
 
-    // REGLA 3: COLISIÓN ENTRE JUGADORES
+
+    // COLISIÓN ENTRE JUGADORES
 
     public void handlePlayersCollision(Player p1, Player p2) {
+
         if (p1 != null) {
-            p1.loseLife(); // Resta 1 corazón
-            applySpeedDebuff(p1); // Regla 4
+            p1.loseLife();
+            applySpeedDebuff(p1);
         }
+
         if (p2 != null) {
-            p2.loseLife(); // Resta 1 corazón
-            applySpeedDebuff(p2); // Regla 4
+            p2.loseLife();
+            applySpeedDebuff(p2);
         }
     }
 
 
-    // REGLA 4: PENALIZACIÓN DE VELOCIDAD (DEBUFF)
+    // REGLA NUEVA
+
+    private void checkZeroLifeRule(Player p) {
+        if (p.getCurrentPoints() <= 0 && p.hasScored()) {
+            p.resetScore();
+            p.loseLife();
+        }
+    }
+
+    // DEBUFF
 
     private void applySpeedDebuff(Player p) {
         if (p != null && p.getCar() != null) {
-            // Reduce al 50% por 2 segundos (definido en GameConstants)
             p.getCar().applyDebuff(
                     GameConstants.DEBUFF_SPEED_FACTOR,
                     GameConstants.DEBUFF_DURATION_MS
@@ -57,24 +70,20 @@ public class GameRulesManager {
     }
 
 
-    // REGLA 5: BONO DE META
+    // META
 
     public void applyFinishBonus(Player p) {
         if (p == null || p.getCar() == null) return;
 
-
         if (!p.getCar().isFinishReached()) {
-            p.updateScore(GameConstants.FINISH_LINE_BONUS); // +50 puntos
+            p.updateScore(GameConstants.FINISH_LINE_BONUS);
             p.getCar().setFinishReached(true);
         }
     }
 
-    // VALIDACIÓN DE VICTORIA
-
     public boolean hasWon(Player p) {
         if (p == null || p.getCar() == null) return false;
 
-        // Gana por puntaje objetivo o por cruzar la meta
         return p.getCurrentPoints() >= targetScore || p.getCar().isFinishReached();
     }
 }

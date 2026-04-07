@@ -46,9 +46,8 @@ public class CollisionManager {
         });
     }
 
-    // ======================
     // OBSTÁCULOS
-    // ======================
+
     private void handleObstacles(Player player, List<Obstacle> obstacles) {
         if (obstacles == null) return;
 
@@ -69,9 +68,9 @@ public class CollisionManager {
         }
     }
 
-    // ======================
+
     // COLISIÓN ENTRE JUGADORES
-    // ======================
+
     private void handlePlayerCollisions(Player local, List<Player> remotes) {
         if (remotes == null) return;
 

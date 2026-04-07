@@ -16,7 +16,6 @@ public class GameLoop {
         this.frameDelay = frameDelay;
         this.networkSync = new NetworkSync();
 
-
         CollisionListener listener = new SoundCollisionListener();
         this.obstacleSystem = new ObstacleSystem(listener);
     }
@@ -33,15 +32,25 @@ public class GameLoop {
         networkSync.join(context, local);
 
         while (!context.getMatch().isFinished()) {
+
             if (local != null && local.getCar() != null) {
+
+
+                local.getCar().updateDebuff();
+
+
                 local.getCar().stop();
+
+
                 keyboard.update(local.getCar());
                 mouse.update(local.getCar());
             }
 
+
             context.getEngine().update();
 
             obstacleSystem.check(local.getCar(), context.getObstacles());
+
 
             viewSync.sync(
                     window,
@@ -50,6 +59,7 @@ public class GameLoop {
                     context.getEngine().getItems()
             );
 
+            // red
             networkSync.sync(context, local);
 
             sleep();

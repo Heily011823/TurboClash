@@ -1,32 +1,67 @@
 package edu.autonoma.turboclash.model;
 
-import edu.autonoma.turboclash.logic.GameConstants;
-
-
 public class Car extends GameObject {
 
-    private int lives = GameConstants.INITIAL_LIVES;
-    private double speedMultiplier = 1.0;
-    private long penaltyEndTime = 0;
-    private boolean active = true;
-    private boolean finishReached = false;
-    private double lastDx, lastDy;
-    private String playerName;
-    private CarSkin carSkin;
-    public String getPlayerName() {
-        return playerName;
+    // ======================
+    // ESTADO DEL CARRO
+    // ======================
+    private double posX;
+    private double posY;
+
+    private double lastDx;
+    private double lastDy;
+
+    private boolean active;
+
+
+    // VIDAS
+    private int lives;
+
+
+    // VELOCIDAD / DEBUFF
+
+    private double speedMultiplier;
+    private boolean debuffed;
+    private long debuffEndTime;
+
+
+    // META
+
+    private boolean finishReached;
+
+
+    // VISUAL
+
+    private final String carImage;
+
+
+    // CONSTRUCTOR
+
+    public Car(String id, double x, double y, int width, int height, String carImage) {
+        super(id, x, y, width, height);
+
+        this.posX = x;
+        this.posY = y;
+
+        this.lastDx = 0;
+        this.lastDy = 0;
+
+        this.active = true;
+
+        this.lives = 3;
+
+        this.speedMultiplier = 1.0;
+        this.debuffed = false;
+        this.debuffEndTime = 0;
+
+        this.finishReached = false;
+
+        this.carImage = carImage;
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
-
-
-
-    public Car(String id, double x, double y, CarSkin carSkin) {
-        super(id, x, y, GameConstants.CAR_WIDTH, GameConstants.CAR_HEIGHT);
-        this.carSkin = carSkin;
-    }
+    // ======================
+    // MOVIMIENTO
+    // ======================
 
     public void move(double dx, double dy) {
         if (!active) {
@@ -39,33 +74,14 @@ public class Car extends GameObject {
 
         this.posX += lastDx;
         this.posY += lastDy;
+
+        updatePosition();
     }
 
     public void undoLastMove() {
         this.posX -= lastDx;
         this.posY -= lastDy;
-        resetMovement();
-    }
-
-    public void reduceLife() {
-        if (lives > 0) {
-            lives--;
-            if (lives <= 0) active = false;
-        }
-    }
-
-    public void applyDebuff(double factor, long duration) {
-        this.speedMultiplier = factor;
-        this.penaltyEndTime = System.currentTimeMillis() + duration;
-    }
-
-    public void update() {
-        if (penaltyEndTime > 0 && System.currentTimeMillis() > penaltyEndTime) {
-            speedMultiplier = 1.0;
-            penaltyEndTime = 0;
-        }
-
-        resetMovement();
+        updatePosition();
     }
 
     public void stop() {
@@ -73,38 +89,100 @@ public class Car extends GameObject {
     }
 
     private void resetMovement() {
-        lastDx = 0;
-        lastDy = 0;
+        this.lastDx = 0;
+        this.lastDy = 0;
     }
 
-    public void setLives(int lives) {
-        this.lives = lives;
-        this.active = (this.lives > 0);
+    private void updatePosition() {
+        super.setPosition(posX, posY);
+    }
+
+
+    // VELOCIDAD / DEBUFF
+
+
+    public void applyDebuff(double factor, long duration) {
+        this.speedMultiplier = factor;
+        this.debuffed = true;
+        this.debuffEndTime = System.currentTimeMillis() + duration;
+    }
+
+    public void updateDebuff() {
+        if (debuffed && System.currentTimeMillis() > debuffEndTime) {
+            this.speedMultiplier = 1.0;
+            this.debuffed = false;
+        }
+    }
+
+    public boolean isDebuffed() {
+        return debuffed;
+    }
+
+    public double getSpeedMultiplier() {
+        return speedMultiplier;
+    }
+
+    // VIDAS
+
+
+    public void reduceLife() {
+        if (lives > 0) {
+            lives--;
+        }
+
+        if (lives <= 0) {
+            active = false;
+        }
     }
 
     public int getLives() {
         return lives;
     }
 
+    public void setLives(int lives) {
+        this.lives = Math.max(0, lives);
+    }
+
+    // META
+
+
+    public boolean isFinishReached() {
+        return finishReached;
+    }
+
+    public void setFinishReached(boolean finishReached) {
+        this.finishReached = finishReached;
+    }
+
+
+    // ESTADO
+
+
     public boolean isActive() {
         return active;
     }
 
-
-    public CarSkin getCarSkin() {
-        return carSkin;
+    public void setActive(boolean active) {
+        this.active = active;
     }
+
+
+    // POSICIÓN
+
+
+    public double getX() {
+        return posX;
+    }
+
+    public double getY() {
+        return posY;
+    }
+
+
+    // VISUAL
 
 
     public String getCarImage() {
-        return carSkin.getFileName();
-    }
-
-    public void setFinishReached(boolean reached) {
-        this.finishReached = reached;
-    }
-
-    public boolean isFinishReached() {
-        return finishReached;
+        return carImage;
     }
 }

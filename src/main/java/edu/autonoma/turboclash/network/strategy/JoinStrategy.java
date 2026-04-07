@@ -16,10 +16,19 @@ public class JoinStrategy implements IMessageStrategy {
     @Override
     public void handle(GameMessage message) {
 
+        Car car = new Car(
+                message.getPlayerId(),
+                message.getPosX(),
+                message.getPosY(),
+                100,
+                50,
+                "Car_Blue.png"
+        );
+
         Player newPlayer = new Player(
                 message.getPlayerId(),
                 message.getPlayerName(),
-                new Car(message.getPlayerId(), message.getPosX(), message.getPosY(), null)
+                car
         );
 
         players.add(newPlayer);

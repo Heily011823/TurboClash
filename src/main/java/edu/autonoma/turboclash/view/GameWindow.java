@@ -3,7 +3,6 @@ package edu.autonoma.turboclash.view;
 import edu.autonoma.turboclash.model.*;
 import javax.swing.*;
 import java.awt.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -30,6 +29,7 @@ public class GameWindow {
         panel1.setOpaque(false);
         panel1.setPreferredSize(new Dimension(1000, 700));
 
+
         Puntaje = createScoreLabel();
         panel1.add(Puntaje);
 
@@ -40,21 +40,24 @@ public class GameWindow {
         this.onCountdownFinished = action;
     }
 
-    public void prepararInicioCarrera(List<Car> cars) {
-        if (cars == null) return;
+    public void prepareRaceStart(List<Car> cars) {
+        if (cars == null || cars.isEmpty()) return;
 
-        int[] lanesY = {100, 190, 280, 370};
+        final int startX = 80;
+        final int[] lanesY = {100, 190, 280, 370};
 
         for (int i = 0; i < cars.size() && i < lanesY.length; i++) {
-            cars.get(i).setPosition(80, lanesY[i]);
-            updateCarPosition(cars.get(i));
+            Car car = cars.get(i);
+            car.setPosition(startX, lanesY[i]);
+            updateCarPosition(car);
         }
 
         panel1.repaint();
     }
 
+
     public void updateScore(int points) {
-        Puntaje.setText("Score: " + points);
+        Puntaje.setText("Puntaje: " + points);
     }
 
     public void updateCarPosition(Car car) {
@@ -64,8 +67,19 @@ public class GameWindow {
             return newLbl;
         });
 
-        lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
+        int width = car.isDebuffed() ? 90 : 100;
+        int height = car.isDebuffed() ? 45 : 50;
+
+        lbl.setBounds((int) car.getX(), (int) car.getY(), width, height);
         lbl.setVisible(car.isActive());
+
+        if (car.isDebuffed()) {
+            lbl.setOpaque(true);
+            lbl.setBackground(new Color(0, 0, 0, 80));
+        } else {
+            lbl.setOpaque(false);
+            lbl.setBackground(null);
+        }
 
         updateHealth(car.getLives(), car);
     }
@@ -122,19 +136,19 @@ public class GameWindow {
         }
     }
 
-    public void iniciarCuentaRegresiva() {
-        final int[] segundos = {3};
+    public void startCountdown() {
+        final int[] seconds = {3};
 
         countdownLabel.setText("3");
         countdownLabel.setVisible(true);
 
         Timer timer = new Timer(1000, null);
         timer.addActionListener(e -> {
-            segundos[0]--;
+            seconds[0]--;
 
-            if (segundos[0] > 0) {
-                countdownLabel.setText(String.valueOf(segundos[0]));
-            } else if (segundos[0] == 0) {
+            if (seconds[0] > 0) {
+                countdownLabel.setText(String.valueOf(seconds[0]));
+            } else if (seconds[0] == 0) {
                 countdownLabel.setText("GO!");
             } else {
                 timer.stop();
@@ -154,7 +168,7 @@ public class GameWindow {
     }
 
     private JLabel createScoreLabel() {
-        JLabel label = new JLabel("Score: 0");
+        JLabel label = new JLabel("Puntaje: 0");
         label.setForeground(Color.YELLOW);
         label.setFont(new Font("Arial", Font.BOLD, 24));
         label.setBounds(20, 40, 250, 40);

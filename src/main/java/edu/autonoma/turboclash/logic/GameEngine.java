@@ -51,7 +51,11 @@ public class GameEngine {
     }
 
     private void updateCars() {
-
+        for (Player p : match.getPlayers()) {
+            if (p.getCar() != null) {
+                p.getCar().updateDebuff();
+            }
+        }
     }
 
     private void processCollisions() {
@@ -92,7 +96,6 @@ public class GameEngine {
         if (local == null || local.getCar() == null) return;
 
         if (local.getCar().getX() <= DEAD_ZONE_X) {
-            System.out.println("💀 PERDISTE: te quedaste atrás");
 
             match.setFinished(null);
         }

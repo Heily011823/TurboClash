@@ -16,6 +16,7 @@ public class GameApplication {
 
     public void start(String playerName) {
         int puerto = getPuerto();
+
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
 
@@ -24,7 +25,8 @@ public class GameApplication {
 
         GameContext context = bootstrap.init(puerto, playerName);
 
-        view.prepararInicioCarrera(context.getCars());
+
+        view.prepareRaceStart(context.getCars());
 
         GameLoop loop = new GameLoop(config.getFrameDelay());
 
@@ -38,11 +40,13 @@ public class GameApplication {
 
         view.setOnCountdownFinished(startGame);
         view.requestGameFocus();
-        view.iniciarCuentaRegresiva();
+
+
+        view.startCountdown();
     }
 
     /**
-     * SRP: Responsable de validar y obtener el puerto de red.
+     * SRP: Responsible for validating and obtaining the network port.
      */
     private int getPuerto() {
         int puerto = Integer.parseInt(
@@ -51,8 +55,8 @@ public class GameApplication {
 
         if (!config.isValidPort(puerto)) {
             throw new IllegalArgumentException(
-                    "Puerto inválido. Usa entre "
-                            + config.getMinPort() + " y " + config.getMaxPort()
+                    "Invalid port. Use between "
+                            + config.getMinPort() + " and " + config.getMaxPort()
             );
         }
 

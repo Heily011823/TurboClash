@@ -4,10 +4,9 @@ import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.model.*;
 
 import java.util.ArrayList;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.ArrayList;
-import java.util.List;
+
 
 
 public class GameFactory {
@@ -25,15 +24,19 @@ public class GameFactory {
     }
 
 
-
-
     public Player createPlayer(String playerId, String playerName, int puerto) {
 
-        Car car = new Car(playerName, 0, 0, CarSkin.BLUE); // luego puedes mejorar skin
-        car.setPlayerName(playerName);
+        CarSkin skin = skinFactory.fromPort(puerto);
 
-        Player player = new Player(playerId, playerName, car);
+        Car car = new Car(
+                playerId,
+                0,
+                0,
+                80,
+                40,
+                skin.getFileName()
+        );
 
-        return player;
+        return new Player(playerId, playerName, car);
     }
 }
