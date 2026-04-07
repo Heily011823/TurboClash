@@ -60,9 +60,17 @@ public class GameBootstrap {
 
         GameMessageHandler messageHandler = new GameMessageHandler(remotePlayers);
 
-        UdpPeer peer = networkFactory.createPeer(puertoLocal, remotePlayers, messageHandler);
-
         GameMessageFactory messageFactory = new GameMessageFactory();
+
+        UdpPeer peer = networkFactory.createPeer(
+                puertoLocal,
+                localPlayer,
+                remotePlayers,
+                messageHandler,
+                messageFactory
+        );
+
+
         GameNetworkService network = new GameNetworkService(peer, messageFactory);
 
         return new GameContext(match, engine, network, obstacles, items, peer);

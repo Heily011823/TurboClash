@@ -3,6 +3,9 @@ package edu.autonoma.turboclash.core;
 import edu.autonoma.turboclash.model.Player;
 import edu.autonoma.turboclash.network.core.*;
 import edu.autonoma.turboclash.network.handler.GameMessageHandler;
+import edu.autonoma.turboclash.network.factory.GameMessageFactory;
+import edu.autonoma.turboclash.network.message.GameMessage;
+import edu.autonoma.turboclash.network.message.MessageType;
 
 import java.net.DatagramSocket;
 import java.util.List;
@@ -16,13 +19,15 @@ public class NetworkFactory {
     }
 
     public UdpPeer createPeer(int puertoLocal,
+                              Player localPlayer,
                               List<Player> remotePlayers,
-                              GameMessageHandler handler) {
+                              GameMessageHandler handler,
+                              GameMessageFactory messageFactory) {
 
         try {
             DatagramSocket socket = new DatagramSocket(puertoLocal);
 
-
+            // 🔥 habilitar broadcast
             socket.setBroadcast(true);
 
             IMessageSender sender = new UdpSender(socket);
@@ -40,6 +45,17 @@ public class NetworkFactory {
 
 
                 handler.handle(msg);
+
+
+                if (msg.getType() == MessageType.PLAYER_JOINED) {
+
+                    GameMessage response = messageFactory.create(
+                            localPlayer,
+                            MessageType.PLAYER_JOINED
+                    );
+
+                    sender.enviarMensaje(response, ip, port);
+                }
             });
 
             peer.iniciar();
