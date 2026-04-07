@@ -33,6 +33,7 @@ public class GameWindow {
             panel1.setLayout(null);
             panel1.setFocusable(true);
             panel1.requestFocusInWindow();
+            panel1.setPreferredSize(GameViewport.size());
         }
 
         initializeScoreUI();
@@ -52,7 +53,7 @@ public class GameWindow {
         countdownLabel = new JLabel("", SwingConstants.CENTER);
         countdownLabel.setFont(new Font("Arial", Font.BOLD, 48));
         countdownLabel.setForeground(Color.WHITE);
-        countdownLabel.setBounds(300, 200, 200, 80);
+        countdownLabel.setBounds((GameViewport.WIDTH - 200) / 2, (GameViewport.HEIGHT - 80) / 2, 200, 80);
         countdownLabel.setVisible(false);
 
         if (panel1 != null) {
@@ -184,11 +185,8 @@ public class GameWindow {
     }
 
     public void prepararInicioCarrera(List<Car> cars) {
-        int startX = 80;
-        int[] lanesY = {100, 190, 280, 370};
-
-        for (int i = 0; i < cars.size() && i < lanesY.length; i++) {
-            cars.get(i).setPosition(startX, lanesY[i]);
+        for (int i = 0; i < cars.size() && i < GameViewport.LANE_Y.length; i++) {
+            cars.get(i).setPosition(GameViewport.CAR_START_X, GameViewport.laneY(i));
         }
 
         updateCars(cars);

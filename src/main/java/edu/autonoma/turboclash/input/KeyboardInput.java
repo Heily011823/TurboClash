@@ -1,6 +1,7 @@
 package edu.autonoma.turboclash.input;
 
 import edu.autonoma.turboclash.model.Car;
+import edu.autonoma.turboclash.view.GameViewport;
 
 public class KeyboardInput implements InputHandler {
 
@@ -24,6 +25,9 @@ public class KeyboardInput implements InputHandler {
         if (left) newX -= speed;
         if (right) newX += speed;
 
-        car.setPosition(newX, newY);
+        car.setPosition(
+                GameViewport.clampX(newX, car),
+                GameViewport.clampY(newY, car)
+        );
     }
 }

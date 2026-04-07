@@ -1,6 +1,7 @@
 package edu.autonoma.turboclash.input;
 
 import edu.autonoma.turboclash.model.Car;
+import edu.autonoma.turboclash.view.GameViewport;
 
 public class MouseInput implements InputHandler {
 
@@ -17,5 +18,6 @@ public class MouseInput implements InputHandler {
         double dy = targetY - car.getY();
 
         car.move(dx * 0.1, dy * 0.1);
+        GameViewport.clampCar(car);
     }
 }
