@@ -141,9 +141,8 @@ public class GameWindow {
         for (int i = 0; i < cars.size(); i++) {
             Car car = cars.get(i);
             JLabel lbl = carLabels.get(i);
-
-            int skinIndex = i % SKINS.length;
-            java.net.URL carUrl = getClass().getResource(SKINS[skinIndex]);
+            String imagePath = "/image/" + car.getCarImage();
+            java.net.URL carUrl = getClass().getResource(imagePath);
 
             if (carUrl != null) {
                 ImageIcon icon = new ImageIcon(new ImageIcon(carUrl)

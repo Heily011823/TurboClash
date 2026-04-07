@@ -4,6 +4,7 @@ import edu.autonoma.turboclash.input.GameInputBinder;
 import edu.autonoma.turboclash.input.KeyboardInput;
 import edu.autonoma.turboclash.input.MouseInput;
 import edu.autonoma.turboclash.model.Car;
+import edu.autonoma.turboclash.model.CarSkin;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -46,10 +47,10 @@ public class GameWindowFrame extends JFrame {
     private void iniciarJuego() {
         cars.clear();
 
-        cars.add(new Car("car1", 0, 0, "BLUE"));
-        cars.add(new Car("car2", 0, 0, "RED"));
-        cars.add(new Car("car3", 0, 0, "YELLOW"));
-        cars.add(new Car("car4", 0, 0, "BROWN"));
+        cars.add(new Car("car1", 0, 0, CarSkin.BLUE));
+        cars.add(new Car("car2", 0, 0, CarSkin.RED));
+        cars.add(new Car("car3", 0, 0, CarSkin.YELLOW));
+        cars.add(new Car("car4", 0, 0, CarSkin.BROWN));
 
         view.prepararInicioCarrera(cars);
 
