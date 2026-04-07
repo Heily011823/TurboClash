@@ -27,7 +27,7 @@ public class NetworkFactory {
         try {
             DatagramSocket socket = new DatagramSocket(puertoLocal);
 
-            // 🔥 habilitar broadcast
+
             socket.setBroadcast(true);
 
             IMessageSender sender = new UdpSender(socket);
@@ -49,12 +49,13 @@ public class NetworkFactory {
 
                 if (msg.getType() == MessageType.PLAYER_JOINED) {
 
-                    GameMessage response = messageFactory.create(
-                            localPlayer,
-                            MessageType.PLAYER_JOINED
-                    );
+                    boolean yaExiste = remotePlayers.stream()
+                            .anyMatch(p -> p.getId().equals(msg.getPlayerId()));
 
-                    sender.enviarMensaje(response, ip, port);
+                    if (!yaExiste) {
+                        GameMessage response = messageFactory.create(localPlayer, MessageType.PLAYER_JOINED);
+                        sender.enviarMensaje(response, ip, port);
+                    }
                 }
             });
 
