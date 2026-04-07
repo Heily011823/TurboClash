@@ -13,14 +13,16 @@ public class NetworkConfig {
         this.config = config;
     }
 
-    public Map<Integer, String> getPeers() {
 
-        Map<Integer, String> peers = new HashMap<>();
+    public int[] getPorts() {
+        int size = config.getMaxPort() - config.getMinPort() + 1;
+        int[] ports = new int[size];
 
+        int index = 0;
         for (int port = config.getMinPort(); port <= config.getMaxPort(); port++) {
-            peers.put(port, config.getDefaultHost());
+            ports[index++] = port;
         }
 
-        return peers;
+        return ports;
     }
 }

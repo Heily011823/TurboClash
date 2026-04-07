@@ -14,7 +14,6 @@ public class GameConfig {
     private final int initialLives;
     private final int targetScore;
     private final long collisionCooldown;
-    private final String defaultHost;
     private final double carStartX;
     private final double carStartY;
 
@@ -28,7 +27,6 @@ public class GameConfig {
         this.initialLives = 3;
         this.targetScore = 10;
         this.collisionCooldown = 1000;
-        this.defaultHost = "localhost";
         this.carStartX = 50.0;
         this.carStartY = 300.0;
 
@@ -51,7 +49,6 @@ public class GameConfig {
     public int getInitialLives() { return initialLives; }
     public int getTargetScore() { return targetScore; }
     public long getCollisionCooldown() { return collisionCooldown; }
-    public String getDefaultHost() { return defaultHost; }
     public double getCarStartX() { return carStartX; }
     public double getCarStartY() { return carStartY; }
 

@@ -22,19 +22,25 @@ public class NetworkFactory {
         try {
             DatagramSocket socket = new DatagramSocket(puertoLocal);
 
+
+            socket.setBroadcast(true);
+
             IMessageSender sender = new UdpSender(socket);
             IMessageReceiver receiver = new UdpReceiver(socket);
 
             UdpPeer peer = new UdpPeer(socket, sender, receiver);
 
 
-            networkConfig.getPeers().forEach((port, ip) -> {
+            receiver.setListener((msg, ip, port) -> {
+
+
                 if (port != puertoLocal) {
                     peer.agregarPeer(ip, port);
                 }
-            });
 
-            receiver.setListener((msg, ip, port) -> handler.handle(msg));
+
+                handler.handle(msg);
+            });
 
             peer.iniciar();
             return peer;
