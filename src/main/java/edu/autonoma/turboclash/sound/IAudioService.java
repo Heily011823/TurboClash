@@ -4,6 +4,8 @@ public interface IAudioService {
 
     void playMenuMusic();
 
+    void playCoinSound();
+
     void stopMusic();
 
 }

@@ -6,6 +6,8 @@ import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.network.core.*;
 import edu.autonoma.turboclash.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.network.handler.GameMessageHandler;
+import edu.autonoma.turboclash.sound.IAudioService;
+import edu.autonoma.turboclash.sound.SoundManager;
 
 import java.util.*;
 
@@ -15,16 +17,18 @@ public class GameBootstrap {
     private final WorldFactory worldFactory;
     private final NetworkFactory networkFactory;
     private final GameConfig config;
+    private final IAudioService audioService;
 
     public GameBootstrap(GameFactory gameFactory,
                          WorldFactory worldFactory,
                          NetworkFactory networkFactory,
-                         GameConfig config) {
+                         GameConfig config, IAudioService audioService) {
 
         this.gameFactory = gameFactory;
         this.worldFactory = worldFactory;
         this.networkFactory = networkFactory;
         this.config = config;
+        this.audioService = audioService;
     }
 
     public GameContext init(int puertoLocal, String playerName) {
@@ -45,7 +49,7 @@ public class GameBootstrap {
         );
 
         GameRulesManager rules = new GameRulesManager(config.getTargetScore());
-        CollisionManager collision = new CollisionManager(rules, config.getCollisionCooldown());
+        CollisionManager collision = new CollisionManager(rules, config.getCollisionCooldown(), audioService);
 
         GameEngine engine = new GameEngine(match, collision, items, obstacles);
 

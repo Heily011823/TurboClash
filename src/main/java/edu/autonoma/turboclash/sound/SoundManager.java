@@ -15,6 +15,11 @@ public class SoundManager implements IAudioService {
     }
 
     @Override
+    public void playCoinSound() {
+        playEffect(Sound.POINT);
+    }
+
+    @Override
     public void stopMusic() {
         stopBackground();
     }

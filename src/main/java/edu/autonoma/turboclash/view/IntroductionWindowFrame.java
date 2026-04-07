@@ -66,7 +66,8 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
                 gameFactory,
                 worldFactory,
                 networkFactory,
-                config
+                config,
+                SoundManager.getInstance()
         );
 
         GameApplication app = new GameApplication(bootstrap, config);
