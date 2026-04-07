@@ -20,6 +20,11 @@ public class SoundManager implements IAudioService {
     }
 
     @Override
+    public void playBrakeSound() {
+        playEffect(Sound.BRAKE);
+    }
+
+    @Override
     public void stopMusic() {
         stopBackground();
     }

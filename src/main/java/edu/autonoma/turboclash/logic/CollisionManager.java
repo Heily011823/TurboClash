@@ -62,6 +62,8 @@ public class CollisionManager {
 
                 if (canApplyCollision()) {
                     rules.applyObstaclePenalty(player);
+
+                    audioService.playBrakeSound();
                 }
             }
         }
