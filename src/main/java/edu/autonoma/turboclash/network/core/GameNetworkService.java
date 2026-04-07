@@ -40,10 +40,14 @@ public class GameNetworkService {
     }
 
     private void send(GameMessage msg) {
-        try {
-            peer.enviarATodos(msg);
-        } catch (Exception e) {
-            throw new RuntimeException("Error enviando mensaje de red", e);
+
+        for (int port = 5000; port <= 5003; port++) {
+            try {
+                peer.getSender().enviarMensaje(msg, "255.255.255.255", port);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
     }
 }

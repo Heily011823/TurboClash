@@ -45,9 +45,7 @@ public class GameApplication {
         view.startCountdown();
     }
 
-    /**
-     * SRP: Responsible for validating and obtaining the network port.
-     */
+
     private int getPuerto() {
         int puerto = Integer.parseInt(
                 System.getProperty("puerto", String.valueOf(config.getMinPort()))
