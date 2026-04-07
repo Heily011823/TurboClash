@@ -27,7 +27,14 @@ public class GameApplication {
         GameContext context = bootstrap.init(puerto, nombreJugador);
 
         GameLoop loop = new GameLoop(config.getFrameDelay());
-        loop.run(context, window, keyboard, mouse, puerto);
+
+
+        new Thread(() -> {
+            loop.run(context, window, keyboard, mouse, puerto);
+        }).start();
+
+
+        window.requestGameFocus();
     }
 
     private int getPuerto() {
