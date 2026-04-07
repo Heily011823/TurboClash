@@ -14,13 +14,14 @@ import edu.autonoma.turboclash.core.NetworkFactory;
 
 import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
 import edu.autonoma.turboclash.network.core.NetworkConfig;
+import edu.autonoma.turboclash.sound.SoundManager;
 import edu.autonoma.turboclash.validation.GameStateValidator;
 import edu.autonoma.turboclash.validation.PlayerNameValidator;
 
 public class IntroductionWindowFrame extends JFrame implements IntroductionWindowListener {
 
     public IntroductionWindowFrame() {
-        IntroductionWindow view = new IntroductionWindow(this);
+        IntroductionWindow view = new IntroductionWindow(this, SoundManager.getInstance());
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/Start.png");
