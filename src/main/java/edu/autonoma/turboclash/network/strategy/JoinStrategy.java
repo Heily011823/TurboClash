@@ -19,10 +19,23 @@ public class JoinStrategy implements IMessageStrategy {
     public void handle(GameMessage message) {
 
 
+        if (message.getPlayerId().equals(match.getLocalPlayer().getId())) {
+            return;
+        }
+
+
         for (Player p : players) {
             if (p.getId().equals(message.getPlayerId())) {
                 return;
             }
+        }
+
+
+        String image = "Car_Blue.png";
+
+        if (message.getCarSkin() != null) {
+            image = message.getCarSkin().name() + ".png";
+
         }
 
         Car car = new Car(
@@ -31,7 +44,7 @@ public class JoinStrategy implements IMessageStrategy {
                 message.getPosY(),
                 100,
                 50,
-                "Car_Blue.png"
+                image
         );
 
         Player newPlayer = new Player(
@@ -39,7 +52,6 @@ public class JoinStrategy implements IMessageStrategy {
                 message.getPlayerName(),
                 car
         );
-
 
         players.add(newPlayer);
 

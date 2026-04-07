@@ -1,7 +1,6 @@
 package edu.autonoma.turboclash.network.core;
 
 import java.net.DatagramSocket;
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.autonoma.turboclash.network.message.GameMessage;
@@ -11,13 +10,12 @@ import edu.autonoma.turboclash.exception.InvalidPortException;
 public class UdpPeer {
 
     private final DatagramSocket socket;
-    private final List<PeerInfo> peers;
+    private final List<PeerInfo> peers = new java.util.concurrent.CopyOnWriteArrayList<>();
 
     private final IMessageSender sender;
     private final IMessageReceiver receiver;
 
     private Thread receiverThread;
-
 
     public UdpPeer(DatagramSocket socket, IMessageSender sender, IMessageReceiver receiver) {
 
@@ -26,7 +24,6 @@ public class UdpPeer {
         }
 
         this.socket = socket;
-        this.peers = new ArrayList<>();
         this.sender = sender;
         this.receiver = receiver;
 
@@ -68,6 +65,7 @@ public class UdpPeer {
     public IMessageReceiver getReceiver() {
         return receiver;
     }
+
     public IMessageSender getSender() {
         return sender;
     }

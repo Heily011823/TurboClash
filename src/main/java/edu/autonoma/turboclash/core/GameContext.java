@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-/**
- * SOLID: Esta clase actúa como un DTO (Data Transfer Object) de contexto.
- * Su única responsabilidad (SRP) es proveer acceso al estado actual del juego.
- */
+
 public class GameContext {
 
     private final Match match;
@@ -39,11 +36,7 @@ public class GameContext {
         this.peer = peer;
     }
 
-    // --- NUEVO MÉTODO PARA SOLUCIONAR EL ERROR ---
-    /**
-     * Obtiene la lista de carros extrayéndolos de los jugadores del Match.
-     * Esto evita que GameApplication tenga que conocer la estructura interna de Match.
-     */
+
     public List<Car> getCars() {
         if (match == null || match.getPlayers() == null) {
             return Collections.emptyList();
@@ -65,7 +58,7 @@ public class GameContext {
         return network;
     }
 
-    // Encapsulamiento: Devolvemos listas inmodificables para proteger el estado interno
+
     public List<Obstacle> getObstacles() {
         return obstacles != null ? Collections.unmodifiableList(obstacles) : Collections.emptyList();
     }
