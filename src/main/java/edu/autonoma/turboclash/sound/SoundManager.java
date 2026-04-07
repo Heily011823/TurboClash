@@ -3,11 +3,21 @@ package edu.autonoma.turboclash.sound;
 import javax.sound.sampled.*;
 import java.io.InputStream;
 
-public class SoundManager {
+public class SoundManager implements IAudioService {
 
     private static SoundManager instance;
     private Clip backgroundClip;
     private static final String BASE_PATH = "/sound/";
+
+    @Override
+    public void playMenuMusic() {
+        playBackground(Sound.MENU);
+    }
+
+    @Override
+    public void stopMusic() {
+        stopBackground();
+    }
 
     // Enum de sonidos
     public enum Sound {

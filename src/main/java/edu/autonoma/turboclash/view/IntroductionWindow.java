@@ -1,6 +1,9 @@
 package edu.autonoma.turboclash.view;
 
 import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
+import edu.autonoma.turboclash.sound.IAudioService;
+import edu.autonoma.turboclash.sound.SoundManager;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -13,9 +16,12 @@ public class IntroductionWindow {
 
     private final IntroductionWindowListener listener;
 
-    public IntroductionWindow(IntroductionWindowListener listener) {
-        this.listener = listener;
+    private final IAudioService audioService;
 
+
+    public IntroductionWindow(IntroductionWindowListener listener, IAudioService audioService) {
+        this.listener = listener;
+        this.audioService = audioService;
 
         try {
             ImageIcon iconoOriginal = new ImageIcon(getClass().getResource("/image/Informacion.png"));
@@ -38,6 +44,7 @@ public class IntroductionWindow {
 
             cerrarVentana();
 
+            audioService.stopMusic();
 
             listener.onContinuePressed(playerName);
         });
