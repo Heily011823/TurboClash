@@ -15,7 +15,7 @@ import edu.autonoma.turboclash.validation.GameStateValidator;
 import edu.autonoma.turboclash.validation.PlayerNameValidator;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
+import java.awt.*;
 
 public class IntroductionWindowFrame extends JFrame implements IntroductionWindowListener {
 
@@ -27,6 +27,7 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
     }
 
     private void setupFrame() {
+
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/Start.png");
@@ -34,10 +35,24 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
         fondo.add(view.panel1, BorderLayout.CENTER);
 
         setContentPane(fondo);
-        setTitle("Introducción");
-        setSize(800, 600);
-        setLocationRelativeTo(null);
+        setTitle("TurboClash");
+
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // ESC para salir
+        fondo.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke("ESCAPE"), "exit");
+
+        fondo.getActionMap().put("exit", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
         setVisible(true);
     }
 

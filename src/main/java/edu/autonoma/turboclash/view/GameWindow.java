@@ -3,182 +3,196 @@ package edu.autonoma.turboclash.view;
 import edu.autonoma.turboclash.model.*;
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.Timer;
 
 public class GameWindow {
 
     public JPanel panel1;
-    public JLabel Puntaje;
+    public JLabel scoreLabel;
 
     private JLabel countdownLabel;
+    private JButton pauseButton;
+
+    private Runnable onPauseRequest;
     private Runnable onCountdownFinished;
 
     private final Map<String, JLabel> carLabels = new HashMap<>();
+    private final Map<String, JLabel> nameLabels = new HashMap<>();
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
     private final Map<Integer, JLabel> healthLabels = new HashMap<>();
 
     public GameWindow() {
-        if (panel1 == null) {
-            panel1 = new JPanel(null);
-        }
 
-        panel1.setLayout(null);
+        panel1 = new JPanel(null);
         panel1.setOpaque(false);
-        panel1.setPreferredSize(new Dimension(1000, 700));
 
-        // Solo inicializamos el Puntaje
-        Puntaje = createScoreLabel();
-        panel1.add(Puntaje);
+        scoreLabel = createScoreLabel();
+        panel1.add(scoreLabel);
 
-        initializeCountdownUI();
+        initCountdown();
+        initPauseButton();
     }
 
-    public void updateScore(int points) {
-        Puntaje.setText("Puntaje: " + points);
-    }
+    // =========================
+    // UI CONTROL (SRP CLEAN)
+    // =========================
+    private void initPauseButton() {
+        pauseButton = new JButton("⏸");
 
-    public void updateCarPosition(Car car) {
-        JLabel lbl = carLabels.computeIfAbsent(car.getId(), id -> {
-            JLabel newLbl = new JLabel(getIcon("/image/" + car.getCarImage(), 100, 50));
-            panel1.add(newLbl);
-            return newLbl;
+        pauseButton.setBounds(20, 20, 50, 50);
+        pauseButton.setBackground(new Color(180, 30, 30));
+        pauseButton.setForeground(Color.WHITE);
+        pauseButton.setFocusPainted(false);
+
+        pauseButton.addActionListener(e -> {
+            if (onPauseRequest != null) onPauseRequest.run();
         });
 
-        
-        lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
-        lbl.setVisible(car.isActive());
-
-        updateHealth(car.getLives(), car);
+        panel1.add(pauseButton);
     }
 
-    public void updateCars(List<Player> players) {
+    // =========================
+    // SCORE
+    // =========================
+    public void updateScore(int score) {
+        scoreLabel.setText("SCORE: " + score);
+    }
+
+    private JLabel createScoreLabel() {
+        JLabel label = new JLabel("SCORE: 0");
+        label.setForeground(Color.YELLOW);
+        label.setFont(new Font("Consolas", Font.BOLD, 22));
+        label.setBounds(20, 70, 250, 40);
+        return label;
+    }
+
+    // =========================
+    // PLAYER RENDERING (CORE)
+    // =========================
+    public void renderPlayer(Player player) {
+
+        Car car = player.getCar();
+
+        JLabel carLbl = carLabels.computeIfAbsent(car.getId(), id -> {
+            JLabel lbl = new JLabel();
+            panel1.add(lbl);
+            return lbl;
+        });
+
+        carLbl.setIcon(loadIcon("/image/" + car.getCarImage(), 100, 50));
+        carLbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
+        carLbl.setVisible(car.isActive());
+
+        JLabel nameLbl = nameLabels.computeIfAbsent(car.getId(), id -> {
+            JLabel lbl = new JLabel();
+            lbl.setFont(new Font("Consolas", Font.BOLD, 14));
+            lbl.setForeground(Color.WHITE);
+            lbl.setOpaque(true);
+            lbl.setBackground(new Color(0, 0, 0, 160));
+            panel1.add(lbl);
+            return lbl;
+        });
+
+        nameLbl.setText(player.getName());
+        nameLbl.setBounds((int) car.getX(), (int) car.getY() - 20, 120, 18);
+        nameLbl.setVisible(car.isActive());
+
+        renderHealth(car);
+    }
+
+    public void renderPlayers(List<Player> players) {
         if (players == null) return;
-        players.forEach(p -> updateCarPosition(p.getCar()));
+        players.forEach(this::renderPlayer);
     }
 
-    public void updateHealth(int lives, Car car) {
-        for (int i = 0; i < 3; i++) {
-            final int heartIndex = i;
+    // =========================
+    // HEALTH
+    // =========================
+    private void renderHealth(Car car) {
 
-            JLabel heart = healthLabels.computeIfAbsent(heartIndex, id -> {
-                JLabel lbl = new JLabel(getIcon("/image/Health.png", 25, 25));
+        for (int i = 0; i < 3; i++) {
+
+            JLabel heart = healthLabels.computeIfAbsent(i, id -> {
+                JLabel lbl = new JLabel(loadIcon("/image/Health.png", 22, 22));
                 panel1.add(lbl);
                 return lbl;
             });
 
-
-            heart.setBounds((int) car.getX() + (i * 30), (int) car.getY() - 30, 25, 25);
-            heart.setVisible(i < lives && car.isActive());
+            heart.setBounds((int) car.getX() + (i * 25), (int) car.getY() - 35, 22, 22);
+            heart.setVisible(i < car.getLives());
         }
     }
 
-    public void updateObstacles(List<Obstacle> obstacles) {
-        obstacleLabels.values().forEach(l -> l.setVisible(false));
-        for (Obstacle obs : obstacles) {
-            JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
-
-
-                String path;
-                String typeStr = obs.getType().toString();
-
-
-                if ("OIL".equals(typeStr)) {
-                    path = "/image/Oil_Spill.png";
-                } else if ("BARRIER".equals(typeStr)) {
-                    path = "/image/Barrier.png";
-                } else {
-                    path = "/image/Cone.png";
-                }
-
-                JLabel newLbl = new JLabel(getIcon(path, 45, 45));
-                panel1.add(newLbl);
-                return newLbl;
-            });
-
-            lbl.setBounds((int) obs.getX(), (int) obs.getY(), 45, 45);
-            lbl.setVisible(obs.isVisible());
-        }
-    }
-    public void updateItems(List<Item> items) {
-        itemLabels.values().forEach(l -> l.setVisible(false));
-        for (Item item : items) {
-            JLabel lbl = itemLabels.computeIfAbsent(item.getId(), id -> {
-                JLabel newLbl = new JLabel(getIcon("/image/Coin.png", 30, 30));
-                panel1.add(newLbl);
-                return newLbl;
-            });
-            lbl.setBounds((int) item.getX(), (int) item.getY(), 30, 30);
-            lbl.setVisible(item.isVisible());
-        }
-    }
-
-    public void setOnCountdownFinished(Runnable action) {
-        this.onCountdownFinished = action;
-    }
-
-    public void prepareRaceStart(List<Car> cars) {
-        if (cars == null || cars.isEmpty()) return;
-        final int startX = 80;
-        final int[] lanesY = {100, 190, 280, 370};
-        for (int i = 0; i < cars.size() && i < lanesY.length; i++) {
-            Car car = cars.get(i);
-            car.setPosition(startX, lanesY[i]);
-            updateCarPosition(car);
-        }
-        panel1.repaint();
-    }
-
+    // =========================
+    // COUNTDOWN (UI ONLY)
+    // =========================
     public void startCountdown() {
-        final int[] seconds = {3};
-        countdownLabel.setText("3");
+
+        final int[] time = {3};
+
         countdownLabel.setVisible(true);
-        Timer timer = new Timer(1000, null);
-        timer.addActionListener(e -> {
-            seconds[0]--;
-            if (seconds[0] > 0) {
-                countdownLabel.setText(String.valueOf(seconds[0]));
-            } else if (seconds[0] == 0) {
+
+        Timer timer = new Timer(1000, e -> {
+
+            time[0]--;
+
+            if (time[0] > 0) {
+                countdownLabel.setText(String.valueOf(time[0]));
+            } else if (time[0] == 0) {
                 countdownLabel.setText("GO!");
             } else {
-                timer.stop();
+                ((Timer) e.getSource()).stop();
                 countdownLabel.setVisible(false);
-                if (onCountdownFinished != null) onCountdownFinished.run();
+
+                if (onCountdownFinished != null)
+                    onCountdownFinished.run();
             }
         });
+
         timer.start();
     }
 
-    public void requestGameFocus() {
-        panel1.requestFocusInWindow();
-    }
-
-    private JLabel createScoreLabel() {
-        JLabel label = new JLabel("Puntaje: 0");
-        label.setForeground(Color.YELLOW);
-        label.setFont(new Font("Arial", Font.BOLD, 24));
-        label.setBounds(20, 40, 250, 40);
-        return label;
-    }
-
-    private void initializeCountdownUI() {
+    private void initCountdown() {
         countdownLabel = new JLabel("", SwingConstants.CENTER);
-        countdownLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        countdownLabel.setFont(new Font("Consolas", Font.BOLD, 50));
         countdownLabel.setForeground(Color.WHITE);
         countdownLabel.setBounds(400, 250, 200, 80);
         countdownLabel.setVisible(false);
         panel1.add(countdownLabel);
     }
 
+    // =========================
+    // PUBLIC API
+    // =========================
     public JPanel getPanel() {
         return panel1;
     }
 
-    private ImageIcon getIcon(String path, int w, int h) {
+    public void requestFocusGame() {
+        panel1.requestFocusInWindow();
+    }
+
+    public void setOnPauseRequest(Runnable r) {
+        this.onPauseRequest = r;
+    }
+
+    public void setOnCountdownFinished(Runnable r) {
+        this.onCountdownFinished = r;
+    }
+
+    // =========================
+    // UTIL
+    // =========================
+    private ImageIcon loadIcon(String path, int w, int h) {
         java.net.URL url = getClass().getResource(path);
         if (url == null) return new ImageIcon();
-        return new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
+
+        return new ImageIcon(
+                new ImageIcon(url).getImage()
+                        .getScaledInstance(w, h, Image.SCALE_SMOOTH)
+        );
     }
 }

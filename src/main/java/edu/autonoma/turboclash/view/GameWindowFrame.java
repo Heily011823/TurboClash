@@ -4,10 +4,6 @@ import edu.autonoma.turboclash.input.*;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * SOLID: Esta clase cumple con el principio de Responsabilidad Única (SRP)
- * al encargarse exclusivamente de la configuración de la ventana principal (JFrame).
- */
 public class GameWindowFrame extends JFrame {
 
     private final GameWindow view;
@@ -19,8 +15,6 @@ public class GameWindowFrame extends JFrame {
         setupFrameProperties();
         setupContentLayout(keyboardInput, mouseInput);
 
-        pack();
-        setLocationRelativeTo(null);
         setVisible(true);
 
         view.requestGameFocus();
@@ -33,22 +27,28 @@ public class GameWindowFrame extends JFrame {
     private void setupFrameProperties() {
         setTitle("TurboClash - Racing Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
-        setResizable(false);
+
+        setUndecorated(true);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     private void setupContentLayout(KeyboardInput keyboardInput, MouseInput mouseInput) {
+
         JPanel gamePanel = view.getPanel();
-        gamePanel.setPreferredSize(new Dimension(1000, 700));
-        gamePanel.setMinimumSize(new Dimension(1000, 700));
         gamePanel.setOpaque(false);
+
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+
+        gamePanel.setPreferredSize(screen);
+        gamePanel.setMinimumSize(screen);
 
         try {
             FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
             fondo.setLayout(new BorderLayout());
-            fondo.setPreferredSize(new Dimension(1000, 700));
+            fondo.setPreferredSize(screen);
             fondo.add(gamePanel, BorderLayout.CENTER);
             setContentPane(fondo);
+
         } catch (Exception e) {
             gamePanel.setOpaque(true);
             gamePanel.setBackground(Color.GRAY);
@@ -68,7 +68,6 @@ public class GameWindowFrame extends JFrame {
         return view;
     }
 
-    // Alias para compatibilidad con GameApplication
     public GameWindow getGameView() {
         return view;
     }
