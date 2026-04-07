@@ -1,19 +1,26 @@
 package edu.autonoma.turboclash.core;
 
-import edu.autonoma.turboclash.input.*;
-import edu.autonoma.turboclash.logic.GameSpawner;
-import edu.autonoma.turboclash.view.ViewSynchronizer;
-import edu.autonoma.turboclash.model.*;
+import edu.autonoma.turboclash.input.KeyboardInput;
+import edu.autonoma.turboclash.input.MouseInput;
+import edu.autonoma.turboclash.model.Player;
 import edu.autonoma.turboclash.view.GameWindow;
+import edu.autonoma.turboclash.view.ViewSynchronizer;
 
 public class GameLoop {
 
     private final int frameDelay;
     private final ObstacleSystem obstacleSystem;
+    private final InputHandler inputHandler;
+    private final NetworkSync networkSync;
 
     public GameLoop(int frameDelay) {
         this.frameDelay = frameDelay;
-        this.obstacleSystem = new ObstacleSystem();
+        this.inputHandler = new InputHandler();
+        this.networkSync = new NetworkSync();
+
+
+        CollisionListener listener = new SoundCollisionListener();
+        this.obstacleSystem = new ObstacleSystem(listener);
     }
 
     public void run(GameContext context,
@@ -27,19 +34,14 @@ public class GameLoop {
         ViewSynchronizer viewSync = new ViewSynchronizer();
         Player local = context.getMatch().getLocalPlayer();
 
-        GameSpawner spawner = new GameSpawner(
-                context.getEngine().getItems(),
-                context.getObstacles()
-        );
-
-        spawner.start();
-        context.getNetwork().sendJoin(local);
+        networkSync.join(context, local);
 
         while (!context.getMatch().isFinished()) {
 
-            handleInput(local, keyboard, mouse, usaTeclado);
+            inputHandler.handle(local, keyboard, mouse, usaTeclado);
 
             context.getEngine().update();
+
 
             obstacleSystem.check(local.getCar(), context.getObstacles());
 
@@ -50,29 +52,16 @@ public class GameLoop {
                     context.getEngine().getItems()
             );
 
-            context.getNetwork().sendMovement(local);
+            networkSync.sync(context, local);
 
             sleep();
         }
 
-        shutdown(context, local, spawner);
+        shutdown(context, local);
     }
 
-    private void handleInput(Player local,
-                             KeyboardInput keyboard,
-                             MouseInput mouse,
-                             boolean usaTeclado) {
-
-        if (usaTeclado) {
-            keyboard.update(local.getCar());
-        } else {
-            mouse.update(local.getCar());
-        }
-    }
-
-    private void shutdown(GameContext context, Player local, GameSpawner spawner) {
-        spawner.stop();
-        context.getNetwork().sendLeave(local);
+    private void shutdown(GameContext context, Player local) {
+        networkSync.leave(context, local);
         context.getPeer().cerrar();
     }
 

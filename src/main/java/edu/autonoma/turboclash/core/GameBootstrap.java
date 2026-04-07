@@ -1,20 +1,31 @@
 package edu.autonoma.turboclash.core;
 
+import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.logic.*;
 import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.network.core.*;
 import edu.autonoma.turboclash.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.network.handler.GameMessageHandler;
 
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.*;
 
 public class GameBootstrap {
 
-    private final GameFactory gameFactory = new GameFactory();
-    private final WorldFactory worldFactory = new WorldFactory();
-    private final NetworkFactory networkFactory = new NetworkFactory();
+    private final GameFactory gameFactory;
+    private final WorldFactory worldFactory;
+    private final NetworkFactory networkFactory;
+    private final GameConfig config;
+
+    public GameBootstrap(GameFactory gameFactory,
+                         WorldFactory worldFactory,
+                         NetworkFactory networkFactory,
+                         GameConfig config) {
+
+        this.gameFactory = gameFactory;
+        this.worldFactory = worldFactory;
+        this.networkFactory = networkFactory;
+        this.config = config;
+    }
 
     public GameContext init(int puertoLocal, String playerName) {
 
@@ -25,15 +36,27 @@ public class GameBootstrap {
 
         Match match = gameFactory.createMatch(localPlayer);
 
-        List<Item> items = worldFactory.createItems();
-        List<Obstacle> obstacles = worldFactory.createObstacles();
+        List<Item> items = Collections.synchronizedList(
+                new ArrayList<>(worldFactory.createItems())
+        );
 
-        GameRulesManager rules = new GameRulesManager(GameConstants.DEFAULT_TARGET_SCORE);
-        CollisionManager collision = new CollisionManager(rules, GameConstants.COLLISION_COOLDOWN);
+        List<Obstacle> obstacles = Collections.synchronizedList(
+                new ArrayList<>(worldFactory.createObstacles())
+        );
+
+        GameRulesManager rules = new GameRulesManager(config.getTargetScore());
+        CollisionManager collision = new CollisionManager(rules, config.getCollisionCooldown());
 
         GameEngine engine = new GameEngine(match, collision, items, obstacles);
 
-        UdpPeer peer = networkFactory.createPeer(puertoLocal, remotePlayers);
+        GameSpawner spawner = new GameSpawner(items, obstacles);
+        spawner.start();
+
+
+        GameMessageHandler messageHandler = new GameMessageHandler(remotePlayers);
+
+        UdpPeer peer = networkFactory.createPeer(puertoLocal, remotePlayers, messageHandler);
+
         GameMessageFactory messageFactory = new GameMessageFactory();
         GameNetworkService network = new GameNetworkService(peer, messageFactory);
 

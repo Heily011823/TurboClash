@@ -1,22 +1,36 @@
 package edu.autonoma.turboclash.core;
 
-import edu.autonoma.turboclash.logic.GameConstants;
-import edu.autonoma.turboclash.model.Car;
-import edu.autonoma.turboclash.model.CarSkinFactory;
-import edu.autonoma.turboclash.model.Match;
-import edu.autonoma.turboclash.model.Player;
+import edu.autonoma.turboclash.config.GameConfig;
+import edu.autonoma.turboclash.model.*;
 
 import java.util.ArrayList;
 
 public class GameFactory {
+
+    private final GameConfig config;
+    private final CarSkinFactory skinFactory;
+
+    public GameFactory(GameConfig config) {
+        this.config = config;
+        this.skinFactory = new CarSkinFactory(config);
+    }
+
     public Match createMatch(Player localPlayer) {
-        return new Match(localPlayer, new ArrayList<>(), GameConstants.DEFAULT_TARGET_SCORE);
+        return new Match(localPlayer, new ArrayList<>(), config.getTargetScore());
     }
 
     public Player createPlayer(String id, String name, int puerto) {
-        Car car = new Car(id, 50.0, 300.0, CarSkinFactory.fromPort(puerto));
+
+        Car car = new Car(
+                id,
+                config.getCarStartX(),
+                config.getCarStartY(),
+                skinFactory.fromPort(puerto)
+        );
+
         Player player = new Player(id, name, car);
-        player.setLives(GameConstants.INITIAL_LIVES);
+        player.setLives(config.getInitialLives());
+
         return player;
     }
 }

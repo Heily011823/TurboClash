@@ -7,9 +7,11 @@ import edu.autonoma.turboclash.view.*;
 public class GameApplication {
 
     private final GameBootstrap bootstrap;
+    private final GameConfig config;
 
-    public GameApplication(GameBootstrap bootstrap) {
+    public GameApplication(GameBootstrap bootstrap, GameConfig config) {
         this.bootstrap = bootstrap;
+        this.config = config;
     }
 
     public void start(String nombreJugador) {
@@ -24,20 +26,19 @@ public class GameApplication {
 
         GameContext context = bootstrap.init(puerto, nombreJugador);
 
-        GameLoop loop = new GameLoop(GameConfig.getFrameDelay());
+        GameLoop loop = new GameLoop(config.getFrameDelay());
         loop.run(context, window, keyboard, mouse, puerto);
     }
 
     private int getPuerto() {
-
         int puerto = Integer.parseInt(
-                System.getProperty("puerto", String.valueOf(GameConfig.MIN_PORT))
+                System.getProperty("puerto", String.valueOf(config.getMinPort()))
         );
 
-        if (!GameConfig.isValidPort(puerto)) {
+        if (!config.isValidPort(puerto)) {
             throw new IllegalArgumentException(
                     "Puerto inválido. Usa entre "
-                            + GameConfig.MIN_PORT + " y " + GameConfig.MAX_PORT
+                            + config.getMinPort() + " y " + config.getMaxPort()
             );
         }
 

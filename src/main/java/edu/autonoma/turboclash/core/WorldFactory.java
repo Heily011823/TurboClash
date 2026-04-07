@@ -1,23 +1,40 @@
 package edu.autonoma.turboclash.core;
 
+import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.model.Item;
 import edu.autonoma.turboclash.model.Obstacle;
-import edu.autonoma.turboclash.model.ObstacleType;
 
 import java.util.List;
 import java.util.UUID;
 
 public class WorldFactory {
+
+    private final GameConfig config;
+
+    public WorldFactory(GameConfig config) {
+        this.config = config;
+    }
+
     public List<Item> createItems() {
-        return List.of(
-                new Item(UUID.randomUUID().toString(), 400, 300, 25, 25),
-                new Item(UUID.randomUUID().toString(), 600, 150, 25, 25)
-        );
+        return config.getItemSpawnPoints().stream()
+                .map(p -> new Item(
+                        UUID.randomUUID().toString(),
+                        p.x,
+                        p.y,
+                        25, 25
+                ))
+                .toList();
     }
 
     public List<Obstacle> createObstacles() {
-        return List.of(
-                new Obstacle(UUID.randomUUID().toString(), 350, 250, 50, 50, ObstacleType.OIL)
-        );
+        return config.getObstacleSpawnPoints().stream()
+                .map(p -> new Obstacle(
+                        UUID.randomUUID().toString(),
+                        p.getX(),
+                        p.getY(),
+                        50, 50,
+                        p.getType()
+                ))
+                .toList();
     }
 }

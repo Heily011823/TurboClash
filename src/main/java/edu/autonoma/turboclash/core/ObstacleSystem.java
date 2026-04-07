@@ -8,6 +8,12 @@ import java.util.List;
 
 public class ObstacleSystem {
 
+    private final CollisionListener listener;
+
+    public ObstacleSystem(CollisionListener listener) {
+        this.listener = listener;
+    }
+
     public void check(Car car, List<Obstacle> obstacles) {
 
         for (Obstacle obs : obstacles) {
@@ -15,9 +21,7 @@ public class ObstacleSystem {
                     car.getBounds().intersects(obs.getBounds())) {
 
                 obs.setProcessed(true);
-
-                SoundManager.getInstance()
-                        .playEffect(SoundManager.Sound.BRAKE);
+                listener.onCollision(obs);
             }
         }
     }

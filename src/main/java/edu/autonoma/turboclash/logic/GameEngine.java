@@ -2,8 +2,8 @@ package edu.autonoma.turboclash.logic;
 
 import edu.autonoma.turboclash.model.*;
 import edu.autonoma.turboclash.network.message.GameMessage;
-import java.util.List;
 
+import java.util.List;
 
 public class GameEngine {
 
@@ -24,32 +24,24 @@ public class GameEngine {
         this.obstacles = obstacles;
     }
 
-
     public void update() {
         if (match.isFinished()) return;
 
         updateCars();
-
         updateWorldObjects();
-
         processCollisions();
 
         match.check();
     }
 
     private void updateWorldObjects() {
-
-        for (int i = 0; i < items.size(); i++) {
-            Item item = items.get(i);
+        for (Item item : items) {
             item.setPosition(item.getX() - WORLD_SPEED, item.getY());
         }
 
-
-        for (int i = 0; i < obstacles.size(); i++) {
-            Obstacle obs = obstacles.get(i);
+        for (Obstacle obs : obstacles) {
             obs.setPosition(obs.getX() - WORLD_SPEED, obs.getY());
         }
-
 
         items.removeIf(item -> item.getX() < -100);
         obstacles.removeIf(obs -> obs.getX() < -100);
@@ -79,6 +71,7 @@ public class GameEngine {
 
     public void syncPlayer(GameMessage msg) {
         if (msg == null) return;
+
         for (Player p : match.getPlayers()) {
             if (p.getId().equals(msg.getPlayerId())) {
                 p.syncFromNetwork(msg.getPosX(), msg.getPosY(), msg.getScore());
@@ -86,7 +79,11 @@ public class GameEngine {
         }
     }
 
+    public List<Item> getItems() {
+        return items;
+    }
 
-    public List<Item> getItems() { return items; }
-    public List<Obstacle> getObstacles() { return obstacles; }
+    public List<Obstacle> getObstacles() {
+        return obstacles;
+    }
 }

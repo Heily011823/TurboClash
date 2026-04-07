@@ -7,12 +7,18 @@ import java.util.Map;
 
 public class NetworkConfig {
 
-    public static Map<Integer, String> getPeers() {
+    private final GameConfig config;
+
+    public NetworkConfig(GameConfig config) {
+        this.config = config;
+    }
+
+    public Map<Integer, String> getPeers() {
 
         Map<Integer, String> peers = new HashMap<>();
 
-        for (int port = GameConfig.MIN_PORT; port <= GameConfig.MAX_PORT; port++) {
-            peers.put(port, GameConfig.DEFAULT_HOST);
+        for (int port = config.getMinPort(); port <= config.getMaxPort(); port++) {
+            peers.put(port, config.getDefaultHost());
         }
 
         return peers;

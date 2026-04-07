@@ -4,9 +4,15 @@ import edu.autonoma.turboclash.config.GameConfig;
 
 public class CarSkinFactory {
 
-    public static CarSkin fromPort(int puerto) {
+    private final GameConfig config;
 
-        int index = puerto - GameConfig.MIN_PORT;
+    public CarSkinFactory(GameConfig config) {
+        this.config = config;
+    }
+
+    public CarSkin fromPort(int puerto) {
+
+        int index = puerto - config.getMinPort();
 
         return CarSkin.fromIndex(index);
     }

@@ -1,29 +1,70 @@
 package edu.autonoma.turboclash.config;
 
+import edu.autonoma.turboclash.model.ObstacleType;
+
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameConfig {
-    // 🎮 PUERTOS (multijugador)
-    public static final int MIN_PORT = 5000;
-    public static final int MAX_PORT = 5003;
+
+    private final int minPort;
+    private final int maxPort;
+    private final int frameDelay;
+    private final int initialLives;
+    private final int targetScore;
+    private final long collisionCooldown;
+    private final String defaultHost;
+    private final double carStartX;
+    private final double carStartY;
+
+    private final List<Point> itemSpawnPoints;
+    private final List<SpawnPoint> obstacleSpawnPoints;
+
+    public GameConfig() {
+        this.minPort = 5000;
+        this.maxPort = 5003;
+        this.frameDelay = 16;
+        this.initialLives = 3;
+        this.targetScore = 10;
+        this.collisionCooldown = 1000;
+        this.defaultHost = "localhost";
+        this.carStartX = 50.0;
+        this.carStartY = 300.0;
 
 
-    private static final int FRAME_DELAY = 16; // ~60 FPS
+        this.itemSpawnPoints = new ArrayList<>();
+        this.itemSpawnPoints.add(new Point(850, 150));
+        this.itemSpawnPoints.add(new Point(850, 300));
+        this.itemSpawnPoints.add(new Point(850, 450));
 
 
-    public static final int INITIAL_LIVES = 3;
-    public static final int TARGET_SCORE = 10;
-
-
-    public static final long COLLISION_COOLDOWN = 1000; // ms
-
-
-    public static final String DEFAULT_HOST = "localhost";
-
-
-    public static int getFrameDelay() {
-        return FRAME_DELAY;
+        this.obstacleSpawnPoints = new ArrayList<>();
+        this.obstacleSpawnPoints.add(new SpawnPoint(1000, 200, ObstacleType.OIL));
+        this.obstacleSpawnPoints.add(new SpawnPoint(1200, 400, ObstacleType.CONE));
+        this.obstacleSpawnPoints.add(new SpawnPoint(1400, 100, ObstacleType.BARRIER));
     }
 
-    public static boolean isValidPort(int puerto) {
-        return puerto >= MIN_PORT && puerto <= MAX_PORT;
+    public int getMinPort() { return minPort; }
+    public int getMaxPort() { return maxPort; }
+    public int getFrameDelay() { return frameDelay; }
+    public int getInitialLives() { return initialLives; }
+    public int getTargetScore() { return targetScore; }
+    public long getCollisionCooldown() { return collisionCooldown; }
+    public String getDefaultHost() { return defaultHost; }
+    public double getCarStartX() { return carStartX; }
+    public double getCarStartY() { return carStartY; }
+
+    public List<Point> getItemSpawnPoints() {
+        return itemSpawnPoints;
+    }
+
+
+    public List<SpawnPoint> getObstacleSpawnPoints() {
+        return obstacleSpawnPoints;
+    }
+
+    public boolean isValidPort(int puerto) {
+        return puerto >= minPort && puerto <= maxPort;
     }
 }

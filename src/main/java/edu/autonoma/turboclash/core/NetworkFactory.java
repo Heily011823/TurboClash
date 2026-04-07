@@ -8,7 +8,17 @@ import java.net.DatagramSocket;
 import java.util.List;
 
 public class NetworkFactory {
-    public UdpPeer createPeer(int puertoLocal, List<Player> remotePlayers) {
+
+    private final NetworkConfig networkConfig;
+
+    public NetworkFactory(NetworkConfig networkConfig) {
+        this.networkConfig = networkConfig;
+    }
+
+    public UdpPeer createPeer(int puertoLocal,
+                              List<Player> remotePlayers,
+                              GameMessageHandler handler) {
+
         try {
             DatagramSocket socket = new DatagramSocket(puertoLocal);
 
@@ -17,13 +27,13 @@ public class NetworkFactory {
 
             UdpPeer peer = new UdpPeer(socket, sender, receiver);
 
-            NetworkConfig.getPeers().forEach((port, ip) -> {
+
+            networkConfig.getPeers().forEach((port, ip) -> {
                 if (port != puertoLocal) {
                     peer.agregarPeer(ip, port);
                 }
             });
 
-            GameMessageHandler handler = new GameMessageHandler(remotePlayers);
             receiver.setListener((msg, ip, port) -> handler.handle(msg));
 
             peer.iniciar();

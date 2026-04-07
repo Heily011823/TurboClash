@@ -56,9 +56,6 @@ public class GameWindowFrame extends JFrame {
 
         view.iniciarCuentaRegresiva(() -> {
 
-            // Aquí arranca tu lógica real
-            // gameLoop.start();
-            // o gameLoop.setRaceStarted(true);
         });
     }
 
