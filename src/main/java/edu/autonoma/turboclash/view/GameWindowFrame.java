@@ -4,19 +4,27 @@ import edu.autonoma.turboclash.input.*;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * SOLID: Esta clase cumple con el principio de Responsabilidad Única (SRP)
+ * al encargarse exclusivamente de la configuración de la ventana principal (JFrame).
+ */
 public class GameWindowFrame extends JFrame {
 
-    private final GameWindow gameView;
+    private final GameWindow view;
 
-    public GameWindowFrame(KeyboardInput keyboard, MouseInput mouse) {
-        this.gameView = new GameWindow();
+    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
+        this.view = new GameWindow();
 
         setupFrameProperties();
-        setupContentLayout();
-        bindInputs(keyboard, mouse);
+        setupContentLayout(keyboardInput, mouseInput);
 
+        // Finalizar configuración de ventana
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
-        gameView.getPanel().requestFocusInWindow();
+
+        // Solicitar foco para los inputs y arrancar cuenta regresiva
+        view.requestGameFocus();
     }
 
     private void setupFrameProperties() {
@@ -25,22 +33,38 @@ public class GameWindowFrame extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
-    private void setupContentLayout() {
-        // FondoAnimadoPanel es el decorador visual (Open/Closed Principle)
-        FondoAnimadoPanel background = new FondoAnimadoPanel("/image/Track.png");
-        background.setLayout(new BorderLayout());
+    private void setupContentLayout(KeyboardInput keyboardInput, MouseInput mouseInput) {
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.setPreferredSize(GameViewport.size());
 
-        // Agregamos la capa de juego (transparente) sobre el fondo
-        background.add(gameView.getPanel(), BorderLayout.CENTER);
+        try {
+            // Intentar cargar el fondo animado (Open/Closed Principle)
+            FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
+            fondo.setLayout(new BorderLayout());
+            fondo.setPreferredSize(GameViewport.size());
 
-        setContentPane(background);
-        pack();
-        setLocationRelativeTo(null);
+            // Agregar la capa de juego transparente sobre el fondo
+            fondo.add(view.getPanel(), BorderLayout.CENTER);
+            rootPanel.add(fondo, BorderLayout.CENTER);
+
+        } catch (Exception e) {
+            // Fallback: Si el fondo falla, mostrar al menos el panel de juego
+            System.err.println("Error cargando fondo animado, usando fallback.");
+            rootPanel.add(view.getPanel(), BorderLayout.CENTER);
+        }
+
+        setContentPane(rootPanel);
+
+        // Vincular periféricos
+        new GameInputBinder(keyboardInput, mouseInput).bind(view.getPanel());
     }
 
-    private void bindInputs(KeyboardInput k, MouseInput m) {
-        new GameInputBinder(k, m).bind(gameView.getPanel());
+    public GameWindow getView() {
+        return view;
     }
 
-    public GameWindow getGameView() { return gameView; }
+    // Alias para compatibilidad con GameApplication
+    public GameWindow getGameView() {
+        return view;
+    }
 }

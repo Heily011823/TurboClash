@@ -7,33 +7,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * SRP: Responsable únicamente de la gestión de componentes Swing sobre el tablero.
- */
 public class GameWindow {
 
     public JPanel panel1;
     public JLabel Puntaje;
-
     private JLabel countdownLabel;
+    private Runnable onCountdownFinished;
 
-    // Repositorios de componentes visuales (Flyweight Pattern)
     private final Map<String, JLabel> carLabels = new HashMap<>();
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
     private final Map<Integer, JLabel> healthLabels = new HashMap<>();
 
     public GameWindow() {
-        // Inicialización de seguridad por si el GUI Designer no se ejecuta
         if (panel1 == null) {
             panel1 = new JPanel(null);
         }
 
-        panel1.setLayout(null); // Necesario para posicionar autos por coordenadas
-        panel1.setOpaque(false); // Para ver el fondo animado detrás
+        panel1.setLayout(null);
+        panel1.setOpaque(false);
         panel1.setPreferredSize(GameViewport.size());
 
-        // Si Puntaje no se inyectó desde el .form, lo creamos manualmente
         if (Puntaje == null) {
             Puntaje = createScoreLabel();
             panel1.add(Puntaje);
@@ -42,20 +36,27 @@ public class GameWindow {
         initializeCountdownUI();
     }
 
-    /**
-     * Prepara el estado visual inicial según el contrato con GameApplication.
-     */
+    public void setOnCountdownFinished(Runnable action) {
+        this.onCountdownFinished = action;
+    }
+
     public void prepararInicioCarrera(List<Car> cars) {
         if (cars == null) return;
+        for (int i = 0; i < cars.size() && i < GameViewport.LANE_Y.length; i++) {
+            cars.get(i).setPosition(GameViewport.CAR_START_X, GameViewport.laneY(i));
+        }
         cars.forEach(this::updateCarPosition);
         panel1.repaint();
     }
 
-    // --- MÉTODOS DE SINCRONIZACIÓN (Usados por ViewSynchronizer) ---
-
     public void updateScore(int points) {
         if (Puntaje != null) {
-            Puntaje.setText("Score: " + points);
+            SwingUtilities.invokeLater(() -> {
+                Puntaje.setText("Score: " + points);
+                Puntaje.setSize(250, 40);
+                Puntaje.setVisible(true);
+                Puntaje.repaint();
+            });
         }
     }
 
@@ -70,11 +71,12 @@ public class GameWindow {
     }
 
     public void updateHealth(int lives, Car car) {
-        if (car == null) return;
+        if (car == null || panel1 == null) return;
         for (int i = 0; i < 3; i++) {
             JLabel heart = healthLabels.computeIfAbsent(i, id -> {
                 JLabel lbl = new JLabel(getIcon("/image/Health.png", 25, 25));
                 panel1.add(lbl);
+                panel1.setComponentZOrder(lbl, 1);
                 return lbl;
             });
             heart.setBounds((int) car.getX() + (i * 30), (int) car.getY() - 30, 25, 25);
@@ -88,12 +90,15 @@ public class GameWindow {
     }
 
     public void updateObstacles(List<Obstacle> obstacles) {
-        if (obstacles == null) return;
+        if (obstacles == null || panel1 == null) return;
         obstacleLabels.values().forEach(l -> l.setVisible(false));
         for (Obstacle obs : obstacles) {
             JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
                 String type = obs.getType() != null ? obs.getType().toString() : "STATIC";
-                String path = "OIL".equals(type) ? "/image/Oil_Spill.png" : "/image/Cone.png";
+                String path = "/image/Cone.png";
+                if ("OIL".equals(type)) path = "/image/Oil_Spill.png";
+                else if ("BARRIER".equals(type)) path = "/image/Barrier.png";
+
                 JLabel newLbl = new JLabel(getIcon(path, 45, 45));
                 panel1.add(newLbl);
                 return newLbl;
@@ -104,7 +109,7 @@ public class GameWindow {
     }
 
     public void updateItems(List<Item> items) {
-        if (items == null) return;
+        if (items == null || panel1 == null) return;
         itemLabels.values().forEach(l -> l.setVisible(false));
         for (Item item : items) {
             JLabel lbl = itemLabels.computeIfAbsent(item.getId(), id -> {
@@ -117,13 +122,41 @@ public class GameWindow {
         }
     }
 
-    // --- UI INTERNA ---
+    public void iniciarCuentaRegresiva() {
+        final int[] segundos = {3};
+        countdownLabel.setText("3");
+        countdownLabel.setVisible(true);
+
+        Timer timer = new Timer(1000, null);
+        timer.addActionListener(e -> {
+            segundos[0]--;
+            if (segundos[0] > 0) {
+                countdownLabel.setText(String.valueOf(segundos[0]));
+            } else if (segundos[0] == 0) {
+                countdownLabel.setText("GO!");
+            } else {
+                timer.stop();
+                countdownLabel.setVisible(false);
+                if (onCountdownFinished != null) {
+                    onCountdownFinished.run();
+                }
+            }
+        });
+        timer.start();
+    }
+
+    public void requestGameFocus() {
+        if (panel1 != null) {
+            panel1.setFocusable(true);
+            panel1.requestFocusInWindow();
+        }
+    }
 
     private JLabel createScoreLabel() {
         JLabel label = new JLabel("Score: 0");
         label.setForeground(Color.YELLOW);
         label.setFont(new Font("Arial", Font.BOLD, 24));
-        label.setBounds(20, 40, 200, 40);
+        label.setBounds(20, 40, 250, 40);
         return label;
     }
 
@@ -136,7 +169,9 @@ public class GameWindow {
         panel1.add(countdownLabel);
     }
 
-    public JPanel getPanel() { return panel1; }
+    public JPanel getPanel() {
+        return panel1;
+    }
 
     private ImageIcon getIcon(String path, int w, int h) {
         java.net.URL url = getClass().getResource(path);

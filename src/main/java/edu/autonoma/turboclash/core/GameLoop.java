@@ -10,12 +10,10 @@ public class GameLoop {
 
     private final int frameDelay;
     private final ObstacleSystem obstacleSystem;
-    private final InputHandler inputHandler;
     private final NetworkSync networkSync;
 
     public GameLoop(int frameDelay) {
         this.frameDelay = frameDelay;
-        this.inputHandler = new InputHandler();
         this.networkSync = new NetworkSync();
 
 
@@ -29,19 +27,19 @@ public class GameLoop {
                     MouseInput mouse,
                     int puertoLocal) {
 
-        boolean usaTeclado = (puertoLocal % 2 != 0);
-
         ViewSynchronizer viewSync = new ViewSynchronizer();
         Player local = context.getMatch().getLocalPlayer();
 
         networkSync.join(context, local);
 
         while (!context.getMatch().isFinished()) {
-
-            inputHandler.handle(local, keyboard, mouse, usaTeclado);
+            if (local != null && local.getCar() != null) {
+                local.getCar().stop();
+                keyboard.update(local.getCar());
+                mouse.update(local.getCar());
+            }
 
             context.getEngine().update();
-
 
             obstacleSystem.check(local.getCar(), context.getObstacles());
 

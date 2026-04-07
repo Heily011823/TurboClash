@@ -25,7 +25,9 @@ public class GameEngine {
     }
 
     public void update() {
-        if (match.isFinished()) return;
+        if (match.isFinished()) {
+            return;
+        }
 
         updateCars();
         updateWorldObjects();
@@ -83,6 +85,7 @@ public class GameEngine {
     public List<Obstacle> getObstacles() {
         return obstacles;
     }
+
     private void checkPlayerOut() {
         Player local = match.getLocalPlayer();
 
