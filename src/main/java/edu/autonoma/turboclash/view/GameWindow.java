@@ -107,9 +107,7 @@ public class GameWindow {
 
         for (Obstacle obs : obstacles) {
             JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
-                String path = "/image/Cone.png";
-                if ("OIL".equals(obs.getType())) path = "/image/Oil_Spill.png";
-                if ("BARRIER".equals(obs.getType())) path = "/image/Barrier.png";
+                String path = "/image/" + obs.getType().getImage();
 
                 JLabel newLbl = new JLabel(getIcon(path, 45, 45));
                 panel1.add(newLbl);
