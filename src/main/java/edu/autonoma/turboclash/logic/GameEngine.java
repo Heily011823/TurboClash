@@ -51,11 +51,7 @@ public class GameEngine {
     }
 
     private void updateCars() {
-        for (Player p : match.getPlayers()) {
-            if (p != null && p.getCar() != null) {
-                p.getCar().update();
-            }
-        }
+
     }
 
     private void processCollisions() {

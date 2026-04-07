@@ -1,62 +1,70 @@
 package edu.autonoma.turboclash.view;
 
-import edu.autonoma.turboclash.input.GameInputBinder;
-import edu.autonoma.turboclash.input.KeyboardInput;
-import edu.autonoma.turboclash.input.MouseInput;
-import edu.autonoma.turboclash.model.Car;
-import edu.autonoma.turboclash.model.CarSkin;
+import edu.autonoma.turboclash.input.*;
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * SOLID: Esta clase cumple con el principio de Responsabilidad Única (SRP)
+ * al encargarse exclusivamente de la configuración de la ventana principal (JFrame).
+ */
 public class GameWindowFrame extends JFrame {
 
     private final GameWindow view;
 
-    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput, Runnable onCountdownFinished) {
+    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
         this.view = new GameWindow();
 
-        view.getPanel().setOpaque(false);
-        view.getPanel().setPreferredSize(GameViewport.size());
-        view.getPanel().setMinimumSize(GameViewport.size());
+        setupFrameProperties();
+        setupContentLayout(keyboardInput, mouseInput);
 
+        // Finalizar configuración de ventana
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        // Solicitar foco para los inputs y arrancar cuenta regresiva
+        view.requestGameFocus();
+    }
+
+    private void setupFrameProperties() {
         setTitle("TurboClash - Racing Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(1000, 700));
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+    }
 
-        JPanel rootPanel = new JPanel(new GridBagLayout());
-        rootPanel.setBackground(Color.BLACK);
+    private void setupContentLayout(KeyboardInput keyboardInput, MouseInput mouseInput) {
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.setPreferredSize(GameViewport.size());
 
         try {
+            // Intentar cargar el fondo animado (Open/Closed Principle)
             FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
             fondo.setLayout(new BorderLayout());
             fondo.setPreferredSize(GameViewport.size());
-            fondo.setMinimumSize(GameViewport.size());
+
+            // Agregar la capa de juego transparente sobre el fondo
             fondo.add(view.getPanel(), BorderLayout.CENTER);
-            rootPanel.add(fondo);
+            rootPanel.add(fondo, BorderLayout.CENTER);
+
         } catch (Exception e) {
-            JPanel fallbackPanel = new JPanel(new BorderLayout());
-            fallbackPanel.setPreferredSize(GameViewport.size());
-            fallbackPanel.setMinimumSize(GameViewport.size());
-            fallbackPanel.add(view.getPanel(), BorderLayout.CENTER);
-            rootPanel.add(fallbackPanel);
+            // Fallback: Si el fondo falla, mostrar al menos el panel de juego
+            System.err.println("Error cargando fondo animado, usando fallback.");
+            rootPanel.add(view.getPanel(), BorderLayout.CENTER);
         }
 
         setContentPane(rootPanel);
 
+        // Vincular periféricos
         new GameInputBinder(keyboardInput, mouseInput).bind(view.getPanel());
-
-        pack();
-        setLocationRelativeTo(null);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setVisible(true);
-        view.requestGameFocus();
-
-        view.iniciarCuentaRegresiva();
     }
 
     public GameWindow getView() {
+        return view;
+    }
+
+    // Alias para compatibilidad con GameApplication
+    public GameWindow getGameView() {
         return view;
     }
 }

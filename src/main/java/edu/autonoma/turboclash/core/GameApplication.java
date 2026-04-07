@@ -14,27 +14,44 @@ public class GameApplication {
         this.config = config;
     }
 
-    public void start(String nombreJugador) {
-
+    public void start(String playerName) {
+        // 1. Obtener puerto y configurar inputs
         int puerto = getPuerto();
-
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
 
-        GameContext context = bootstrap.init(puerto, nombreJugador);
+        // 2. Inicializar Ventana y Vista
+        GameWindowFrame mainFrame = new GameWindowFrame(keyboard, mouse);
+        GameWindow view = mainFrame.getGameView();
+
+        // 3. Inicializar Contexto de Juego
+        GameContext context = bootstrap.init(puerto, playerName);
+
+        // 4. Preparar estado inicial de la carrera
+        view.prepararInicioCarrera(context.getCars());
+
+        // 5. Definir la lógica de inicio tras la cuenta regresiva
         GameLoop loop = new GameLoop(config.getFrameDelay());
 
-        GameWindowFrame frame = new GameWindowFrame(keyboard, mouse, null);
+        Runnable startGame = () -> {
+            Thread gameThread = new Thread(() ->
+                    loop.run(context, view, keyboard, mouse, puerto)
+            );
+            gameThread.setName("GameLoop-Thread");
+            gameThread.start();
+        };
 
-        Runnable startGame = () ->
-                new Thread(() ->
-                        loop.run(context, frame.getView(), keyboard, mouse, puerto)
-                ).start();
+        // 6. Vincular inicio a la vista y solicitar foco
+        view.setOnCountdownFinished(startGame);
+        view.requestGameFocus();
 
-        frame.getView().setOnCountdownFinished(startGame);
-
-        frame.getView().requestGameFocus();
+        // Iniciar la cuenta regresiva visual
+        view.iniciarCuentaRegresiva();
     }
+
+    /**
+     * SRP: Responsable de validar y obtener el puerto de red.
+     */
     private int getPuerto() {
         int puerto = Integer.parseInt(
                 System.getProperty("puerto", String.valueOf(config.getMinPort()))
