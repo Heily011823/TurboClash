@@ -12,7 +12,6 @@ public class JoinStrategy implements IMessageStrategy {
     public JoinStrategy(List<Player> players) {
         this.players = players;
     }
-
     @Override
     public void handle(GameMessage message) {
 
