@@ -73,6 +73,8 @@ public class GameBootstrap {
 
         GameNetworkService network = new GameNetworkService(peer, messageFactory);
 
+        network.sendJoin(localPlayer);
+
         return new GameContext(match, engine, network, obstacles, items, peer);
     }
 }

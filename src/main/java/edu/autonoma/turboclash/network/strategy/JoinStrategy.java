@@ -16,6 +16,12 @@ public class JoinStrategy implements IMessageStrategy {
     @Override
     public void handle(GameMessage message) {
 
+        for (Player p : players) {
+            if (p.getId().equals(message.getPlayerId())) {
+                return;
+            }
+        }
+
         Car car = new Car(
                 message.getPlayerId(),
                 message.getPosX(),
@@ -32,5 +38,7 @@ public class JoinStrategy implements IMessageStrategy {
         );
 
         players.add(newPlayer);
+
+        System.out.println("Jugador agregado: " + message.getPlayerName());
     }
 }

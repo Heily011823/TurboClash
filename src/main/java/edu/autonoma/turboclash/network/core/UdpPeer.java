@@ -68,4 +68,7 @@ public class UdpPeer {
     public IMessageReceiver getReceiver() {
         return receiver;
     }
+    public IMessageSender getSender() {
+        return sender;
+    }
 }

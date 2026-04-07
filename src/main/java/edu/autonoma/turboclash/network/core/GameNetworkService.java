@@ -16,7 +16,17 @@ public class GameNetworkService {
     }
 
     public void sendJoin(Player player) {
-        send(messageFactory.create(player, MessageType.PLAYER_JOINED));
+
+        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_JOINED);
+
+
+        for (int port = 5000; port <= 5003; port++) {
+            try {
+                peer.getSender().enviarMensaje(msg, "255.255.255.255", port);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void sendMovement(Player player) {
