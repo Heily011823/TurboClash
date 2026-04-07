@@ -8,6 +8,7 @@ import edu.autonoma.turboclash.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.network.handler.GameMessageHandler;
 import edu.autonoma.turboclash.sound.IAudioService;
 import edu.autonoma.turboclash.sound.SoundManager;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import java.util.*;
 
@@ -40,12 +41,12 @@ public class GameBootstrap {
 
         Match match = gameFactory.createMatch(localPlayer);
 
-        List<Item> items = Collections.synchronizedList(
-                new ArrayList<>(worldFactory.createItems())
+        List<Item> items = new CopyOnWriteArrayList<>(
+                worldFactory.createItems()
         );
 
-        List<Obstacle> obstacles = Collections.synchronizedList(
-                new ArrayList<>(worldFactory.createObstacles())
+        List<Obstacle> obstacles = new CopyOnWriteArrayList<>(
+                worldFactory.createObstacles()
         );
 
         GameRulesManager rules = new GameRulesManager(config.getTargetScore());
