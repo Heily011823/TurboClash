@@ -17,11 +17,13 @@ public class Car extends GameObject {
         this.posY = y;
         this.active = true;
         this.lives = 3;
+        this.finishReached = false;
         this.carImage = carImage;
     }
 
     public void move(double dx, double dy) {
         if (!active) return;
+
         double baseSpeed = 12.0;
         this.lastDx = dx * baseSpeed * speedMultiplier;
         this.lastDy = dy * 6.0 * speedMultiplier;
@@ -59,17 +61,54 @@ public class Car extends GameObject {
     }
 
     public void reduceLife() {
-        if (lives > 0) lives--;
-        if (lives <= 0) active = false;
+        if (lives > 0) {
+            lives--;
+        }
+
+        if (lives <= 0) {
+            lives = 0;
+            active = false;
+        }
     }
+
     public void setLives(int lives) {
         this.lives = Math.max(0, lives);
+        this.active = this.lives > 0;
     }
-    public int getLives() { return lives; }
-    public boolean isFinishReached() { return finishReached; }
-    public void setFinishReached(boolean finishReached) { this.finishReached = finishReached; }
-    public boolean isActive() { return active; }
-    public double getX() { return posX; }
-    public double getY() { return posY; }
-    public String getCarImage() { return carImage; }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public boolean isFinishReached() {
+        return finishReached;
+    }
+
+    public void setFinishReached(boolean finishReached) {
+        this.finishReached = finishReached;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public double getX() {
+        return posX;
+    }
+
+    public double getY() {
+        return posY;
+    }
+
+    public String getCarImage() {
+        return carImage;
+    }
+
+    public boolean isDebuffed() {
+        return debuffed;
+    }
+
+    public double getSpeedMultiplier() {
+        return speedMultiplier;
+    }
 }

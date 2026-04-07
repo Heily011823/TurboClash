@@ -1,7 +1,11 @@
 package edu.autonoma.turboclash.view;
 
+import edu.autonoma.turboclash.model.Player;
+
 import javax.swing.*;
 import java.awt.*;
+import java.net.URL;
+import java.util.List;
 
 public class FondoAnimadoPanel extends JPanel {
 
@@ -9,12 +13,12 @@ public class FondoAnimadoPanel extends JPanel {
     private Image meta;
 
     private int x1 = 0;
-    private int velocidad = 8;
+    private final int velocidad = 8;
 
     private Timer timerMovimiento;
     private Timer timerTiempo;
 
-    private int segundosRestantes = 180; // 3 minutos
+    private int segundosRestantes = 180;
     private boolean tiempoTerminado = false;
     private boolean mostrarMeta = false;
     private boolean juegoTerminado = false;
@@ -22,8 +26,19 @@ public class FondoAnimadoPanel extends JPanel {
     private int metaX;
 
     public FondoAnimadoPanel(String ruta) {
-        carretera = new ImageIcon(getClass().getResource(ruta)).getImage();
-        meta = new ImageIcon(getClass().getResource("/image/Finish.png")).getImage();
+        URL rutaCarretera = getClass().getResource(ruta);
+        if (rutaCarretera != null) {
+            carretera = new ImageIcon(rutaCarretera).getImage();
+        } else {
+            System.out.println("No se encontró la imagen: " + ruta);
+        }
+
+        URL rutaMeta = getClass().getResource("/image/Finish.png");
+        if (rutaMeta != null) {
+            meta = new ImageIcon(rutaMeta).getImage();
+        } else {
+            System.out.println("No se encontró la imagen: /image/Finish.png");
+        }
 
         metaX = GameViewport.WIDTH;
 
@@ -41,7 +56,6 @@ public class FondoAnimadoPanel extends JPanel {
                 x1 = 0;
             }
 
-            // La meta solo aparece cuando se acaban los 3 minutos
             if (tiempoTerminado && mostrarMeta) {
                 if (metaX > getWidth() - 200) {
                     metaX -= velocidad;
@@ -87,7 +101,7 @@ public class FondoAnimadoPanel extends JPanel {
         return juegoTerminado;
     }
 
-    public void terminarJuego() {
+    public void terminarJuego(List<Player> ranking) {
         if (juegoTerminado) return;
 
         juegoTerminado = true;
@@ -95,14 +109,17 @@ public class FondoAnimadoPanel extends JPanel {
         timerMovimiento.stop();
         timerTiempo.stop();
 
-        JOptionPane.showMessageDialog(this, "¡Llegaste a la meta!");
+        String primero = ranking.size() > 0 ? ranking.get(0).getName() : "";
+        String segundo = ranking.size() > 1 ? ranking.get(1).getName() : "";
+        String tercero = ranking.size() > 2 ? ranking.get(2).getName() : "";
+        String cuarto = ranking.size() > 3 ? ranking.get(3).getName() : "";
 
         Window ventana = SwingUtilities.getWindowAncestor(this);
         if (ventana != null) {
             ventana.dispose();
         }
 
-        new EndGameWindowFrame();
+        new EndGameWindowFrame(primero, segundo, tercero, cuarto);
     }
 
     @Override
@@ -112,10 +129,12 @@ public class FondoAnimadoPanel extends JPanel {
         int ancho = getWidth();
         int alto = getHeight();
 
-        g.drawImage(carretera, x1, 0, ancho, alto, this);
-        g.drawImage(carretera, x1 + ancho, 0, ancho, alto, this);
+        if (carretera != null) {
+            g.drawImage(carretera, x1, 0, ancho, alto, this);
+            g.drawImage(carretera, x1 + ancho, 0, ancho, alto, this);
+        }
 
-        if (mostrarMeta) {
+        if (mostrarMeta && meta != null) {
             g.drawImage(meta, metaX, 0, 200, alto, this);
         }
 

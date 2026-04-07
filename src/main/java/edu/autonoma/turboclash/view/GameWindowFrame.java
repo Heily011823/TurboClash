@@ -1,13 +1,12 @@
 package edu.autonoma.turboclash.view;
 
-import edu.autonoma.turboclash.input.*;
+import edu.autonoma.turboclash.input.GameInputBinder;
+import edu.autonoma.turboclash.input.KeyboardInput;
+import edu.autonoma.turboclash.input.MouseInput;
+
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * SOLID: Esta clase cumple con el principio de Responsabilidad Única (SRP)
- * al encargarse exclusivamente de la configuración de la ventana principal (JFrame).
- */
 public class GameWindowFrame extends JFrame {
 
     private final GameWindow view;
@@ -48,6 +47,9 @@ public class GameWindowFrame extends JFrame {
             fondo.setLayout(new BorderLayout());
             fondo.setPreferredSize(new Dimension(1000, 700));
             fondo.add(gamePanel, BorderLayout.CENTER);
+
+            view.setBackgroundPanel(fondo);
+
             setContentPane(fondo);
         } catch (Exception e) {
             gamePanel.setOpaque(true);
@@ -68,7 +70,6 @@ public class GameWindowFrame extends JFrame {
         return view;
     }
 
-    // Alias para compatibilidad con GameApplication
     public GameWindow getGameView() {
         return view;
     }
