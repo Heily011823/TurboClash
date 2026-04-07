@@ -1,18 +1,21 @@
 package edu.autonoma.turboclash.logic;
 
 import edu.autonoma.turboclash.model.*;
+import edu.autonoma.turboclash.sound.IAudioService;
 import java.util.List;
 
 public class CollisionManager {
 
     private final GameRulesManager rules;
     private final long collisionCooldown;
+    private final IAudioService audioService;
 
     private long lastCollisionTime = 0;
 
-    public CollisionManager(GameRulesManager rules, long collisionCooldown) {
+    public CollisionManager(GameRulesManager rules, long collisionCooldown, IAudioService audioService) {
         this.rules = rules;
         this.collisionCooldown = collisionCooldown;
+        this.audioService = audioService;
     }
 
     public void process(Player localPlayer, List<Player> remotePlayers,
@@ -34,6 +37,9 @@ public class CollisionManager {
         items.removeIf(item -> {
             if (item.isVisible() && player.getCar().collidesWith(item)) {
                 rules.applyCoinReward(player);
+
+                audioService.playCoinSound();
+
                 return true;
             }
             return false;
@@ -56,6 +62,8 @@ public class CollisionManager {
 
                 if (canApplyCollision()) {
                     rules.applyObstaclePenalty(player);
+
+                    audioService.playBrakeSound();
                 }
             }
         }

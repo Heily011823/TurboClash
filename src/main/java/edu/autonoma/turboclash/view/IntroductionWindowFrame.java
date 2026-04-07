@@ -1,31 +1,37 @@
 package edu.autonoma.turboclash.view;
 
 import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
-
-import javax.swing.*;
-import java.awt.BorderLayout;
-
 import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.core.GameApplication;
 import edu.autonoma.turboclash.core.GameBootstrap;
 import edu.autonoma.turboclash.exception.InvalidGameStateException;
 import edu.autonoma.turboclash.exception.InvalidNameException;
-
 import edu.autonoma.turboclash.core.GameFactory;
 import edu.autonoma.turboclash.core.WorldFactory;
 import edu.autonoma.turboclash.core.NetworkFactory;
-
-import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
 import edu.autonoma.turboclash.network.core.NetworkConfig;
+import edu.autonoma.turboclash.sound.SoundManager;
 import edu.autonoma.turboclash.validation.GameStateValidator;
 import edu.autonoma.turboclash.validation.PlayerNameValidator;
 
+import javax.swing.*;
+import java.awt.BorderLayout;
+
 public class IntroductionWindowFrame extends JFrame implements IntroductionWindowListener {
+
     private IntroductionWindow view;
+
     public IntroductionWindowFrame(IntroductionWindowListener listener) {
+        this.view = new IntroductionWindow(listener);
+        setupFrame();
+    }
 
-        view = new IntroductionWindow(listener);
+    public IntroductionWindowFrame() {
+        this.view = new IntroductionWindow(this, SoundManager.getInstance());
+        setupFrame();
+    }
 
+    private void setupFrame() {
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/Start.png");
@@ -33,7 +39,6 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
         fondo.add(view.panel1, BorderLayout.CENTER);
 
         setContentPane(fondo);
-
         setTitle("Introducción");
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -56,12 +61,10 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
     }
 
     private void startGame(String playerName) {
-
         GameConfig config = new GameConfig();
 
         GameFactory gameFactory = new GameFactory(config);
         WorldFactory worldFactory = new WorldFactory(config);
-
 
         NetworkConfig networkConfig = new NetworkConfig(config);
         NetworkFactory networkFactory = new NetworkFactory(networkConfig);
@@ -70,7 +73,8 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
                 gameFactory,
                 worldFactory,
                 networkFactory,
-                config
+                config,
+                SoundManager.getInstance()
         );
 
         GameApplication app = new GameApplication(bootstrap, config);

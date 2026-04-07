@@ -14,25 +14,36 @@ public class GameApplication {
         this.config = config;
     }
 
-    public void start(String nombreJugador) {
+    public void start(String playerName) {
         int puerto = getPuerto();
-
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
 
-        GameContext context = bootstrap.init(puerto, nombreJugador);
+        GameWindowFrame mainFrame = new GameWindowFrame(keyboard, mouse);
+        GameWindow view = mainFrame.getGameView();
+
+        GameContext context = bootstrap.init(puerto, playerName);
+
+        view.prepararInicioCarrera(context.getCars());
+
         GameLoop loop = new GameLoop(config.getFrameDelay());
 
-        GameWindowFrame frame = new GameWindowFrame(keyboard, mouse, null);
+        Runnable startGame = () -> {
+            Thread gameThread = new Thread(() ->
+                    loop.run(context, view, keyboard, mouse, puerto)
+            );
+            gameThread.setName("GameLoop-Thread");
+            gameThread.start();
+        };
 
-        Runnable startGame = () -> new Thread(() ->
-                loop.run(context, frame.getView(), keyboard, mouse, puerto)
-        ).start();
-
-        frame.setCountdownAction(startGame);
-
-        frame.getView().requestGameFocus();
+        view.setOnCountdownFinished(startGame);
+        view.requestGameFocus();
+        view.iniciarCuentaRegresiva();
     }
+
+    /**
+     * SRP: Responsable de validar y obtener el puerto de red.
+     */
     private int getPuerto() {
         int puerto = Integer.parseInt(
                 System.getProperty("puerto", String.valueOf(config.getMinPort()))

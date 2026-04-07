@@ -2,6 +2,7 @@ package edu.autonoma.turboclash.view;
 
 import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
 import edu.autonoma.turboclash.navigation.IstartWindowListener;
+import edu.autonoma.turboclash.sound.SoundManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +11,7 @@ public class StartWindowFrame extends JFrame implements IstartWindowListener, In
 
     public StartWindowFrame() {
 
-        StartWindow view = new StartWindow(this);
+        StartWindow view = new StartWindow(this, SoundManager.getInstance());
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/Game_Cover.png");

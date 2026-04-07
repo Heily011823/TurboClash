@@ -1,31 +1,47 @@
 package edu.autonoma.turboclash.view;
 
-import edu.autonoma.turboclash.input.GameInputBinder;
-import edu.autonoma.turboclash.input.KeyboardInput;
-import edu.autonoma.turboclash.input.MouseInput;
-
+import edu.autonoma.turboclash.input.*;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * SOLID: Esta clase cumple con el principio de Responsabilidad Única (SRP)
+ * al encargarse exclusivamente de la configuración de la ventana principal (JFrame).
+ */
 public class GameWindowFrame extends JFrame {
 
     private final GameWindow view;
     private Runnable countdownAction;
 
-    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput, Runnable onCountdownFinished) {
+    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
         this.view = new GameWindow();
-        this.countdownAction = onCountdownFinished;
 
+        setupFrameProperties();
+        setupContentLayout(keyboardInput, mouseInput);
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        view.requestGameFocus();
+
+        if (countdownAction != null) {
+            view.iniciarCuentaRegresiva();
+        }
+    }
+
+    private void setupFrameProperties() {
+        setTitle("TurboClash - Racing Game");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1000, 700);
+        setResizable(false);
+    }
+
+    private void setupContentLayout(KeyboardInput keyboardInput, MouseInput mouseInput) {
         JPanel gamePanel = view.getPanel();
         gamePanel.setPreferredSize(new Dimension(1000, 700));
         gamePanel.setMinimumSize(new Dimension(1000, 700));
         gamePanel.setOpaque(false);
-
-        setTitle("TurboClash - Racing Game");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
-        setLocationRelativeTo(null);
-        setResizable(false);
 
         try {
             FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
@@ -41,21 +57,19 @@ public class GameWindowFrame extends JFrame {
         }
 
         new GameInputBinder(keyboardInput, mouseInput).bind(gamePanel);
-
-        setVisible(true);
-        view.requestGameFocus();
-
-        if (countdownAction != null) {
-            view.iniciarCuentaRegresiva(countdownAction);
-        }
     }
 
     public void setCountdownAction(Runnable countdownAction) {
         this.countdownAction = countdownAction;
-        view.iniciarCuentaRegresiva(countdownAction);
+        view.iniciarCuentaRegresiva();
     }
 
     public GameWindow getView() {
+        return view;
+    }
+
+    // Alias para compatibilidad con GameApplication
+    public GameWindow getGameView() {
         return view;
     }
 }
