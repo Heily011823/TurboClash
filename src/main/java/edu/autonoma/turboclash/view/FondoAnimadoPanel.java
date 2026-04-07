@@ -25,7 +25,7 @@ public class FondoAnimadoPanel extends JPanel {
         carretera = new ImageIcon(getClass().getResource(ruta)).getImage();
         meta = new ImageIcon(getClass().getResource("/image/Finish.png")).getImage();
 
-        metaX = 800;
+        metaX = GameViewport.WIDTH;
 
         iniciarMovimiento();
         iniciarTiempo();

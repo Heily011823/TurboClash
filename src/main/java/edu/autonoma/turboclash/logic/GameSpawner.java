@@ -3,6 +3,7 @@ package edu.autonoma.turboclash.logic;
 import edu.autonoma.turboclash.model.Item;
 import edu.autonoma.turboclash.model.Obstacle;
 import edu.autonoma.turboclash.model.ObstacleType;
+import edu.autonoma.turboclash.view.GameViewport;
 
 import java.util.List;
 import java.util.Random;
@@ -60,16 +61,15 @@ public class GameSpawner implements Runnable {
     }
 
     private void spawnItem() {
-
-        double x = 850;
-        double y = 100 + random.nextInt(400);
+        double x = GameViewport.ITEM_SPAWN_X;
+        double y = GameViewport.randomPlayableY(30, random);
 
         String id = "coin_" + System.currentTimeMillis();
         items.add(new Item(id, x, y, 30, 30));
     }
     private void spawnObstacle() {
-        double x = 850;
-        double y = 100 + random.nextInt(400);
+        double x = GameViewport.OBSTACLE_SPAWN_X;
+        double y = GameViewport.randomPlayableY(45, random);
 
 
         ObstacleType[] types = ObstacleType.values();

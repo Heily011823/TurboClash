@@ -19,25 +19,39 @@ public class GameWindowFrame extends JFrame {
         this.view = new GameWindow();
 
         view.getPanel().setOpaque(false);
+        view.getPanel().setPreferredSize(GameViewport.size());
+        view.getPanel().setMinimumSize(GameViewport.size());
 
         setTitle("TurboClash - Racing Game");
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(1000, 700));
+
+        JPanel rootPanel = new JPanel(new GridBagLayout());
+        rootPanel.setBackground(Color.BLACK);
 
         try {
             FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
             fondo.setLayout(new BorderLayout());
-            fondo.add(view.getPanel());
-            setContentPane(fondo);
+            fondo.setPreferredSize(GameViewport.size());
+            fondo.setMinimumSize(GameViewport.size());
+            fondo.add(view.getPanel(), BorderLayout.CENTER);
+            rootPanel.add(fondo);
         } catch (Exception e) {
-            setContentPane(view.getPanel());
+            JPanel fallbackPanel = new JPanel(new BorderLayout());
+            fallbackPanel.setPreferredSize(GameViewport.size());
+            fallbackPanel.setMinimumSize(GameViewport.size());
+            fallbackPanel.add(view.getPanel(), BorderLayout.CENTER);
+            rootPanel.add(fallbackPanel);
             System.err.println("No se pudo cargar el fondo animado: " + e.getMessage());
         }
 
+        setContentPane(rootPanel);
+
         new GameInputBinder(keyboardInput, mouseInput).bind(view.getPanel());
 
+        pack();
+        setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
         view.requestGameFocus();
 
