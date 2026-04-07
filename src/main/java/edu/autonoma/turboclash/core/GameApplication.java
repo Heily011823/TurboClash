@@ -21,22 +21,20 @@ public class GameApplication {
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
 
-        GameWindowFrame frame = new GameWindowFrame(keyboard, mouse);
-        GameWindow window = frame.getView();
-
         GameContext context = bootstrap.init(puerto, nombreJugador);
-
         GameLoop loop = new GameLoop(config.getFrameDelay());
 
+        GameWindowFrame frame = new GameWindowFrame(keyboard, mouse, null);
 
-        new Thread(() -> {
-            loop.run(context, window, keyboard, mouse, puerto);
-        }).start();
+        Runnable startGame = () ->
+                new Thread(() ->
+                        loop.run(context, frame.getView(), keyboard, mouse, puerto)
+                ).start();
 
+        frame.getView().setOnCountdownFinished(startGame);
 
-        window.requestGameFocus();
+        frame.getView().requestGameFocus();
     }
-
     private int getPuerto() {
         int puerto = Integer.parseInt(
                 System.getProperty("puerto", String.valueOf(config.getMinPort()))

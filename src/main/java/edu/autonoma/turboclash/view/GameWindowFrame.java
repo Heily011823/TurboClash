@@ -13,9 +13,8 @@ import java.util.List;
 public class GameWindowFrame extends JFrame {
 
     private final GameWindow view;
-    private final List<Car> cars = new ArrayList<>();
 
-    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
+    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput, Runnable onCountdownFinished) {
         this.view = new GameWindow();
 
         view.getPanel().setOpaque(false);
@@ -42,7 +41,6 @@ public class GameWindowFrame extends JFrame {
             fallbackPanel.setMinimumSize(GameViewport.size());
             fallbackPanel.add(view.getPanel(), BorderLayout.CENTER);
             rootPanel.add(fallbackPanel);
-            System.err.println("No se pudo cargar el fondo animado: " + e.getMessage());
         }
 
         setContentPane(rootPanel);
@@ -55,22 +53,7 @@ public class GameWindowFrame extends JFrame {
         setVisible(true);
         view.requestGameFocus();
 
-        iniciarJuego();
-    }
-
-    private void iniciarJuego() {
-        cars.clear();
-
-        cars.add(new Car("car1", 0, 0, CarSkin.BLUE));
-        cars.add(new Car("car2", 0, 0, CarSkin.RED));
-        cars.add(new Car("car3", 0, 0, CarSkin.YELLOW));
-        cars.add(new Car("car4", 0, 0, CarSkin.BROWN));
-
-        view.prepararInicioCarrera(cars);
-
-        view.iniciarCuentaRegresiva(() -> {
-
-        });
+        view.iniciarCuentaRegresiva();
     }
 
     public GameWindow getView() {

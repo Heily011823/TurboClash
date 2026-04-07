@@ -13,6 +13,7 @@ public class GameWindow {
 
     public JPanel panel1;
     public JLabel Puntaje;
+    private Runnable onCountdownFinished;
 
     private JLabel countdownLabel;
 
@@ -20,7 +21,9 @@ public class GameWindow {
     private final List<JLabel> healthLabels = new ArrayList<>();
     private final List<JLabel> obstacleLabels = new ArrayList<>();
     private final List<JLabel> itemLabels = new ArrayList<>();
-
+    public void setOnCountdownFinished(Runnable action) {
+        this.onCountdownFinished = action;
+    }
     private final String[] SKINS = {
             "/image/Car_Blue.png",
             "/image/Car_Red.png",
@@ -196,16 +199,15 @@ public class GameWindow {
         }
     }
 
-    public void iniciarCuentaRegresiva(Runnable onFinish) {
-        if (countdownLabel == null) return;
+    public void iniciarCuentaRegresiva() {
 
         final int[] segundos = {3};
 
         countdownLabel.setText("3");
         countdownLabel.setVisible(true);
-        countdownLabel.repaint();
 
         Timer timer = new Timer(1000, null);
+
         timer.addActionListener(e -> {
             segundos[0]--;
 
@@ -216,7 +218,11 @@ public class GameWindow {
             } else {
                 timer.stop();
                 countdownLabel.setVisible(false);
-                onFinish.run();
+
+                // 🔥 AQUÍ ARRANCA EL JUEGO
+                if (onCountdownFinished != null) {
+                    onCountdownFinished.run();
+                }
             }
         });
 

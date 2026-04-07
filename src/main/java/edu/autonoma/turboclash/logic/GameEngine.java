@@ -25,7 +25,9 @@ public class GameEngine {
     }
 
     public void update() {
-        if (match.isFinished()) return;
+        if (match.isFinished()) {
+            return;
+        }
 
         updateCars();
         updateWorldObjects();

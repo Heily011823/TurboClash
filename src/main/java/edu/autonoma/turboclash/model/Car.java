@@ -21,7 +21,10 @@ public class Car extends GameObject {
     }
 
     public void move(double dx, double dy) {
-        if (!active) return;
+        if (!active) {
+            resetMovement();
+            return;
+        }
 
         this.lastDx = dx * speedMultiplier;
         this.lastDy = dy * speedMultiplier;
@@ -33,6 +36,7 @@ public class Car extends GameObject {
     public void undoLastMove() {
         this.posX -= lastDx;
         this.posY -= lastDy;
+        resetMovement();
     }
 
     public void reduceLife() {
@@ -52,6 +56,17 @@ public class Car extends GameObject {
             speedMultiplier = 1.0;
             penaltyEndTime = 0;
         }
+
+        resetMovement();
+    }
+
+    public void stop() {
+        resetMovement();
+    }
+
+    private void resetMovement() {
+        lastDx = 0;
+        lastDy = 0;
     }
 
     public void setLives(int lives) {
