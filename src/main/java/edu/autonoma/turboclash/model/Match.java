@@ -21,17 +21,16 @@ public class Match {
     public void check() {
         if (finished) return;
 
-        // 1. Revisar Jugador Local
-        // CAMBIO: Se usa isFinishReached() en lugar de hasReachedFinishLine()
+
         if (localPlayer.getCar().isFinishReached()) {
             this.finished = true;
             this.winner = localPlayer;
             return;
         }
 
-        // 2. Revisar Jugadores Remotos
+
         for (Player p : remotePlayers) {
-            // CAMBIO: Se usa isFinishReached() aquí también
+
             if (p.getCar().isFinishReached()) {
                 this.finished = true;
                 this.winner = p;

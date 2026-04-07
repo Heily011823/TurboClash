@@ -11,7 +11,7 @@ public class GameEngine {
     private final CollisionManager collisionManager;
     private final List<Item> items;
     private final List<Obstacle> obstacles;
-
+    private static final double DEAD_ZONE_X = 0;
     private static final double WORLD_SPEED = 6.0;
 
     public GameEngine(Match match,
@@ -30,6 +30,7 @@ public class GameEngine {
         updateCars();
         updateWorldObjects();
         processCollisions();
+        checkPlayerOut();
 
         match.check();
     }
@@ -85,5 +86,16 @@ public class GameEngine {
 
     public List<Obstacle> getObstacles() {
         return obstacles;
+    }
+    private void checkPlayerOut() {
+        Player local = match.getLocalPlayer();
+
+        if (local == null || local.getCar() == null) return;
+
+        if (local.getCar().getX() <= DEAD_ZONE_X) {
+            System.out.println("💀 PERDISTE: te quedaste atrás");
+
+            match.setFinished(null);
+        }
     }
 }
