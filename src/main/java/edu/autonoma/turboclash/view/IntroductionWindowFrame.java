@@ -21,11 +21,6 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
 
     private IntroductionWindow view;
 
-    public IntroductionWindowFrame(IntroductionWindowListener listener) {
-        this.view = new IntroductionWindow(listener);
-        setupFrame();
-    }
-
     public IntroductionWindowFrame() {
         this.view = new IntroductionWindow(this, SoundManager.getInstance());
         setupFrame();

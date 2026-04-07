@@ -31,7 +31,7 @@ public class StartWindowFrame extends JFrame implements IstartWindowListener, In
     @Override
     public void onPlayPressed() {
         dispose();
-        new IntroductionWindowFrame(this);
+        new IntroductionWindowFrame();
     }
 
     @Override
