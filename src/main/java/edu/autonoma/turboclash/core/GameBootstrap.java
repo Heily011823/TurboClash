@@ -38,8 +38,7 @@ public class GameBootstrap {
 
         Player localPlayer = gameFactory.createPlayer(playerId, playerName, puertoLocal);
         List<Player> remotePlayers = new ArrayList<>();
-
-        Match match = gameFactory.createMatch(localPlayer);
+        Match match = new Match(localPlayer, remotePlayers, config.getTargetScore());
 
         List<Item> items = new CopyOnWriteArrayList<>(
                 worldFactory.createItems()
@@ -58,7 +57,7 @@ public class GameBootstrap {
         spawner.start();
 
 
-        GameMessageHandler messageHandler = new GameMessageHandler(remotePlayers);
+        GameMessageHandler messageHandler = new GameMessageHandler(remotePlayers, match);
 
         GameMessageFactory messageFactory = new GameMessageFactory();
 

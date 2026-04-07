@@ -8,12 +8,16 @@ import java.util.List;
 public class JoinStrategy implements IMessageStrategy {
 
     private final List<Player> players;
+    private final Match match;
 
-    public JoinStrategy(List<Player> players) {
+    public JoinStrategy(List<Player> players, Match match) {
         this.players = players;
+        this.match = match;
     }
+
     @Override
     public void handle(GameMessage message) {
+
 
         for (Player p : players) {
             if (p.getId().equals(message.getPlayerId())) {
@@ -35,6 +39,7 @@ public class JoinStrategy implements IMessageStrategy {
                 message.getPlayerName(),
                 car
         );
+
 
         players.add(newPlayer);
 
