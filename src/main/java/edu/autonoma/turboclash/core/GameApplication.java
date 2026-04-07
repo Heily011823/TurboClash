@@ -15,7 +15,6 @@ public class GameApplication {
     }
 
     public void start(String nombreJugador) {
-
         int puerto = getPuerto();
 
         KeyboardInput keyboard = new KeyboardInput();
@@ -26,12 +25,11 @@ public class GameApplication {
 
         GameWindowFrame frame = new GameWindowFrame(keyboard, mouse, null);
 
-        Runnable startGame = () ->
-                new Thread(() ->
-                        loop.run(context, frame.getView(), keyboard, mouse, puerto)
-                ).start();
+        Runnable startGame = () -> new Thread(() ->
+                loop.run(context, frame.getView(), keyboard, mouse, puerto)
+        ).start();
 
-        frame.getView().setOnCountdownFinished(startGame);
+        frame.setCountdownAction(startGame);
 
         frame.getView().requestGameFocus();
     }

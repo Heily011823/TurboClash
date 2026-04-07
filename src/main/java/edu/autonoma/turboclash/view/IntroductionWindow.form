@@ -16,7 +16,7 @@
           <text value="PLAY"/>
         </properties>
       </component>
-      <component id="9edd0" class="javax.swing.JLabel" binding="iconInformacion">
+      <component id="9edd0" class="javax.swing.JLabel" binding="iconInfo">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="5" height="5"/>
@@ -41,7 +41,7 @@
           <text value=""/>
         </properties>
       </component>
-      <component id="b3f9f" class="javax.swing.JLabel">
+      <component id="b3f9f" class="javax.swing.JLabel" binding="lblNombre">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="10" fill="0" indent="1" use-parent-layout="false"/>
         </constraints>

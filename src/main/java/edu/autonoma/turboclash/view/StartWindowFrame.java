@@ -1,11 +1,12 @@
 package edu.autonoma.turboclash.view;
 
+import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
 import edu.autonoma.turboclash.navigation.IstartWindowListener;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class StartWindowFrame extends JFrame implements IstartWindowListener {
+public class StartWindowFrame extends JFrame implements IstartWindowListener, IntroductionWindowListener {
 
     public StartWindowFrame() {
 
@@ -29,6 +30,11 @@ public class StartWindowFrame extends JFrame implements IstartWindowListener {
     @Override
     public void onPlayPressed() {
         dispose();
-        new IntroductionWindowFrame();
+        new IntroductionWindowFrame(this);
+    }
+
+    @Override
+    public void onContinuePressed(String playerName) {
+        dispose();
     }
 }

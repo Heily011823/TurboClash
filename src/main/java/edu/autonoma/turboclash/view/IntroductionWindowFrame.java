@@ -1,6 +1,9 @@
 package edu.autonoma.turboclash.view;
 
+import edu.autonoma.turboclash.navigation.IntroductionWindowListener;
+
 import javax.swing.*;
+import java.awt.BorderLayout;
 
 import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.core.GameApplication;
@@ -18,21 +21,23 @@ import edu.autonoma.turboclash.validation.GameStateValidator;
 import edu.autonoma.turboclash.validation.PlayerNameValidator;
 
 public class IntroductionWindowFrame extends JFrame implements IntroductionWindowListener {
+    private IntroductionWindow view;
+    public IntroductionWindowFrame(IntroductionWindowListener listener) {
 
-    public IntroductionWindowFrame() {
-        IntroductionWindow view = new IntroductionWindow(this);
+        view = new IntroductionWindow(listener);
+
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/Start.png");
-        fondo.setLayout(new java.awt.BorderLayout());
-        fondo.add(view.panel1);
+        fondo.setLayout(new BorderLayout());
+        fondo.add(view.panel1, BorderLayout.CENTER);
 
         setContentPane(fondo);
+
         setTitle("Introducción");
         setSize(800, 600);
         setLocationRelativeTo(null);
-
-        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }
 

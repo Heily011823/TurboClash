@@ -4,6 +4,11 @@ import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.model.*;
 
 import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class GameFactory {
 
@@ -19,17 +24,15 @@ public class GameFactory {
         return new Match(localPlayer, new ArrayList<>(), config.getTargetScore());
     }
 
-    public Player createPlayer(String id, String name, int puerto) {
 
-        Car car = new Car(
-                id,
-                config.getCarStartX(),
-                config.getCarStartY(),
-                skinFactory.fromPort(puerto)
-        );
 
-        Player player = new Player(id, name, car);
-        player.setLives(config.getInitialLives());
+
+    public Player createPlayer(String playerId, String playerName, int puerto) {
+
+        Car car = new Car(playerName, 0, 0, CarSkin.BLUE); // luego puedes mejorar skin
+        car.setPlayerName(playerName);
+
+        Player player = new Player(playerId, playerName, car);
 
         return player;
     }

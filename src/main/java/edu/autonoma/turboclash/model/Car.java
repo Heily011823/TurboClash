@@ -11,9 +11,17 @@ public class Car extends GameObject {
     private boolean active = true;
     private boolean finishReached = false;
     private double lastDx, lastDy;
-
-
+    private String playerName;
     private CarSkin carSkin;
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+
 
     public Car(String id, double x, double y, CarSkin carSkin) {
         super(id, x, y, GameConstants.CAR_WIDTH, GameConstants.CAR_HEIGHT);
