@@ -40,7 +40,7 @@ public class GameContext {
         this.items = items;
         this.peer = peer;
 
-        // 🔥 NUEVO
+
         this.rulesManager = rulesManager;
         this.resultManager = resultManager;
     }

@@ -1,14 +1,13 @@
 package edu.autonoma.turboclash.infrastructure;
 
+import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.infrastructure.network.core.*;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.handler.GameMessageHandler;
 import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
-import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
 
 import java.net.DatagramSocket;
-import java.util.List;
 
 public class NetworkFactory {
 
@@ -18,15 +17,16 @@ public class NetworkFactory {
         this.networkConfig = networkConfig;
     }
 
-    public UdpPeer createPeer(int puertoLocal,
-                              Player localPlayer,
-                              List<Player> remotePlayers,
-                              GameMessageHandler handler,
-                              GameMessageFactory messageFactory) {
+    public UdpPeer createPeer(
+            int puerto,
+            Player localPlayer,
+            Match match,
+            GameMessageHandler handler,
+            GameMessageFactory factory
+    ) {
 
         try {
-            DatagramSocket socket = new DatagramSocket(puertoLocal);
-
+            DatagramSocket socket = new DatagramSocket(puerto);
 
             socket.setBroadcast(true);
 
@@ -35,11 +35,10 @@ public class NetworkFactory {
 
             UdpPeer peer = new UdpPeer(socket, sender, receiver);
 
-
             receiver.setListener((msg, ip, port) -> {
 
 
-                if (port != puertoLocal) {
+                if (port != puerto) {
                     peer.agregarPeer(ip, port);
                 }
 
@@ -47,16 +46,6 @@ public class NetworkFactory {
                 handler.handle(msg);
 
 
-                if (msg.getType() == MessageType.PLAYER_JOINED) {
-
-                    boolean yaExiste = remotePlayers.stream()
-                            .anyMatch(p -> p.getId().equals(msg.getPlayerId()));
-
-                    if (!yaExiste) {
-                        GameMessage response = messageFactory.create(localPlayer, MessageType.PLAYER_JOINED);
-                        sender.enviarMensaje(response, ip, port);
-                    }
-                }
             });
 
             peer.iniciar();

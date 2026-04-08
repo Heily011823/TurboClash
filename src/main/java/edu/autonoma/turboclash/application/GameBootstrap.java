@@ -37,27 +37,24 @@ public class GameBootstrap {
 
     public GameContext init(int puertoLocal, String playerName) {
 
-
         String playerId = String.valueOf(puertoLocal);
 
         Player localPlayer = gameFactory.createPlayer(playerId, playerName, puertoLocal);
-        List<Player> remotePlayers = new ArrayList<>();
+
 
         Match match = new Match(
                 localPlayer,
-                remotePlayers,
+                new ArrayList<>(),
                 config.getTargetScore()
         );
 
         List<Item> items = new CopyOnWriteArrayList<>(worldFactory.createItems());
         List<Obstacle> obstacles = new CopyOnWriteArrayList<>(worldFactory.createObstacles());
 
-
         CollisionListener listener = new SoundCollisionListener();
 
         CollisionManager collisionManager =
                 new CollisionManager(listener);
-
 
         GameEngine engine = new GameEngine(
                 match,
@@ -66,20 +63,20 @@ public class GameBootstrap {
                 obstacles
         );
 
-
         GameSpawner spawner = new GameSpawner(items, obstacles);
         spawner.start();
 
 
         GameMessageHandler messageHandler =
-                new GameMessageHandler(remotePlayers, match);
+                new GameMessageHandler(match);
 
         GameMessageFactory messageFactory = new GameMessageFactory();
+
 
         UdpPeer peer = networkFactory.createPeer(
                 puertoLocal,
                 localPlayer,
-                remotePlayers,
+                match,
                 messageHandler,
                 messageFactory
         );
@@ -88,7 +85,6 @@ public class GameBootstrap {
                 new GameNetworkService(peer, messageFactory);
 
         network.sendJoin(localPlayer);
-
 
         return new GameContext(
                 match,

@@ -1,20 +1,23 @@
 package edu.autonoma.turboclash.infrastructure.network.strategy;
 
-import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
-
-import java.util.List;
 
 public class LeaveStrategy implements IMessageStrategy {
 
-    private final List<Player> players;
+    private final Match match;
 
-    public LeaveStrategy(List<Player> players) {
-        this.players = players;
+    public LeaveStrategy(Match match) {
+        this.match = match;
     }
 
     @Override
     public void handle(GameMessage message) {
-        players.removeIf(p -> p.getId().equals(message.getPlayerId()));
+
+        match.getPlayers().removeIf(
+                p -> p.getId().equals(message.getPlayerId())
+        );
+
+        System.out.println("Jugador eliminado: " + message.getPlayerId());
     }
 }
