@@ -26,7 +26,8 @@ public class GameApplication {
         GameContext context = bootstrap.init(puerto, playerName);
 
 
-        view.prepareRaceStart(context.getCars());
+
+        view.updateCars(context.getPlayers());
 
         GameLoop loop = new GameLoop(config.getFrameDelay());
 

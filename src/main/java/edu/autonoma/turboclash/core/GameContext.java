@@ -1,17 +1,17 @@
 package edu.autonoma.turboclash.core;
 
 import edu.autonoma.turboclash.logic.GameEngine;
-import edu.autonoma.turboclash.model.Car; // Importante añadir esto
+import edu.autonoma.turboclash.model.Car;
 import edu.autonoma.turboclash.model.Item;
 import edu.autonoma.turboclash.model.Match;
 import edu.autonoma.turboclash.model.Obstacle;
+import edu.autonoma.turboclash.model.Player;
 import edu.autonoma.turboclash.network.core.GameNetworkService;
 import edu.autonoma.turboclash.network.core.UdpPeer;
 
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
-
 
 public class GameContext {
 
@@ -36,15 +36,23 @@ public class GameContext {
         this.peer = peer;
     }
 
-
-    public List<Car> getCars() {
+    // =========================
+    // 🔥 NUEVO: PLAYER LEVEL (IMPORTANTE)
+    // =========================
+    public List<Player> getPlayers() {
         if (match == null || match.getPlayers() == null) {
             return Collections.emptyList();
         }
-        return match.getPlayers().stream()
-                .map(player -> player.getCar())
+        return match.getPlayers();
+    }
+
+
+    public List<Car> getCars() {
+        return getPlayers().stream()
+                .map(Player::getCar)
                 .collect(Collectors.toList());
     }
+
 
     public Match getMatch() {
         return match;
@@ -58,13 +66,16 @@ public class GameContext {
         return network;
     }
 
-
     public List<Obstacle> getObstacles() {
-        return obstacles != null ? Collections.unmodifiableList(obstacles) : Collections.emptyList();
+        return obstacles != null
+                ? Collections.unmodifiableList(obstacles)
+                : Collections.emptyList();
     }
 
     public List<Item> getItems() {
-        return items != null ? Collections.unmodifiableList(items) : Collections.emptyList();
+        return items != null
+                ? Collections.unmodifiableList(items)
+                : Collections.emptyList();
     }
 
     public UdpPeer getPeer() {

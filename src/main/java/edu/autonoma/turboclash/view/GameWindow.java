@@ -3,7 +3,10 @@ package edu.autonoma.turboclash.view;
 import edu.autonoma.turboclash.logic.GameConstants;
 import edu.autonoma.turboclash.logic.GameResultManager;
 import edu.autonoma.turboclash.logic.GameRulesManager;
-import edu.autonoma.turboclash.model.*;
+import edu.autonoma.turboclash.model.Car;
+import edu.autonoma.turboclash.model.Item;
+import edu.autonoma.turboclash.model.Obstacle;
+import edu.autonoma.turboclash.model.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,10 +27,11 @@ public class GameWindow {
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
     private final Map<Integer, JLabel> healthLabels = new HashMap<>();
+
     private boolean gameFinished = false;
+
     private final GameRulesManager gameRulesManager;
     private final GameResultManager gameResultManager;
-
     private final List<Player> players = new ArrayList<>();
 
     private FondoAnimadoPanel fondoAnimadoPanel;
@@ -184,7 +188,7 @@ public class GameWindow {
         countdownLabel.setText("3");
         countdownLabel.setVisible(true);
 
-        Timer timer = new Timer(1000, null);
+        javax.swing.Timer timer = new javax.swing.Timer(1000, null);
         timer.addActionListener(e -> {
             seconds[0]--;
 
@@ -200,6 +204,7 @@ public class GameWindow {
                 }
             }
         });
+
         timer.start();
     }
 
@@ -255,6 +260,7 @@ public class GameWindow {
     }
 
     private void checkGameEnd() {
+        if (gameFinished) return;
         if (players.isEmpty() || fondoAnimadoPanel == null || fondoAnimadoPanel.isJuegoTerminado()) {
             return;
         }
@@ -275,23 +281,27 @@ public class GameWindow {
         }
 
         if (someoneReachedFinish || aliveCount <= 1) {
-            List<Player> ranking = gameResultManager.calculateRanking(players);
-            fondoAnimadoPanel.terminarJuego(ranking);
+            finishGame();
         }
     }
+
     private void finishGame() {
         gameFinished = true;
 
-        GameResultManager resultManager = new GameResultManager();
-        java.util.List<Player> ranking = resultManager.calculateRanking(players);
+        List<Player> ranking = gameResultManager.calculateRanking(players);
 
-        String primero = ranking.size() > 0 ? ranking.get(0).getName() : "";
+        if (fondoAnimadoPanel != null) {
+            fondoAnimadoPanel.terminarJuego(ranking);
+            return;
+        }
+
+        String primero = !ranking.isEmpty() ? ranking.get(0).getName() : "";
         String segundo = ranking.size() > 1 ? ranking.get(1).getName() : "";
         String tercero = ranking.size() > 2 ? ranking.get(2).getName() : "";
         String cuarto = ranking.size() > 3 ? ranking.get(3).getName() : "";
 
-        SwingUtilities.invokeLater(() -> {
-            new EndGameWindowFrame(primero, segundo, tercero, cuarto);
-        });
+        SwingUtilities.invokeLater(() ->
+                new EndGameWindowFrame(primero, segundo, tercero, cuarto)
+        );
     }
 }

@@ -46,20 +46,10 @@ public class GameConfig {
     public int getMinPort() { return minPort; }
     public int getMaxPort() { return maxPort; }
     public int getFrameDelay() { return frameDelay; }
-    public int getInitialLives() { return initialLives; }
+
     public int getTargetScore() { return targetScore; }
     public long getCollisionCooldown() { return collisionCooldown; }
-    public double getCarStartX() { return carStartX; }
-    public double getCarStartY() { return carStartY; }
 
-    public List<Point> getItemSpawnPoints() {
-        return itemSpawnPoints;
-    }
-
-
-    public List<SpawnPoint> getObstacleSpawnPoints() {
-        return obstacleSpawnPoints;
-    }
 
     public boolean isValidPort(int puerto) {
         return puerto >= minPort && puerto <= maxPort;
