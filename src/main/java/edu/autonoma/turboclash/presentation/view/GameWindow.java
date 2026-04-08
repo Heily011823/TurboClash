@@ -6,6 +6,7 @@ import edu.autonoma.turboclash.domain.model.Obstacle;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.domain.services.GameConstants;
 
+import edu.autonoma.turboclash.domain.services.GameResultManager;
 import edu.autonoma.turboclash.domain.services.GameRulesManager;
 
 import javax.swing.*;
