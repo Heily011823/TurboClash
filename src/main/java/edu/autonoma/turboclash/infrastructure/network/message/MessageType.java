@@ -9,6 +9,7 @@ public enum MessageType {
     HANDSHAKE,
     PLAYER_JOINED,
     PLAYER_LEFT,
+    DISCOVERY,
 
     // Juego
     MOVEMENT,

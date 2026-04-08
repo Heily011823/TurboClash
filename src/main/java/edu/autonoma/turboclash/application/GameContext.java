@@ -23,9 +23,9 @@ public class GameContext {
     private final List<Item> items;
     private final UdpPeer peer;
 
-
     private final GameRulesManager rulesManager;
     private final GameResultManager resultManager;
+
 
     /**
      * Crea una nueva instancia de {@code GameContext}.
@@ -39,6 +39,9 @@ public class GameContext {
      * @param rulesManager valor del parametro {@code rulesManager}
      * @param resultManager valor del parametro {@code resultManager}
      */
+
+    private Player localPlayer;
+
     public GameContext(Match match,
                        GameEngine engine,
                        GameNetworkService network,
@@ -54,7 +57,6 @@ public class GameContext {
         this.obstacles = obstacles;
         this.items = items;
         this.peer = peer;
-
 
         this.rulesManager = rulesManager;
         this.resultManager = resultManager;
@@ -158,5 +160,25 @@ public class GameContext {
      */
     public GameResultManager getResultManager() {
         return resultManager;
+    }
+
+
+    public Player getLocalPlayer() {
+        return localPlayer;
+    }
+
+    public void setLocalPlayer(Player localPlayer) {
+        this.localPlayer = localPlayer;
+    }
+    public void addPlayer(Player player) {
+        if (match != null && match.getPlayers() != null) {
+
+            boolean exists = match.getPlayers().stream()
+                    .anyMatch(p -> p.getId().equals(player.getId()));
+
+            if (!exists) {
+                match.getPlayers().add(player);
+            }
+        }
     }
 }

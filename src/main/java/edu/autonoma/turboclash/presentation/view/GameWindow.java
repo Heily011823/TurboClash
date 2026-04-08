@@ -4,6 +4,7 @@ import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.domain.model.Item;
 import edu.autonoma.turboclash.domain.model.Obstacle;
 import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
 import edu.autonoma.turboclash.presentation.view.EndGameWindowFrame;
 
 import javax.swing.*;
@@ -179,23 +180,18 @@ public class GameWindow {
      * @param obstacles valor del parametro {@code obstacles}
      */
     public void updateObstacles(List<Obstacle> obstacles) {
-        obstacleLabels.values().forEach(l -> l.setVisible(false));
+        obstacleLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         if (obstacles == null) return;
 
         for (Obstacle obs : obstacles) {
             JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
                 String path;
-                String typeStr = obs.getType().toString();
-
-                if ("OIL".equals(typeStr)) {
-                    path = "/image/Oil_Spill.png";
-                } else if ("BARRIER".equals(typeStr)) {
-                    path = "/image/Barrier.png";
-                } else {
-                    path = "/image/Cone.png";
+                switch (obs.getType()) {
+                    case OIL -> path = "/image/Oil_Spill.png";
+                    case BARRIER -> path = "/image/Barrier.png";
+                    default -> path = "/image/Cone.png";
                 }
-
                 JLabel newLbl = new JLabel(getIcon(path, 45, 45));
                 panel1.add(newLbl);
                 return newLbl;
@@ -212,7 +208,7 @@ public class GameWindow {
      * @param items valor del parametro {@code items}
      */
     public void updateItems(List<Item> items) {
-        itemLabels.values().forEach(l -> l.setVisible(false));
+        itemLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         if (items == null) return;
 
@@ -263,6 +259,7 @@ public class GameWindow {
 
             if (seconds[0] > 0) {
                 countdownLabel.setText(String.valueOf(seconds[0]));
+                SoundManager.getInstance().playEffect(SoundManager.Sound.START);
             } else if (seconds[0] == 0) {
                 countdownLabel.setText("GO!");
             } else {

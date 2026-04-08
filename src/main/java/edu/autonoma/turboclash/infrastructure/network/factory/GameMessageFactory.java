@@ -26,6 +26,15 @@ public class GameMessageFactory {
         msg.setPosY(player.getCar().getY());
         msg.setTime(System.currentTimeMillis());
 
+        return msg;
+    }
+
+
+    public GameMessage createDiscovery() {
+        GameMessage msg = new GameMessage();
+
+        msg.setType(MessageType.DISCOVERY);
+        msg.setTime(System.currentTimeMillis());
 
         return msg;
     }

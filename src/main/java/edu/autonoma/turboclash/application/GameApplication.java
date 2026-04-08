@@ -9,6 +9,8 @@ import edu.autonoma.turboclash.presentation.view.GameWindowFrame;
 /**
  * Representa la responsabilidad de {@code GameApplication} en la capa de aplicacion.
  */
+import javax.swing.JOptionPane;
+
 public class GameApplication {
 
     private final GameBootstrap bootstrap;
@@ -31,7 +33,11 @@ public class GameApplication {
      * @param playerName valor del parametro {@code playerName}
      */
     public void start(String playerName) {
+
         int puerto = getPuerto();
+
+        // 🔥 NUEVO: pedir IP del host (Radmin)
+        String hostIp = JOptionPane.showInputDialog("Ingrese la IP del host:");
 
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
@@ -42,6 +48,9 @@ public class GameApplication {
         GameContext context = bootstrap.init(puerto, playerName);
 
 
+        context.getNetwork().getPeer().agregarPeer(hostIp, puerto);
+
+        context.getNetwork().join(context, context.getLocalPlayer());
 
         view.updateCars(context.getPlayers());
 
@@ -57,10 +66,9 @@ public class GameApplication {
 
         view.setOnCountdownFinished(startGame);
         view.requestGameFocus();
-
-
         view.startCountdown();
     }
+
 
 
     /**

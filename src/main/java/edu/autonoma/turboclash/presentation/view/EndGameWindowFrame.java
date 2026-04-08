@@ -1,5 +1,7 @@
 package edu.autonoma.turboclash.presentation.view;
 
+import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -19,6 +21,10 @@ public class EndGameWindowFrame extends JFrame {
      * @param cuarto valor del parametro {@code cuarto}
      */
     public EndGameWindowFrame(String primero, String segundo, String tercero, String cuarto) {
+
+        SoundManager.getInstance().stopMusic();
+        SoundManager.getInstance().playWinSound();
+
         view = new EndGameWindow();
 
         view.panel1.setOpaque(false);

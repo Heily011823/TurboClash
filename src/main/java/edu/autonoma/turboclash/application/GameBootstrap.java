@@ -60,7 +60,6 @@ public class GameBootstrap {
 
         Player localPlayer = gameFactory.createPlayer(playerId, playerName, puertoLocal);
 
-
         Match match = new Match(
                 localPlayer,
                 new ArrayList<>(),
@@ -85,12 +84,10 @@ public class GameBootstrap {
         GameSpawner spawner = new GameSpawner(items, obstacles);
         spawner.start();
 
-
         GameMessageHandler messageHandler =
                 new GameMessageHandler(match);
 
         GameMessageFactory messageFactory = new GameMessageFactory();
-
 
         UdpPeer peer = networkFactory.createPeer(
                 puertoLocal,
@@ -100,12 +97,16 @@ public class GameBootstrap {
                 messageFactory
         );
 
+
+        NetworkConfig networkConfig = new NetworkConfig(config);
+
         GameNetworkService network =
-                new GameNetworkService(peer, messageFactory);
+                new GameNetworkService(peer, messageFactory, networkConfig);
 
         network.sendJoin(localPlayer);
 
-        return new GameContext(
+
+        GameContext context = new GameContext(
                 match,
                 engine,
                 network,
@@ -115,5 +116,10 @@ public class GameBootstrap {
                 new GameRulesManager(100),
                 new GameResultManager()
         );
+
+
+        context.setLocalPlayer(localPlayer);
+
+        return context;
     }
 }

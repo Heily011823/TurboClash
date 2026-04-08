@@ -23,6 +23,10 @@ public interface IAudioService {
     /**
      * Detiene {@code Music}.
      */
+    void playCountdownSound();
+
+    void playWinSound();
+
     void stopMusic();
 
 }

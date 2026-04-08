@@ -17,6 +17,7 @@ import java.util.Map;
 public class GameMessageHandler {
 
     private final Map<MessageType, IMessageStrategy> strategies = new HashMap<>();
+    private final Match match;
 
     /**
      * Crea una nueva instancia de {@code GameMessageHandler}.
@@ -24,6 +25,7 @@ public class GameMessageHandler {
      * @param match valor del parametro {@code match}
      */
     public GameMessageHandler(Match match) {
+        this.match = match;
 
         strategies.put(MessageType.PLAYER_JOINED, new JoinStrategy(match));
         strategies.put(MessageType.MOVEMENT, new MoveStrategy(match));
@@ -38,6 +40,11 @@ public class GameMessageHandler {
      */
     public void handle(GameMessage msg) {
         if (msg == null) return;
+
+
+        if (msg.getPlayerId().equals(match.getLocalPlayer().getId())) {
+            return;
+        }
 
         IMessageStrategy strategy = strategies.get(msg.getType());
 
