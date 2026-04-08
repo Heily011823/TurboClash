@@ -10,18 +10,27 @@ import java.awt.event.MouseMotionAdapter;
  */
 public class GameInputBinder {
 
+    public enum ControlType {
+        KEYBOARD,
+        MOUSE,
+        BOTH
+    }
+
     private final KeyboardInput keyboardInput;
     private final MouseInput mouseInput;
+    private final ControlType controlType;
 
     /**
      * Crea una nueva instancia de {@code GameInputBinder}.
      *
      * @param keyboardInput valor del parametro {@code keyboardInput}
      * @param mouseInput valor del parametro {@code mouseInput}
+     * @param controlType tipo de control que se va a enlazar
      */
-    public GameInputBinder(KeyboardInput keyboardInput, MouseInput mouseInput) {
+    public GameInputBinder(KeyboardInput keyboardInput, MouseInput mouseInput, ControlType controlType) {
         this.keyboardInput = keyboardInput;
         this.mouseInput = mouseInput;
+        this.controlType = controlType;
     }
 
     /**
@@ -31,10 +40,17 @@ public class GameInputBinder {
      */
     public void bind(JPanel panel) {
         panel.setFocusable(true);
-        panel.requestFocusInWindow();
 
-        bindKeyboard(panel);
-        bindMouse(panel);
+        SwingUtilities.invokeLater(panel::requestFocusInWindow);
+
+        switch (controlType) {
+            case KEYBOARD -> bindKeyboard(panel);
+            case MOUSE -> bindMouse(panel);
+            case BOTH -> {
+                bindKeyboard(panel);
+                bindMouse(panel);
+            }
+        }
     }
 
     /**
@@ -74,6 +90,11 @@ public class GameInputBinder {
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
+                mouseInput.setTarget(e.getX(), e.getY());
+            }
+
+            @Override
+            public void mouseDragged(java.awt.event.MouseEvent e) {
                 mouseInput.setTarget(e.getX(), e.getY());
             }
         });
