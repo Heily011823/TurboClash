@@ -24,8 +24,13 @@ public class GamePresenter {
         this.resultManager = resultManager;
     }
 
-    public void onCarUpdated(Car car, List<Player> players) {
+
+    public void update(Car car, List<Player> players) {
         if (car == null || players == null) return;
+
+
+        view.updateCars(players);
+
 
         checkFinish(car, players);
         checkGameEnd(players);
@@ -33,8 +38,6 @@ public class GamePresenter {
 
 
     private void checkFinish(Car car, List<Player> players) {
-        if (view == null || view.getPlayers() == null) return;
-
         int metaX = view.getMetaX();
 
         for (Player player : players) {
@@ -47,6 +50,7 @@ public class GamePresenter {
             }
         }
     }
+
 
     private void checkGameEnd(List<Player> players) {
         if (gameFinished || players.isEmpty()) return;
@@ -68,6 +72,7 @@ public class GamePresenter {
             finishGame(players);
         }
     }
+
 
     private void finishGame(List<Player> players) {
         gameFinished = true;

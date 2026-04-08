@@ -3,8 +3,7 @@ package edu.autonoma.turboclash.domain.services;
 import edu.autonoma.turboclash.domain.model.Item;
 import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Obstacle;
-import edu.autonoma.turboclash.domain.model.Player;
-import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
+
 
 import java.util.List;
 
@@ -45,5 +44,14 @@ public class GameEngine {
         ruleService.checkPlayerOut(match);
 
         match.check();
+    }
+
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public List<Obstacle> getObstacles() {
+        return obstacles;
     }
 }
