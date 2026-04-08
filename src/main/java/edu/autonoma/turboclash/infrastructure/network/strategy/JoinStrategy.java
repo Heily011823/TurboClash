@@ -21,36 +21,73 @@ public class JoinStrategy implements IMessageStrategy {
         this.match = match;
     }
 
-    @Override
     /**
      * Procesa la operacion principal del metodo.
      *
      * @param message valor del parametro {@code message}
      */
+    @Override
     public void handle(GameMessage message) {
-
-
-        if (message.getPlayerId().equals(match.getLocalPlayer().getId())) {
+        if (message == null || match == null) {
             return;
         }
 
+        Player localPlayer = match.getLocalPlayer();
+        String messagePlayerId = message.getPlayerId();
+        String messagePlayerName = message.getPlayerName();
 
-        boolean exists = match.getPlayers().stream()
-                .anyMatch(p -> p.getId().equals(message.getPlayerId()));
+        if ((messagePlayerId == null || messagePlayerId.isBlank())
+                && (messagePlayerName == null || messagePlayerName.isBlank())) {
+            return;
+        }
+
+        // No agregar al jugador local
+        if (localPlayer != null) {
+            boolean sameAsLocalById =
+                    localPlayer.getId() != null
+                            && messagePlayerId != null
+                            && localPlayer.getId().equals(messagePlayerId);
+
+            boolean sameAsLocalByName =
+                    localPlayer.getName() != null
+                            && messagePlayerName != null
+                            && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
+
+            if (sameAsLocalById || sameAsLocalByName) {
+                return;
+            }
+        }
+
+        // Evitar duplicados
+        boolean exists = match.getPlayers().stream().anyMatch(player -> {
+            if (player == null) {
+                return false;
+            }
+
+            boolean sameId =
+                    player.getId() != null
+                            && messagePlayerId != null
+                            && player.getId().equals(messagePlayerId);
+
+            boolean sameName =
+                    player.getName() != null
+                            && messagePlayerName != null
+                            && player.getName().equalsIgnoreCase(messagePlayerName);
+
+            return sameId || sameName;
+        });
 
         if (exists) {
             return;
         }
 
-
-        String image = "Car_Blue.png";
-
+        String image = "/image/Car_Blue.png";
         if (message.getCarSkin() != null) {
-            image = message.getCarSkin().name() + ".png";
+            image = "/image/" + message.getCarSkin().name() + ".png";
         }
 
         Car car = new Car(
-                message.getPlayerId(),
+                messagePlayerId,
                 message.getPosX(),
                 message.getPosY(),
                 100,
@@ -59,14 +96,14 @@ public class JoinStrategy implements IMessageStrategy {
         );
 
         Player newPlayer = new Player(
-                message.getPlayerId(),
-                message.getPlayerName(),
+                messagePlayerId,
+                messagePlayerName,
                 car
         );
 
-
         match.addPlayer(newPlayer);
 
-        System.out.println("Jugador agregado: " + message.getPlayerName());
+        System.out.println("Jugador agregado: " + messagePlayerName);
+        System.out.println("Remotos actuales: " + match.getRemotePlayers().size());
     }
 }
