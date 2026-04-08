@@ -43,7 +43,7 @@ public class GameBootstrap {
 
         String playerId = String.valueOf(puertoLocal);
 
-        // 🎮 Crear jugador local y partida
+
         Player localPlayer = gameFactory.createPlayer(playerId, playerName, puertoLocal);
         List<Player> remotePlayers = new ArrayList<>();
         Match match = new Match(localPlayer, remotePlayers, config.getTargetScore());
@@ -60,7 +60,7 @@ public class GameBootstrap {
 
         PlayerService playerService = new PlayerService();
         WorldService worldService = new WorldService();
-        CollisionService collisionService = new CollisionService(collisionManager);
+        CollisionManager collisionService = new CollisionManager(collisionManager);
         RuleService ruleService = new RuleService();
 
 

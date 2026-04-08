@@ -6,7 +6,7 @@ public class GameRulesManager {
 
     private final int targetScore;
 
-    // 🔥 NUEVO (para ranking)
+
     private int currentFinishOrder = 1;
     private int currentEliminationOrder = 1;
 
@@ -14,7 +14,7 @@ public class GameRulesManager {
         this.targetScore = targetScore;
     }
 
-    // MONEDAS
+
     public void applyCoinReward(Player p) {
         if (p == null) return;
 
@@ -22,7 +22,7 @@ public class GameRulesManager {
         p.setHasScored(true);
     }
 
-    // OBSTÁCULOS
+
     public void applyObstaclePenalty(Player p) {
         if (p == null) return;
 
@@ -31,27 +31,27 @@ public class GameRulesManager {
         checkZeroLifeRule(p);
         applySpeedDebuff(p);
 
-        // 🔥 NUEVO (si muere aquí)
+
         checkElimination(p);
     }
 
-    // COLISIÓN ENTRE JUGADORES
+
     public void handlePlayersCollision(Player p1, Player p2) {
 
         if (p1 != null) {
             p1.loseLife();
             applySpeedDebuff(p1);
-            checkElimination(p1); // 🔥 NUEVO
+            checkElimination(p1);
         }
 
         if (p2 != null) {
             p2.loseLife();
             applySpeedDebuff(p2);
-            checkElimination(p2); // 🔥 NUEVO
+            checkElimination(p2);
         }
     }
 
-    // REGLA NUEVA
+
     private void checkZeroLifeRule(Player p) {
         if (p.getCurrentPoints() <= 0 && p.hasScored()) {
             p.resetScore();
@@ -59,7 +59,7 @@ public class GameRulesManager {
         }
     }
 
-    // 🔥 NUEVO: detectar eliminación
+
     private void checkElimination(Player p) {
         if (p != null && !p.isAlive() && !p.isEliminated()) {
             p.setEliminated(true);
@@ -67,7 +67,7 @@ public class GameRulesManager {
         }
     }
 
-    // DEBUFF
+
     private void applySpeedDebuff(Player p) {
         if (p != null && p.getCar() != null) {
             p.getCar().applyDebuff(

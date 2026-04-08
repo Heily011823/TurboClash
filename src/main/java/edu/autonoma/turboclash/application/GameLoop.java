@@ -1,7 +1,6 @@
 package edu.autonoma.turboclash.application;
 
 import edu.autonoma.turboclash.domain.events.CollisionListener;
-import edu.autonoma.turboclash.domain.services.ObstacleSystem;
 import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
 import edu.autonoma.turboclash.domain.model.Player;
