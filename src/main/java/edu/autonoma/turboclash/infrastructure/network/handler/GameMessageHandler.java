@@ -62,10 +62,8 @@ public class GameMessageHandler {
             return;
         }
 
-        if (msg.getType() == MessageType.HANDSHAKE) {
-            if (peer != null) {
-                peer.agregarPeer(ip, port);
-            }
+        if (msg.getType() == MessageType.HANDSHAKE && peer != null) {
+            peer.agregarPeer(ip, port);
         }
 
         if (localPlayer != null) {
@@ -131,9 +129,9 @@ public class GameMessageHandler {
             return;
         }
 
-
-        if ((msg.getType() == MessageType.PLAYER_LEFT
-                || msg.getType() == MessageType.SCORE_UPDATE)
+        // No reenviar MOVEMENT para evitar eco y titileo
+        // No reenviar SCORE_UPDATE por ahora
+        if (msg.getType() == MessageType.PLAYER_LEFT
                 && peer != null
                 && peer.getPeerCount() > 1) {
             peer.enviarATodosExcepto(msg, ip, port);
