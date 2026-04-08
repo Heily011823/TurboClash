@@ -25,6 +25,8 @@ public class GameWindow {
     private JLabel statusLabel;
     private Runnable onCountdownFinished;
 
+    private JButton btnClose;
+
     private final Map<String, JLabel> carLabels = new HashMap<>();
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
@@ -51,6 +53,20 @@ public class GameWindow {
         panel1.add(statusLabel);
 
         initializeCountdownUI();
+
+        btnClose = new JButton("X");
+        btnClose.setBounds(1200, 20, 50, 50); // esquina superior derecha
+
+        btnClose.setFocusPainted(false);
+        btnClose.setBorderPainted(false);
+        btnClose.setBackground(new Color(150, 0, 0));
+        btnClose.setForeground(Color.WHITE);
+        btnClose.setFont(new Font("Arial", Font.BOLD, 18));
+        btnClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        panel1.add(btnClose);
+
+        btnClose.addActionListener(e -> System.exit(0));
     }
 
     /**
@@ -151,7 +167,7 @@ public class GameWindow {
     /**
      * Actualiza {@code Health}.
      *
-     * @param car valor del parametro {@code car}
+     * @param car   valor del parametro {@code car}
      * @param lives valor del parametro {@code lives}
      */
     public void updateHealth(Car car, int lives) {
@@ -366,8 +382,8 @@ public class GameWindow {
      * Obtiene el valor de {@code Icon}.
      *
      * @param path valor del parametro {@code path}
-     * @param w ancho requerido por la operacion
-     * @param h alto requerido por la operacion
+     * @param w    ancho requerido por la operacion
+     * @param h    alto requerido por la operacion
      * @return valor de {@code Icon}
      */
     private ImageIcon getIcon(String path, int w, int h) {
