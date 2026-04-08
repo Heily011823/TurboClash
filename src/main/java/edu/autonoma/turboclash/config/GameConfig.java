@@ -27,8 +27,8 @@ public class GameConfig {
      * Crea una nueva instancia de {@code GameConfig}.
      */
     public GameConfig() {
-        this.minPort = 5000;
-        this.maxPort = 5003;
+        this.minPort = 5001;
+        this.maxPort = 5004;
         this.frameDelay = 16;
         this.initialLives = 3;
         this.targetScore = 10;
