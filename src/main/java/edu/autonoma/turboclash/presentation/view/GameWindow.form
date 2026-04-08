@@ -7,7 +7,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="a0b6a" class="javax.swing.JLabel" binding="Puntaje">
+      <component id="a0b6a" class="javax.swing.JLabel" binding="puntaje">
         <constraints border-constraint="Center"/>
         <properties>
           <text value="Puntaje:"/>

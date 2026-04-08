@@ -102,7 +102,7 @@ public class GameWindow {
         updateHealth(car);
     }
 
-    private void updateHealth(Car car) {
+    void updateHealth(Car car) {
         String carId = car.getId();
 
         for (int i = 0; i < 3; i++) {
