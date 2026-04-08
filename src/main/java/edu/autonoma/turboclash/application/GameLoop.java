@@ -14,7 +14,6 @@ public class GameLoop {
     private final int frameDelay;
     private final NetworkSync networkSync;
 
-    // Si juegan 4 en total, cada cliente debe ver 3 remotos
     private static final int EXPECTED_REMOTE_PLAYERS = 3;
 
     public GameLoop(int frameDelay) {
@@ -39,7 +38,6 @@ public class GameLoop {
 
         networkSync.join(context, local);
 
-        // Esperar un poco a que lleguen los remotos
         long timeout = System.currentTimeMillis() + 10000;
         while (context.getMatch().getRemotePlayers().size() < EXPECTED_REMOTE_PLAYERS
                 && System.currentTimeMillis() < timeout) {
@@ -66,14 +64,11 @@ public class GameLoop {
             if (local != null && local.getCar() != null && presenter.isMovementEnabled()) {
                 local.getCar().updateDebuff();
 
-                // 5001 y 5002 -> teclado
-                // 5003 y 5004 -> mouse
                 if (puertoLocal == 5001 || puertoLocal == 5002) {
                     keyboard.update(local.getCar());
                 } else if (puertoLocal == 5003 || puertoLocal == 5004) {
                     mouse.update(local.getCar());
                 } else {
-                    // respaldo por si usan otro puerto
                     keyboard.update(local.getCar());
                 }
             }
@@ -94,11 +89,9 @@ public class GameLoop {
     }
 
     private void shutdown(GameContext context, Player local) {
-        networkSync.leave(context, local);
-
-        if (context.getPeer() != null) {
-            context.getPeer().cerrar();
-        }
+        System.out.println("GameLoop finalizado.");
+        // No enviar PLAYER_LEFT ni cerrar peer automáticamente aquí.
+        // Eso solo debe hacerse cuando el usuario cierre realmente el juego.
     }
 
     private void sleep() {
