@@ -36,7 +36,6 @@ public class GameWindow {
     private static final int CAR_HEIGHT = 50;
     private static final int START_X = 80;
 
-    // 4 carriles iniciales, bien separados
     private static final int[] START_LANES_Y = {80, 220, 360, 500};
 
     public GameWindow() {
@@ -86,7 +85,7 @@ public class GameWindow {
     }
 
     public void showWaitingPlayers() {
-        statusLabel.setText("Esperando al menos 2 jugadores...");
+        statusLabel.setText("Esperando 4 jugadores...");
         statusLabel.setVisible(true);
     }
 
@@ -98,11 +97,6 @@ public class GameWindow {
         Puntaje.setText("Puntaje: " + points);
     }
 
-    /**
-     * IMPORTANTE:
-     * Aqui NO se fuerza el carril.
-     * Solo se dibuja el carro en la posicion real que tenga.
-     */
     public void updateCars(List<Player> players) {
         if (players == null) {
             return;
@@ -120,9 +114,6 @@ public class GameWindow {
         panel1.repaint();
     }
 
-    /**
-     * Dibuja el carro donde realmente esta.
-     */
     public void updateCarPosition(Car car) {
         if (car == null || car.getId() == null) {
             return;
@@ -214,9 +205,8 @@ public class GameWindow {
     }
 
     /**
-     * SOLO acomoda la salida inicial.
-     * Cada jugador sale en una posicion diferente.
-     * Despues se pueden mover libremente.
+     * SOLO organiza salida inicial.
+     * No debe pisar posiciones ya sincronizadas por red.
      */
     public void prepareRaceStart(List<Player> players) {
         if (players == null || players.isEmpty()) {
@@ -229,16 +219,34 @@ public class GameWindow {
             }
 
             Car car = player.getCar();
-            car.setPosition(START_X, getStartLaneY(player));
+
+            boolean uninitializedX = car.getX() <= 0;
+            boolean uninitializedY = car.getY() <= 0;
+            boolean stillAtStartX = Math.abs(car.getX() - START_X) < 5;
+
+            if (uninitializedX) {
+                car.setPosition(START_X, getStartLaneY(player));
+            } else if (uninitializedY) {
+                car.setPosition(car.getX(), getStartLaneY(player));
+            } else if (stillAtStartX && !isValidLane((int) car.getY())) {
+                car.setPosition(START_X, getStartLaneY(player));
+            }
+
             updateCarPosition(car);
         }
 
         panel1.repaint();
     }
 
-    /**
-     * Asigna 1 de 4 carriles iniciales.
-     */
+    private boolean isValidLane(int y) {
+        for (int lane : START_LANES_Y) {
+            if (Math.abs(lane - y) < 20) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private int getStartLaneY(Player player) {
         if (player == null || player.getId() == null) {
             return START_LANES_Y[0];
@@ -329,7 +337,7 @@ public class GameWindow {
     }
 
     private JLabel createStatusLabel() {
-        JLabel label = new JLabel("Esperando al menos 2 jugadores...");
+        JLabel label = new JLabel("Esperando 4 jugadores...");
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", Font.BOLD, 22));
         label.setBounds(20, 80, 450, 40);

@@ -52,14 +52,20 @@ public class UdpPeer {
         try {
             PortValidator.validate(puerto);
 
+            // Evita agregarse a sí mismo
+            if (puerto == socket.getLocalPort()) {
+                return;
+            }
+
             boolean exists = peers.stream()
                     .anyMatch(peer -> peer.getIp().equals(ip) && peer.getPuerto() == puerto);
 
             if (!exists) {
                 peers.add(new PeerInfo(ip, puerto));
+                System.out.println("Peer agregado: " + ip + ":" + puerto);
             }
         } catch (InvalidPortException e) {
-            System.err.println("Puerto invÃƒÂ¡lido: " + e.getMessage());
+            System.err.println("Puerto inválido: " + e.getMessage());
         }
     }
 
