@@ -113,7 +113,6 @@ public class Match {
             return;
         }
 
-        // No agregar al local como remoto
         if (localPlayer != null && samePlayer(localPlayer, newPlayer)) {
             return;
         }
@@ -151,12 +150,10 @@ public class Match {
             return false;
         }
 
-        // 1. Comparar por id si ambos lo tienen
         if (a.getId() != null && b.getId() != null) {
             return a.getId().equals(b.getId());
         }
 
-        // 2. Si no, comparar por nombre
         if (a.getName() != null && b.getName() != null) {
             return a.getName().equalsIgnoreCase(b.getName());
         }

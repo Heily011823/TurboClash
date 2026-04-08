@@ -1,6 +1,7 @@
 package edu.autonoma.turboclash.infrastructure.network.strategy;
 
 import edu.autonoma.turboclash.domain.model.Car;
+import edu.autonoma.turboclash.domain.model.CarSkin;
 import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
@@ -41,7 +42,6 @@ public class JoinStrategy implements IMessageStrategy {
             return;
         }
 
-        // No agregar al jugador local
         if (localPlayer != null) {
             boolean sameAsLocalById =
                     localPlayer.getId() != null
@@ -58,7 +58,6 @@ public class JoinStrategy implements IMessageStrategy {
             }
         }
 
-        // Evitar duplicados
         boolean exists = match.getPlayers().stream().anyMatch(player -> {
             if (player == null) {
                 return false;
@@ -81,15 +80,18 @@ public class JoinStrategy implements IMessageStrategy {
             return;
         }
 
-        String image = "/image/Car_Blue.png";
+        String image = CarSkin.BLUE.getFileName();
         if (message.getCarSkin() != null) {
-            image = "/image/" + message.getCarSkin().name() + ".png";
+            image = message.getCarSkin().getFileName();
         }
+
+        double posX = Math.max(80, message.getPosX());
+        double posY = message.getPosY();
 
         Car car = new Car(
                 messagePlayerId,
-                message.getPosX(),
-                message.getPosY(),
+                posX,
+                posY,
                 100,
                 50,
                 image

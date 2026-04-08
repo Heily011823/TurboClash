@@ -35,8 +35,6 @@ public class GameWindow {
     private static final int CAR_WIDTH = 100;
     private static final int CAR_HEIGHT = 50;
     private static final int START_X = 80;
-
-    // AJUSTA estos valores según tu pista real
     private static final int[] LANES_Y = {120, 340, 560};
 
     public GameWindow() {
@@ -57,7 +55,7 @@ public class GameWindow {
         initializeCountdownUI();
 
         btnClose = new JButton("X");
-        btnClose.setBounds(1450, 20, 55, 55);
+        btnClose.setBounds(930, 20, 55, 55);
         btnClose.setFocusPainted(false);
         btnClose.setBorderPainted(false);
         btnClose.setBackground(new Color(150, 0, 0));
@@ -98,39 +96,45 @@ public class GameWindow {
         Puntaje.setText("Puntaje: " + points);
     }
 
-    /**
-     * Aquí está la corrección importante:
-     * cada jugador conserva su carril y solo avanza en X.
-     */
     public void updateCars(List<Player> players) {
-        if (players == null) return;
+        if (players == null) {
+            return;
+        }
 
         for (Player player : players) {
-            if (player == null || player.getCar() == null) continue;
+            if (player == null || player.getCar() == null) {
+                continue;
+            }
 
             Car car = player.getCar();
 
             int laneY = getLaneY(player);
             int safeX = Math.max(START_X, (int) car.getX());
 
-            // FORZAR el carril siempre
             car.setPosition(safeX, laneY);
-
             updateCarPosition(car);
         }
 
+        panel1.revalidate();
         panel1.repaint();
     }
 
     public void updateCarPosition(Car car) {
-        if (car == null) return;
+        if (car == null || car.getId() == null) {
+            return;
+        }
 
         JLabel lbl = carLabels.computeIfAbsent(car.getId(), id -> {
-            JLabel newLbl = new JLabel(getIcon("/image/" + car.getCarImage(), CAR_WIDTH, CAR_HEIGHT));
+            String imagePath = normalizeCarImagePath(car.getCarImage());
+            JLabel newLbl = new JLabel(getIcon(imagePath, CAR_WIDTH, CAR_HEIGHT));
+            newLbl.setOpaque(false);
             panel1.add(newLbl);
+            panel1.setComponentZOrder(newLbl, 0);
             return newLbl;
         });
 
+        String imagePath = normalizeCarImagePath(car.getCarImage());
+        lbl.setIcon(getIcon(imagePath, CAR_WIDTH, CAR_HEIGHT));
         lbl.setBounds((int) car.getX(), (int) car.getY(), CAR_WIDTH, CAR_HEIGHT);
         lbl.setVisible(car.isActive());
 
@@ -138,7 +142,9 @@ public class GameWindow {
     }
 
     public void updateHealth(Car car, int lives) {
-        if (car == null) return;
+        if (car == null || car.getId() == null) {
+            return;
+        }
 
         String carId = car.getId();
 
@@ -162,7 +168,9 @@ public class GameWindow {
     public void updateObstacles(List<Obstacle> obstacles) {
         obstacleLabels.values().forEach(lbl -> lbl.setVisible(false));
 
-        if (obstacles == null) return;
+        if (obstacles == null) {
+            return;
+        }
 
         for (Obstacle obs : obstacles) {
             JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
@@ -185,7 +193,9 @@ public class GameWindow {
     public void updateItems(List<Item> items) {
         itemLabels.values().forEach(lbl -> lbl.setVisible(false));
 
-        if (items == null) return;
+        if (items == null) {
+            return;
+        }
 
         for (Item item : items) {
             JLabel lbl = itemLabels.computeIfAbsent(item.getId(), id -> {
@@ -199,14 +209,15 @@ public class GameWindow {
         }
     }
 
-    /**
-     * Acomoda los jugadores al comenzar.
-     */
     public void prepareRaceStart(List<Player> players) {
-        if (players == null || players.isEmpty()) return;
+        if (players == null || players.isEmpty()) {
+            return;
+        }
 
         for (Player player : players) {
-            if (player == null || player.getCar() == null) continue;
+            if (player == null || player.getCar() == null) {
+                continue;
+            }
 
             Car car = player.getCar();
             car.setPosition(START_X, getLaneY(player));
@@ -216,9 +227,6 @@ public class GameWindow {
         panel1.repaint();
     }
 
-    /**
-     * Asigna carril fijo por id.
-     */
     private int getLaneY(Player player) {
         if (player == null || player.getId() == null) {
             return LANES_Y[0];
@@ -272,7 +280,9 @@ public class GameWindow {
     }
 
     public int getMetaX() {
-        if (fondoAnimadoPanel == null) return Integer.MAX_VALUE;
+        if (fondoAnimadoPanel == null) {
+            return Integer.MAX_VALUE;
+        }
         return fondoAnimadoPanel.getMetaX();
     }
 
@@ -287,7 +297,6 @@ public class GameWindow {
     public void showGameResult(List<Player> ranking) {
         if (fondoAnimadoPanel != null) {
             fondoAnimadoPanel.terminarJuego(ranking);
-            return;
         }
     }
 
@@ -312,16 +321,37 @@ public class GameWindow {
         countdownLabel = new JLabel("", SwingConstants.CENTER);
         countdownLabel.setFont(new Font("Arial", Font.BOLD, 48));
         countdownLabel.setForeground(Color.WHITE);
-        countdownLabel.setBounds(700, 250, 200, 80);
+        countdownLabel.setBounds(400, 250, 200, 80);
         countdownLabel.setVisible(false);
         panel1.add(countdownLabel);
     }
 
     private ImageIcon getIcon(String path, int w, int h) {
         java.net.URL url = getClass().getResource(path);
-        if (url == null) return new ImageIcon();
+        if (url == null) {
+            System.out.println("No se encontró imagen: " + path);
+            return new ImageIcon();
+        }
 
         Image scaled = new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
         return new ImageIcon(scaled);
+    }
+
+    private String normalizeCarImagePath(String carImage) {
+        if (carImage == null || carImage.isBlank()) {
+            return "/image/Car_Blue.png";
+        }
+
+        String value = carImage.trim();
+
+        if (value.startsWith("/image/")) {
+            return value;
+        }
+
+        if (value.startsWith("/")) {
+            return value;
+        }
+
+        return "/image/" + value;
     }
 }
