@@ -22,6 +22,10 @@ public class GameWindow {
     private JLabel statusLabel;
     private Runnable onCountdownFinished;
 
+    private JButton btnIrFin;
+
+    private JButton btnClose;
+
     private final Map<String, JLabel> carLabels = new HashMap<>();
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
@@ -45,6 +49,26 @@ public class GameWindow {
         panel1.add(statusLabel);
 
         initializeCountdownUI();
+
+        btnIrFin = new JButton("Ir a fin");
+        btnIrFin.setBounds(850, 20, 120, 30); // posición arriba derecha
+        panel1.add(btnIrFin);
+
+        btnClose = new JButton("X");
+        btnClose.setBounds(1200, 20, 50, 50); // esquina superior derecha
+
+        btnClose.setFocusPainted(false);
+        btnClose.setBorderPainted(false);
+        btnClose.setBackground(new Color(150, 0, 0));
+        btnClose.setForeground(Color.WHITE);
+        btnClose.setFont(new Font("Arial", Font.BOLD, 18));
+        btnClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        panel1.add(btnClose);
+
+        btnClose.addActionListener(e -> System.exit(0));
+
+        btnIrFin.addActionListener(e -> abrirVentanaFinal());
     }
 
     public void setBackgroundPanel(FondoAnimadoPanel fondoAnimadoPanel) {
@@ -266,5 +290,14 @@ public class GameWindow {
 
         Image scaled = new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
         return new ImageIcon(scaled);
+    }
+
+    private void abrirVentanaFinal() {
+        String primero = "Jugador1";
+        String segundo = "Jugador2";
+        String tercero = "Jugador3";
+        String cuarto = "Jugador4";
+
+        new EndGameWindowFrame(primero, segundo, tercero, cuarto);
     }
 }

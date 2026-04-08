@@ -18,10 +18,10 @@ public class EndGameWindow {
         panel1.setOpaque(false);
         panel1.setPreferredSize(new Dimension(1000, 700));
 
-        PrimerLugar = crearLabel("", 330, 300, 400, 60);
-        SegundoLugar = crearLabel("", 180, 380, 300, 60);
-        TercerLugar = crearLabel("", 500, 380, 300, 60);
-        CuartoLugar = crearLabel("", 330, 470, 400, 60);
+        PrimerLugar = crearLabel("", 242, 208, 300, 50);
+        SegundoLugar = crearLabel("", 120, 260, 250, 50);
+        TercerLugar = crearLabel("", 400, 260, 250, 50);
+        CuartoLugar = crearLabel("", 240, 440, 300, 50);
 
         btnFin = crearBotonImagen("/image/btn_fin.png", 540, 510, 180, 55);
         btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 70, 510, 180, 55);
@@ -46,7 +46,9 @@ public class EndGameWindow {
 
     private JLabel crearLabel(String texto, int x, int y, int w, int h) {
         JLabel label = new JLabel(texto, SwingConstants.CENTER);
+
         label.setBounds(x, y, w, h);
+
         label.setForeground(new Color(255, 215, 0));
         label.setFont(new Font("Arial", Font.BOLD, 20));
         return label;
