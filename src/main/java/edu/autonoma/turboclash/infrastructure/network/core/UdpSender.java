@@ -5,7 +5,7 @@ import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
+import java.net.SocketException;
 
 /**
  * Representa la responsabilidad de {@code UdpSender} en la infraestructura de red.
@@ -41,7 +41,11 @@ public class UdpSender implements IMessageSender {
         }
 
         if (ipDestino == null || ipDestino.isEmpty()) {
-            throw new IllegalArgumentException("IP destino inválida");
+            throw new IllegalArgumentException("IP destino invÃ¡lida");
+        }
+
+        if (socket.isClosed()) {
+            return;
         }
 
         try {
@@ -57,6 +61,11 @@ public class UdpSender implements IMessageSender {
 
             socket.send(packet);
 
+        } catch (SocketException e) {
+            if (socket.isClosed()) {
+                return;
+            }
+            throw new RuntimeException("Error enviando mensaje UDP", e);
         } catch (Exception e) {
             throw new RuntimeException("Error enviando mensaje UDP", e);
         }
