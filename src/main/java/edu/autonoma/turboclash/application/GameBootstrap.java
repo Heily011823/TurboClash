@@ -8,10 +8,7 @@ import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.GameFactory;
 import edu.autonoma.turboclash.infrastructure.NetworkFactory;
 import edu.autonoma.turboclash.infrastructure.WorldFactory;
-import edu.autonoma.turboclash.domain.services.CollisionManager;
-import edu.autonoma.turboclash.domain.services.GameEngine;
-import edu.autonoma.turboclash.domain.services.GameRulesManager;
-import edu.autonoma.turboclash.domain.services.GameSpawner;
+import edu.autonoma.turboclash.domain.services.*;
 import edu.autonoma.turboclash.infrastructure.network.core.GameNetworkService;
 import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
 import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
@@ -19,7 +16,6 @@ import edu.autonoma.turboclash.infrastructure.network.handler.GameMessageHandler
 import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
 
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import java.util.*;
 
 public class GameBootstrap {
@@ -33,7 +29,8 @@ public class GameBootstrap {
     public GameBootstrap(GameFactory gameFactory,
                          WorldFactory worldFactory,
                          NetworkFactory networkFactory,
-                         GameConfig config, IAudioService audioService) {
+                         GameConfig config,
+                         IAudioService audioService) {
 
         this.gameFactory = gameFactory;
         this.worldFactory = worldFactory;
@@ -46,29 +43,43 @@ public class GameBootstrap {
 
         String playerId = String.valueOf(puertoLocal);
 
+        // 🎮 Crear jugador local y partida
         Player localPlayer = gameFactory.createPlayer(playerId, playerName, puertoLocal);
         List<Player> remotePlayers = new ArrayList<>();
         Match match = new Match(localPlayer, remotePlayers, config.getTargetScore());
 
-        List<Item> items = new CopyOnWriteArrayList<>(
-                worldFactory.createItems()
-        );
 
-        List<Obstacle> obstacles = new CopyOnWriteArrayList<>(
-                worldFactory.createObstacles()
-        );
+        List<Item> items = new CopyOnWriteArrayList<>(worldFactory.createItems());
+        List<Obstacle> obstacles = new CopyOnWriteArrayList<>(worldFactory.createObstacles());
+
 
         GameRulesManager rules = new GameRulesManager(config.getTargetScore());
-        CollisionManager collision = new CollisionManager(rules, config.getCollisionCooldown(), audioService);
+        CollisionManager collisionManager =
+                new CollisionManager(rules, config.getCollisionCooldown(), audioService);
 
-        GameEngine engine = new GameEngine(match, collision, items, obstacles);
+
+        PlayerService playerService = new PlayerService();
+        WorldService worldService = new WorldService();
+        CollisionService collisionService = new CollisionService(collisionManager);
+        RuleService ruleService = new RuleService();
+
+
+        GameEngine engine = new GameEngine(
+                match,
+                playerService,
+                worldService,
+                collisionService,
+                ruleService,
+                items,
+                obstacles
+        );
+
 
         GameSpawner spawner = new GameSpawner(items, obstacles);
         spawner.start();
 
 
         GameMessageHandler messageHandler = new GameMessageHandler(remotePlayers, match);
-
         GameMessageFactory messageFactory = new GameMessageFactory();
 
         UdpPeer peer = networkFactory.createPeer(
@@ -78,7 +89,6 @@ public class GameBootstrap {
                 messageHandler,
                 messageFactory
         );
-
 
         GameNetworkService network = new GameNetworkService(peer, messageFactory);
 
