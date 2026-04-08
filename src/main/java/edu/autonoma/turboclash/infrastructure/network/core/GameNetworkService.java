@@ -1,5 +1,6 @@
 package edu.autonoma.turboclash.infrastructure.network.core;
 
+import edu.autonoma.turboclash.application.GameContext;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
@@ -9,45 +10,53 @@ public class GameNetworkService {
 
     private final UdpPeer peer;
     private final GameMessageFactory messageFactory;
+    private final NetworkConfig networkConfig;
 
-    public GameNetworkService(UdpPeer peer, GameMessageFactory messageFactory) {
+    public GameNetworkService(UdpPeer peer,
+                              GameMessageFactory messageFactory,
+                              NetworkConfig networkConfig) {
         this.peer = peer;
         this.messageFactory = messageFactory;
+        this.networkConfig = networkConfig;
+    }
+
+    public UdpPeer getPeer() {
+        return peer;
     }
 
     public void sendJoin(Player player) {
-
         GameMessage msg = messageFactory.create(player, MessageType.PLAYER_JOINED);
-
-
-        for (int port = 5000; port <= 5003; port++) {
-            try {
-                peer.getSender().enviarMensaje(msg, "255.255.255.255", port);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        peer.enviarATodos(msg);
     }
 
     public void sendMovement(Player player) {
         GameMessage msg = messageFactory.create(player, MessageType.MOVEMENT);
         msg.setScore(player.getCurrentPoints());
-        send(msg);
+        peer.enviarATodos(msg);
     }
 
     public void sendLeave(Player player) {
-        send(messageFactory.create(player, MessageType.PLAYER_LEFT));
+        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_LEFT);
+        peer.enviarATodos(msg);
     }
 
-    private void send(GameMessage msg) {
+    public void discover() {
+        GameMessage msg = messageFactory.createDiscovery();
 
-        for (int port = 5000; port <= 5003; port++) {
+
+        for (int port : networkConfig.getPorts()) {
             try {
                 peer.getSender().enviarMensaje(msg, "255.255.255.255", port);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+    public void join(GameContext context, Player player) {
 
+        sendJoin(player);
+
+
+        context.addPlayer(player);
     }
 }

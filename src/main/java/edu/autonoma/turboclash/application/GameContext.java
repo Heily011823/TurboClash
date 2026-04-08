@@ -20,9 +20,11 @@ public class GameContext {
     private final List<Item> items;
     private final UdpPeer peer;
 
-
     private final GameRulesManager rulesManager;
     private final GameResultManager resultManager;
+
+
+    private Player localPlayer;
 
     public GameContext(Match match,
                        GameEngine engine,
@@ -39,7 +41,6 @@ public class GameContext {
         this.obstacles = obstacles;
         this.items = items;
         this.peer = peer;
-
 
         this.rulesManager = rulesManager;
         this.resultManager = resultManager;
@@ -86,12 +87,31 @@ public class GameContext {
         return peer;
     }
 
-
     public GameRulesManager getRulesManager() {
         return rulesManager;
     }
 
     public GameResultManager getResultManager() {
         return resultManager;
+    }
+
+
+    public Player getLocalPlayer() {
+        return localPlayer;
+    }
+
+    public void setLocalPlayer(Player localPlayer) {
+        this.localPlayer = localPlayer;
+    }
+    public void addPlayer(Player player) {
+        if (match != null && match.getPlayers() != null) {
+
+            boolean exists = match.getPlayers().stream()
+                    .anyMatch(p -> p.getId().equals(player.getId()));
+
+            if (!exists) {
+                match.getPlayers().add(player);
+            }
+        }
     }
 }

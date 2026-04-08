@@ -37,7 +37,7 @@ public class GameLoop {
         );
 
         networkSync.join(context, local);
-
+        System.out.println("ANTES DEL LOOP: " + context.getMatch().isFinished());
         while (!context.getMatch().isFinished()) {
 
             context.getEngine().update();
@@ -64,7 +64,7 @@ public class GameLoop {
             });
 
             networkSync.sync(context, local);
-
+            System.out.println("ENTRO AL LOOP");
             sleep();
         }
 
