@@ -1,7 +1,7 @@
 package edu.autonoma.turboclash.domain.model;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Representa la responsabilidad de {@code Match} dentro del dominio del juego.
@@ -24,7 +24,7 @@ public class Match {
      */
     public Match(Player localPlayer, List<Player> remotePlayers, int targetScore) {
         this.localPlayer = localPlayer;
-        this.remotePlayers = remotePlayers;
+        this.remotePlayers = (remotePlayers != null) ? remotePlayers : new ArrayList<>();
         this.targetScore = targetScore;
     }
 
@@ -32,19 +32,22 @@ public class Match {
      * Ejecuta la operacion {@code check}.
      */
     public void check() {
-        if (finished) return;
+        if (finished) {
+            return;
+        }
 
-
-        if (localPlayer.getCar().isFinishReached()) {
+        if (localPlayer != null
+                && localPlayer.getCar() != null
+                && localPlayer.getCar().isFinishReached()) {
             this.finished = true;
             this.winner = localPlayer;
             return;
         }
 
-
         for (Player p : remotePlayers) {
-
-            if (p.getCar().isFinishReached()) {
+            if (p != null
+                    && p.getCar() != null
+                    && p.getCar().isFinishReached()) {
                 this.finished = true;
                 this.winner = p;
                 return;
@@ -59,8 +62,10 @@ public class Match {
      */
     public List<Player> getPlayers() {
         List<Player> all = new ArrayList<>();
-        if (localPlayer != null) all.add(localPlayer);
-        if (remotePlayers != null) all.addAll(remotePlayers);
+        if (localPlayer != null) {
+            all.add(localPlayer);
+        }
+        all.addAll(remotePlayers);
         return all;
     }
 
@@ -74,10 +79,29 @@ public class Match {
         this.winner = winner;
     }
 
-    public Player getLocalPlayer() { return localPlayer; }
-    public List<Player> getRemotePlayers() { return remotePlayers; }
-    public boolean isFinished() { return finished; }
-    public Player getWinner() { return winner; }
+    public Player getLocalPlayer() {
+        return localPlayer;
+    }
+
+    public void setLocalPlayer(Player localPlayer) {
+        this.localPlayer = localPlayer;
+    }
+
+    public List<Player> getRemotePlayers() {
+        return remotePlayers;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public Player getWinner() {
+        return winner;
+    }
+
+    public int getTargetScore() {
+        return targetScore;
+    }
 
     /**
      * Ejecuta la operacion {@code addPlayer}.
@@ -85,13 +109,58 @@ public class Match {
      * @param newPlayer valor del parametro {@code newPlayer}
      */
     public void addPlayer(Player newPlayer) {
-        if (newPlayer == null) return;
+        if (newPlayer == null) {
+            return;
+        }
+
+        // No agregar al local como remoto
+        if (localPlayer != null && samePlayer(localPlayer, newPlayer)) {
+            return;
+        }
 
         boolean exists = remotePlayers.stream()
-                .anyMatch(p -> p.getId().equals(newPlayer.getId()));
+                .anyMatch(existing -> samePlayer(existing, newPlayer));
 
         if (!exists) {
             remotePlayers.add(newPlayer);
+            System.out.println("Jugador remoto agregado al Match: " + newPlayer.getName());
         }
+    }
+
+    public void removePlayer(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        remotePlayers.removeIf(existing -> samePlayer(existing, player));
+    }
+
+    public void removePlayerByName(String playerName) {
+        if (playerName == null || playerName.isBlank()) {
+            return;
+        }
+
+        remotePlayers.removeIf(player ->
+                player != null
+                        && player.getName() != null
+                        && player.getName().equalsIgnoreCase(playerName));
+    }
+
+    private boolean samePlayer(Player a, Player b) {
+        if (a == null || b == null) {
+            return false;
+        }
+
+        // 1. Comparar por id si ambos lo tienen
+        if (a.getId() != null && b.getId() != null) {
+            return a.getId().equals(b.getId());
+        }
+
+        // 2. Si no, comparar por nombre
+        if (a.getName() != null && b.getName() != null) {
+            return a.getName().equalsIgnoreCase(b.getName());
+        }
+
+        return false;
     }
 }
