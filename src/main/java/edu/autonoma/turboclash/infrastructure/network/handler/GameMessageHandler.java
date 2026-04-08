@@ -99,15 +99,7 @@ public class GameMessageHandler {
                 + " de " + msg.getPlayerName()
                 + " | remotos: " + match.getRemotePlayers().size());
 
-        // IMPORTANTE:
-        // ya no responder PLAYER_JOINED con más PLAYER_JOINED ni HANDSHAKE,
-        // porque eso crea bucle de anuncios.
 
-        if (msg.getType() == MessageType.PLAYER_LEFT
-                && peer != null
-                && peer.getPeerCount() > 1) {
-            peer.enviarATodosExcepto(msg, ip, port);
-        }
     }
 
     private String buildJoinKey(GameMessage msg, String ip, int port) {
