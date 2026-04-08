@@ -64,12 +64,13 @@ public class GamePresenter {
         if (gameStarted) return;
 
         gameStarted = true;
-        movementEnabled = false; // Bloqueado hasta que termine el countdown
+        movementEnabled = false;
         timerStarted = false;
         remainingSeconds = 180;
 
         view.prepareRaceStart(players);
         view.showGameStarted();
+        view.startCountdown();
     }
 
     private void startMatchTimer() {

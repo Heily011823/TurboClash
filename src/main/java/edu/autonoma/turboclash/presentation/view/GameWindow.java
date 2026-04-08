@@ -35,7 +35,9 @@ public class GameWindow {
     private static final int CAR_WIDTH = 100;
     private static final int CAR_HEIGHT = 50;
     private static final int START_X = 80;
-    private static final int[] LANES_Y = {120, 340, 560};
+
+    // 4 carriles SOLO para la salida inicial
+    private static final int[] START_LANES_Y = {90, 210, 330, 450};
 
     public GameWindow() {
         if (panel1 == null) {
@@ -96,6 +98,11 @@ public class GameWindow {
         Puntaje.setText("Puntaje: " + points);
     }
 
+    /**
+     * IMPORTANTE:
+     * Aqui NO se fuerza el carril.
+     * Solo se dibuja el carro en la posicion real que tenga.
+     */
     public void updateCars(List<Player> players) {
         if (players == null) {
             return;
@@ -106,15 +113,19 @@ public class GameWindow {
                 continue;
             }
 
-            updateCarPosition(player, player.getCar());
+            updateCarPosition(player.getCar());
         }
 
         panel1.revalidate();
         panel1.repaint();
     }
 
-    public void updateCarPosition(Player player, Car car) {
-        if (player == null || car == null || car.getId() == null) {
+    /**
+     * Dibuja el carro donde realmente esta.
+     * No vuelve a asignar carril.
+     */
+    public void updateCarPosition(Car car) {
+        if (car == null || car.getId() == null) {
             return;
         }
 
@@ -127,8 +138,8 @@ public class GameWindow {
             return newLbl;
         });
 
-        int drawX = Math.max(START_X, (int) car.getX());
-        int drawY = getLaneY(player);
+        int drawX = Math.max(0, (int) car.getX());
+        int drawY = Math.max(0, (int) car.getY());
 
         lbl.setBounds(drawX, drawY, CAR_WIDTH, CAR_HEIGHT);
         lbl.setVisible(car.isActive());
@@ -203,47 +214,27 @@ public class GameWindow {
         }
     }
 
+    /**
+     * SOLO acomoda la salida inicial.
+     * Despues los carros se mueven libremente.
+     */
     public void prepareRaceStart(List<Player> players) {
         if (players == null || players.isEmpty()) {
             return;
         }
 
-        for (Player player : players) {
+        for (int i = 0; i < players.size() && i < START_LANES_Y.length; i++) {
+            Player player = players.get(i);
             if (player == null || player.getCar() == null) {
                 continue;
             }
 
             Car car = player.getCar();
-            car.setPosition(START_X, getLaneY(player));
-            updateCarPosition(player, car);
+            car.setPosition(START_X, START_LANES_Y[i]);
+            updateCarPosition(car);
         }
 
         panel1.repaint();
-    }
-
-    private int getLaneY(Player player) {
-        if (player == null || player.getId() == null) {
-            return LANES_Y[0];
-        }
-
-        String id = player.getId().trim();
-
-        switch (id) {
-            case "5001":
-            case "player1":
-            case "jugador1":
-                return LANES_Y[0];
-            case "5002":
-            case "player2":
-            case "jugador2":
-                return LANES_Y[1];
-            case "5003":
-            case "player3":
-            case "jugador3":
-                return LANES_Y[2];
-            default:
-                return LANES_Y[Math.abs(id.hashCode()) % LANES_Y.length];
-        }
     }
 
     public void startCountdown() {
