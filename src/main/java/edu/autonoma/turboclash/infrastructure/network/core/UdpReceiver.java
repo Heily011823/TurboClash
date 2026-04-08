@@ -5,6 +5,7 @@ import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 
 /**
  * Representa la responsabilidad de {@code UdpReceiver} en la infraestructura de red.
@@ -26,6 +27,12 @@ public class UdpReceiver implements IMessageReceiver {
         }
         this.socket = socket;
         this.activo = true;
+
+        try {
+            this.socket.setSoTimeout(1000);
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo configurar el timeout UDP", e);
+        }
     }
 
     @Override
@@ -45,37 +52,40 @@ public class UdpReceiver implements IMessageReceiver {
     public void escuchar() {
         try {
             while (activo && !socket.isClosed()) {
-
-                byte[] buffer = new byte[1024];
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
-                socket.receive(packet);
-
-                String data = new String(packet.getData(), 0, packet.getLength());
-
                 try {
-                    GameMessage message = GameMessage.deserialize(data);
+                    byte[] buffer = new byte[1024];
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
-                    InetAddress ipAddress = packet.getAddress();
-                    String ip = ipAddress.getHostAddress();
-                    int puerto = packet.getPort();
+                    socket.receive(packet);
 
-                    System.out.println(
-                            "Recibido: " + message.getType() +
-                                    " de " + message.getPlayerName()
-                    );
+                    String data = new String(packet.getData(), 0, packet.getLength());
 
-                    if (listener != null) {
-                        listener.onMessage(message, ip, puerto);
+                    try {
+                        GameMessage message = GameMessage.deserialize(data);
+
+                        InetAddress ipAddress = packet.getAddress();
+                        String ip = ipAddress.getHostAddress();
+                        int puerto = packet.getPort();
+
+                        System.out.println(
+                                "Recibido: " + message.getType() +
+                                        " de " + message.getPlayerName()
+                        );
+
+                        if (listener != null) {
+                            listener.onMessage(message, ip, puerto);
+                        }
+
+                    } catch (Exception e) {
+                        System.err.println("Mensaje invÃ¡lido: " + data);
                     }
-
-                } catch (Exception e) {
-                    System.err.println("Mensaje inválido: " + data);
+                } catch (SocketTimeoutException e) {
+                    continue;
                 }
             }
         } catch (Exception e) {
             if (activo) {
-                throw new RuntimeException("Error en recepción UDP", e);
+                throw new RuntimeException("Error en recepciÃ³n UDP", e);
             }
         }
     }

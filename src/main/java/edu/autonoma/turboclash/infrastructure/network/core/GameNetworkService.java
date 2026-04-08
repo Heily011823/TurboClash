@@ -82,6 +82,12 @@ public class GameNetworkService {
             }
         }
     }
+
+    public void discover(String hostIp, int hostPort) {
+        GameMessage msg = messageFactory.createDiscovery();
+        peer.getSender().enviarMensaje(msg, hostIp, hostPort);
+    }
+
     public void join(GameContext context, Player player) {
 
         sendJoin(player);

@@ -49,9 +49,15 @@ public class UdpPeer {
     public void agregarPeer(String ip, int puerto) {
         try {
             PortValidator.validate(puerto);
-            peers.add(new PeerInfo(ip, puerto));
+
+            boolean exists = peers.stream()
+                    .anyMatch(peer -> peer.getIp().equals(ip) && peer.getPuerto() == puerto);
+
+            if (!exists) {
+                peers.add(new PeerInfo(ip, puerto));
+            }
         } catch (InvalidPortException e) {
-            System.err.println("Puerto inválido: " + e.getMessage());
+            System.err.println("Puerto invÃ¡lido: " + e.getMessage());
         }
     }
 

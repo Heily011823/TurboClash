@@ -54,19 +54,10 @@ public class NetworkFactory {
             UdpPeer peer = new UdpPeer(socket, sender, receiver);
 
             receiver.setListener((msg, ip, port) -> {
-
-
-                if (port != puerto) {
-                    peer.agregarPeer(ip, port);
-                }
-
-
-                handler.handle(msg);
-
-
+                peer.agregarPeer(ip, port);
+                handler.handle(msg, ip, port);
             });
 
-            peer.iniciar();
             return peer;
 
         } catch (Exception e) {

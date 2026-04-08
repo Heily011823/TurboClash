@@ -97,14 +97,14 @@ public class GameBootstrap {
                 messageFactory
         );
 
+        messageHandler.setPeer(peer);
+        messageHandler.setMessageFactory(messageFactory);
+        peer.iniciar();
 
         NetworkConfig networkConfig = new NetworkConfig(config);
 
         GameNetworkService network =
                 new GameNetworkService(peer, messageFactory, networkConfig);
-
-        network.sendJoin(localPlayer);
-
 
         GameContext context = new GameContext(
                 match,
@@ -116,7 +116,6 @@ public class GameBootstrap {
                 new GameRulesManager(100),
                 new GameResultManager()
         );
-
 
         context.setLocalPlayer(localPlayer);
 

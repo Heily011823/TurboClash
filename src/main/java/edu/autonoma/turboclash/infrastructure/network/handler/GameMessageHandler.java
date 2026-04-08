@@ -2,13 +2,12 @@ package edu.autonoma.turboclash.infrastructure.network.handler;
 
 import edu.autonoma.turboclash.infrastructure.network.strategy.*;
 import edu.autonoma.turboclash.domain.model.Match;
-import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
+import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
 
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +17,8 @@ public class GameMessageHandler {
 
     private final Map<MessageType, IMessageStrategy> strategies = new HashMap<>();
     private final Match match;
+    private UdpPeer peer;
+    private GameMessageFactory messageFactory;
 
     /**
      * Crea una nueva instancia de {@code GameMessageHandler}.
@@ -37,12 +38,36 @@ public class GameMessageHandler {
      * Procesa la operacion principal del metodo.
      *
      * @param msg valor del parametro {@code msg}
+     * @param ip direccion IP asociada a la operacion
+     * @param port valor del parametro {@code port}
      */
-    public void handle(GameMessage msg) {
+    public void handle(GameMessage msg, String ip, int port) {
         if (msg == null) return;
 
+        if (msg.getType() == MessageType.DISCOVERY) {
+            if (peer != null) {
+                peer.agregarPeer(ip, port);
+            }
 
-        if (msg.getPlayerId().equals(match.getLocalPlayer().getId())) {
+            if (peer != null && messageFactory != null && match.getLocalPlayer() != null) {
+                GameMessage response = messageFactory.create(
+                        match.getLocalPlayer(),
+                        MessageType.PLAYER_JOINED
+                );
+                peer.getSender().enviarMensaje(response, ip, port);
+            }
+            return;
+        }
+
+        if (msg.getType() == MessageType.HANDSHAKE) {
+            if (peer != null) {
+                peer.agregarPeer(ip, port);
+            }
+            return;
+        }
+
+        if (msg.getPlayerId() != null
+                && msg.getPlayerId().equals(match.getLocalPlayer().getId())) {
             return;
         }
 
@@ -53,4 +78,11 @@ public class GameMessageHandler {
         }
     }
 
+    public void setPeer(UdpPeer peer) {
+        this.peer = peer;
+    }
+
+    public void setMessageFactory(GameMessageFactory messageFactory) {
+        this.messageFactory = messageFactory;
+    }
 }
