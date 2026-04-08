@@ -31,7 +31,7 @@ public class GameWindow {
     private boolean gameFinished = false;
 
     private final GameRulesManager gameRulesManager;
-    private final GameResultManager gameResultManager;
+    private final edu.autonoma.turboclash.logic.GameResultManager gameResultManager;
     private final List<Player> players = new ArrayList<>();
 
     private FondoAnimadoPanel fondoAnimadoPanel;
