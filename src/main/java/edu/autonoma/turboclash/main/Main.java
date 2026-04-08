@@ -1,6 +1,6 @@
 package edu.autonoma.turboclash.main;
 
-import edu.autonoma.turboclash.view.StartWindowFrame;
+import edu.autonoma.turboclash.presentation.view.StartWindowFrame;
 
 import javax.swing.*;
 
