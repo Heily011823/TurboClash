@@ -15,6 +15,8 @@ public class GameNetworkService {
     private final GameMessageFactory messageFactory;
     private final NetworkConfig networkConfig;
 
+    private volatile boolean connecting = false;
+
     public GameNetworkService(UdpPeer peer,
                               GameMessageFactory messageFactory,
                               NetworkConfig networkConfig) {
@@ -28,7 +30,7 @@ public class GameNetworkService {
     }
 
     public void sendJoin(Player player) {
-        if (player == null || !peer.isActivo()) {
+        if (player == null || player.getCar() == null || !peer.isActivo()) {
             return;
         }
 
@@ -37,7 +39,7 @@ public class GameNetworkService {
     }
 
     public void sendMovement(Player player) {
-        if (player == null || !peer.isActivo()) {
+        if (player == null || player.getCar() == null || !peer.isActivo()) {
             return;
         }
 
@@ -47,7 +49,7 @@ public class GameNetworkService {
     }
 
     public void sendLeave(Player player) {
-        if (player == null || !peer.isActivo()) {
+        if (player == null || player.getCar() == null || !peer.isActivo()) {
             return;
         }
 
@@ -84,32 +86,43 @@ public class GameNetworkService {
     }
 
     /**
-     * Inicia conexión P2P enviando varios DISCOVERY y JOIN.
+     * Inicia conexión P2P enviando algunos DISCOVERY y JOIN,
+     * pero se detiene si ya detecta jugadores remotos.
      */
     public void connect(GameContext context, Player player) {
-        if (context == null || player == null || !peer.isActivo()) {
+        if (context == null || player == null || !peer.isActivo() || connecting) {
             return;
         }
 
-        Thread connectionThread = new Thread(() -> {
-            for (int i = 0; i < 10; i++) {
-                if (!peer.isActivo()) {
-                    break;
-                }
+        connecting = true;
 
-                try {
-                    discover();
-                    sendJoin(player);
-                    Thread.sleep(700);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                } catch (Exception e) {
+        Thread connectionThread = new Thread(() -> {
+            try {
+                for (int i = 0; i < 4; i++) {
                     if (!peer.isActivo()) {
                         break;
                     }
+
+                    if (!context.getMatch().getRemotePlayers().isEmpty()) {
+                        break;
+                    }
+
+                    discover();
+                    sendJoin(player);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                if (peer.isActivo()) {
                     System.err.println("Error durante connect(): " + e.getMessage());
                 }
+            } finally {
+                connecting = false;
             }
         });
 
