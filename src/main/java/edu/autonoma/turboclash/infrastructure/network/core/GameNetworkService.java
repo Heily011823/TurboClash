@@ -85,33 +85,38 @@ public class GameNetworkService {
 
     public void discover(String hostIp, int hostPort) {
         GameMessage msg = messageFactory.createDiscovery();
-
-        for (int i = 0; i < 5; i++) {
-            peer.getSender().enviarMensaje(msg, hostIp, hostPort);
-
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
+        peer.getSender().enviarMensaje(msg, hostIp, hostPort);
     }
 
     public void join(GameContext context, Player player) {
 
-        for (int i = 0; i < 3; i++) {
-            sendJoin(player);
-
-            try {
-                Thread.sleep(150);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
+        sendJoin(player);
 
 
         context.addPlayer(player);
+    }
+
+    public void connect(GameContext context, Player player, String hostIp, int hostPort) {
+        Thread connectionThread = new Thread(() -> {
+            for (int i = 0; i < 20; i++) {
+                if (!context.getMatch().getRemotePlayers().isEmpty()) {
+                    break;
+                }
+
+                try {
+                    peer.agregarPeer(hostIp, hostPort);
+                    discover(hostIp, hostPort);
+                    sendJoin(player);
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+
+        connectionThread.setName("Network-Connect-Thread");
+        connectionThread.setDaemon(true);
+        connectionThread.start();
     }
 }

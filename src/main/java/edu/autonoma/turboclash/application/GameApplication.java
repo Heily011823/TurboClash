@@ -62,8 +62,7 @@ public class GameApplication {
             }
 
             context.getNetwork().getPeer().agregarPeer(hostIp.trim(), hostPort);
-            context.getNetwork().discover(hostIp.trim(), hostPort);
-            context.getNetwork().join(context, context.getLocalPlayer());
+            context.getNetwork().connect(context, context.getLocalPlayer(), hostIp.trim(), hostPort);
         }
 
         view.updateCars(context.getPlayers());

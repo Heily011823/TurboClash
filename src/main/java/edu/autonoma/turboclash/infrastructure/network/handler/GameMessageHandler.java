@@ -28,6 +28,7 @@ public class GameMessageHandler {
     public GameMessageHandler(Match match) {
         this.match = match;
 
+        strategies.put(MessageType.HANDSHAKE, new JoinStrategy(match));
         strategies.put(MessageType.PLAYER_JOINED, new JoinStrategy(match));
         strategies.put(MessageType.MOVEMENT, new MoveStrategy(match));
         strategies.put(MessageType.SCORE_UPDATE, new ScoreStrategy(match));
@@ -63,7 +64,6 @@ public class GameMessageHandler {
             if (peer != null) {
                 peer.agregarPeer(ip, port);
             }
-            return;
         }
 
         if (msg.getPlayerId() != null
@@ -75,6 +75,17 @@ public class GameMessageHandler {
 
         if (strategy != null) {
             strategy.handle(msg);
+
+            if (msg.getType() == MessageType.PLAYER_JOINED
+                    && peer != null
+                    && messageFactory != null
+                    && match.getLocalPlayer() != null) {
+                GameMessage response = messageFactory.create(
+                        match.getLocalPlayer(),
+                        MessageType.HANDSHAKE
+                );
+                peer.getSender().enviarMensaje(response, ip, port);
+            }
         }
     }
 
