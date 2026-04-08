@@ -22,26 +22,27 @@ public class CollisionManager {
     }
 
     /**
-     * Ejecuta la operacion {@code process}.
-     *
-     * @param match valor del parametro {@code match}
-     * @param items valor del parametro {@code items}
-     * @param obstacles valor del parametro {@code obstacles}
+     * Procesa todas las colisiones del juego.
      */
     public void process(Match match,
                         List<Item> items,
                         List<Obstacle> obstacles) {
 
+        if (match == null) return;
+
+
         checkCarCollisions(match.getLocalPlayer(), obstacles);
-        checkRemoteCars(match.getRemotePlayers(), obstacles);
         checkItemCollisions(match.getLocalPlayer(), items);
+
+
+        checkRemoteCars(match.getRemotePlayers(), obstacles);
+
+
+        checkPlayerVsPlayer(match.getPlayers());
     }
 
     /**
-     * Ejecuta la operacion {@code checkCarCollisions}.
-     *
-     * @param player valor del parametro {@code player}
-     * @param obstacles valor del parametro {@code obstacles}
+     * Colisiones contra obstáculos.
      */
     private void checkCarCollisions(Player player, List<Obstacle> obstacles) {
         if (player == null || player.getCar() == null) return;
@@ -51,28 +52,26 @@ public class CollisionManager {
                     player.getCar().getBounds().intersects(obs.getBounds())) {
 
                 obs.setProcessed(true);
-                listener.onCollision(obs);
+
+
+                listener.onObstacleCollision(player);
             }
         }
     }
 
     /**
-     * Ejecuta la operacion {@code checkRemoteCars}.
-     *
-     * @param players valor del parametro {@code players}
-     * @param obstacles valor del parametro {@code obstacles}
+     * Aplica colisiones a jugadores remotos.
      */
     private void checkRemoteCars(List<Player> players, List<Obstacle> obstacles) {
+        if (players == null) return;
+
         for (Player p : players) {
             checkCarCollisions(p, obstacles);
         }
     }
 
     /**
-     * Ejecuta la operacion {@code checkItemCollisions}.
-     *
-     * @param player valor del parametro {@code player}
-     * @param items valor del parametro {@code items}
+     * Colisiones con items.
      */
     private void checkItemCollisions(Player player, List<Item> items) {
         if (player == null || player.getCar() == null) return;
@@ -82,7 +81,34 @@ public class CollisionManager {
                     player.getCar().getBounds().intersects(item.getBounds())) {
 
                 item.setVisible(false);
-                listener.onCollision(item);
+
+
+                listener.onItemCollision(player);
+            }
+        }
+    }
+
+    /**
+     * Colisiones entre jugadores.
+     */
+    private void checkPlayerVsPlayer(List<Player> players) {
+        if (players == null) return;
+
+        for (int i = 0; i < players.size(); i++) {
+            Player p1 = players.get(i);
+
+            if (p1 == null || p1.getCar() == null) continue;
+
+            for (int j = i + 1; j < players.size(); j++) {
+                Player p2 = players.get(j);
+
+                if (p2 == null || p2.getCar() == null) continue;
+
+                if (p1.getCar().getBounds().intersects(p2.getCar().getBounds())) {
+
+
+                    listener.onPlayersCollision(p1, p2);
+                }
             }
         }
     }
