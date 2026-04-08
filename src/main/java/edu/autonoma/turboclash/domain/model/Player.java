@@ -27,14 +27,14 @@ public class Player {
         this.eliminationOrder = Integer.MAX_VALUE;
     }
 
-    // MOVIMIENTO
+
     public void move(double dx, double dy) {
         if (car != null) {
             car.move(dx, dy);
         }
     }
 
-    // SINCRONIZACIÓN
+
     public void syncFromNetwork(double x, double y, int score) {
         if (car != null) {
             car.setPosition(x, y);
@@ -79,7 +79,7 @@ public class Player {
         this.hasScored = value;
     }
 
-    // VIDAS
+
     public void loseLife() {
         if (car != null) {
             car.reduceLife();
@@ -108,7 +108,7 @@ public class Player {
         return getLives() > 0;
     }
 
-    // ESTADO FINAL DEL JUGADOR
+
     public boolean isFinishReached() {
         return finishReached;
     }
@@ -141,7 +141,7 @@ public class Player {
         this.eliminationOrder = eliminationOrder;
     }
 
-    // GETTERS
+
     public Car getCar() {
         return car;
     }

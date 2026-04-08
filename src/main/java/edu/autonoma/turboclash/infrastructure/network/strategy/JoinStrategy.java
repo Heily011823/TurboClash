@@ -5,15 +5,11 @@ import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
-import java.util.List;
-
 public class JoinStrategy implements IMessageStrategy {
 
-    private final List<Player> players;
     private final Match match;
 
-    public JoinStrategy(List<Player> players, Match match) {
-        this.players = players;
+    public JoinStrategy(Match match) {
         this.match = match;
     }
 
@@ -26,10 +22,11 @@ public class JoinStrategy implements IMessageStrategy {
         }
 
 
-        for (Player p : players) {
-            if (p.getId().equals(message.getPlayerId())) {
-                return;
-            }
+        boolean exists = match.getPlayers().stream()
+                .anyMatch(p -> p.getId().equals(message.getPlayerId()));
+
+        if (exists) {
+            return;
         }
 
 
@@ -37,7 +34,6 @@ public class JoinStrategy implements IMessageStrategy {
 
         if (message.getCarSkin() != null) {
             image = message.getCarSkin().name() + ".png";
-
         }
 
         Car car = new Car(
@@ -55,7 +51,8 @@ public class JoinStrategy implements IMessageStrategy {
                 car
         );
 
-        players.add(newPlayer);
+
+        match.addPlayer(newPlayer);
 
         System.out.println("Jugador agregado: " + message.getPlayerName());
     }

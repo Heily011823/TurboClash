@@ -55,4 +55,15 @@ public class Match {
     public List<Player> getRemotePlayers() { return remotePlayers; }
     public boolean isFinished() { return finished; }
     public Player getWinner() { return winner; }
+
+    public void addPlayer(Player newPlayer) {
+        if (newPlayer == null) return;
+
+        boolean exists = remotePlayers.stream()
+                .anyMatch(p -> p.getId().equals(newPlayer.getId()));
+
+        if (!exists) {
+            remotePlayers.add(newPlayer);
+        }
+    }
 }

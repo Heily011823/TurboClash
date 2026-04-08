@@ -15,12 +15,12 @@ public class GameMessageHandler {
 
     private final Map<MessageType, IMessageStrategy> strategies = new HashMap<>();
 
-    public GameMessageHandler(List<Player> remotePlayers, Match match) {
+    public GameMessageHandler(Match match) {
 
-        strategies.put(MessageType.PLAYER_JOINED, new JoinStrategy(remotePlayers, match));
-        strategies.put(MessageType.MOVEMENT, new MoveStrategy(remotePlayers));
-        strategies.put(MessageType.SCORE_UPDATE, new ScoreStrategy(remotePlayers));
-        strategies.put(MessageType.PLAYER_LEFT, new LeaveStrategy(remotePlayers));
+        strategies.put(MessageType.PLAYER_JOINED, new JoinStrategy(match));
+        strategies.put(MessageType.MOVEMENT, new MoveStrategy(match));
+        strategies.put(MessageType.SCORE_UPDATE, new ScoreStrategy(match));
+        strategies.put(MessageType.PLAYER_LEFT, new LeaveStrategy(match));
     }
 
     public void handle(GameMessage msg) {

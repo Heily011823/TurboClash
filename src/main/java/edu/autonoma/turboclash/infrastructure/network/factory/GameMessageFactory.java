@@ -15,7 +15,7 @@ public class GameMessageFactory {
         msg.setPosX(player.getCar().getX());
         msg.setPosY(player.getCar().getY());
         msg.setTime(System.currentTimeMillis());
-        msg.setEvent("");
+
 
         return msg;
     }
