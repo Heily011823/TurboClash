@@ -15,7 +15,7 @@ import java.util.Map;
 public class GameWindow {
 
     public JPanel panel1;
-    public JLabel puntaje;
+    public JLabel Puntaje;
 
     private JLabel countdownLabel;
     private JLabel statusLabel;
@@ -37,8 +37,8 @@ public class GameWindow {
         panel1.setOpaque(false);
         panel1.setPreferredSize(new Dimension(1000, 700));
 
-        puntaje = createScoreLabel();
-        panel1.add(puntaje);
+        Puntaje = createScoreLabel();
+        panel1.add(Puntaje);
 
         statusLabel = createStatusLabel();
         panel1.add(statusLabel);
@@ -72,7 +72,7 @@ public class GameWindow {
     }
 
     public void updateScore(int points) {
-        puntaje.setText("Puntaje: " + points);
+        Puntaje.setText("Puntaje: " + points);
     }
 
     public void updateCars(List<Player> players) {
@@ -99,10 +99,9 @@ public class GameWindow {
         lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
         lbl.setVisible(car.isActive());
 
-        updateHealth(car);
+        updateHealth(car, car.getLives());
     }
-
-    private void updateHealth(Car car) {
+    public void updateHealth(Car car, int lives) {
         String carId = car.getId();
 
         for (int i = 0; i < 3; i++) {
@@ -114,8 +113,11 @@ public class GameWindow {
                 return lbl;
             });
 
-            heart.setBounds((int) car.getX() + (i * 30), (int) car.getY() - 30, 25, 25);
-            heart.setVisible(i < car.getLives() && car.isActive());
+            heart.setBounds((int) car.getX() + (i * 30),
+                    (int) car.getY() - 30,
+                    25, 25);
+
+            heart.setVisible(i < lives && car.isActive());
         }
     }
 

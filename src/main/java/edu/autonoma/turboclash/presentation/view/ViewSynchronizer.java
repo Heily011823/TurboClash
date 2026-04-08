@@ -20,7 +20,7 @@ public class ViewSynchronizer {
         window.updateScore(localPlayer.getCurrentPoints());
 
 
-        window.updateHealth(localPlayer.getLives(), localPlayer.getCar());
+        window.updateHealth(localPlayer.getCar(), localPlayer.getLives());
 
 
         window.updateCars(match.getPlayers());

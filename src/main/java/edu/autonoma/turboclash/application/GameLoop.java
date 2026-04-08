@@ -44,6 +44,8 @@ public class GameLoop {
 
             context.getEngine().update();
 
+            window.updateCars(context.getMatch().getPlayers());
+
             viewSync.sync(
                     window,
                     context.getMatch(),
