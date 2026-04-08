@@ -6,6 +6,7 @@ import edu.autonoma.turboclash.domain.services.GameRulesManager;
 import edu.autonoma.turboclash.domain.services.GameResultManager;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -20,6 +21,10 @@ public class GamePresenter {
     private boolean gameFinished = false;
     private boolean gameStarted = false;
     private boolean movementEnabled = false;
+    private boolean timerStarted = false;
+
+    private Timer gameTimer;
+    private int remainingSeconds = 180; // 3 minutos
 
     public GamePresenter(GameWindow view,
                          GameRulesManager rulesManager,
@@ -28,7 +33,10 @@ public class GamePresenter {
         this.rulesManager = rulesManager;
         this.resultManager = resultManager;
 
-        this.view.setOnCountdownFinished(() -> movementEnabled = true);
+        this.view.setOnCountdownFinished(() -> {
+            movementEnabled = true;
+            startMatchTimer();
+        });
     }
 
     public void update(Car localCar, List<Player> players) {
@@ -55,10 +63,43 @@ public class GamePresenter {
 
         gameStarted = true;
         movementEnabled = false;
+        timerStarted = false;
+        remainingSeconds = 180;
 
         view.prepareRaceStart(players);
         view.showGameStarted();
         view.startCountdown();
+    }
+
+    private void startMatchTimer() {
+        if (timerStarted || gameFinished) return;
+
+        timerStarted = true;
+
+        gameTimer = new Timer(1000, e -> {
+            if (gameFinished) {
+                stopMatchTimer();
+                return;
+            }
+
+            remainingSeconds--;
+
+            // Si luego quieres mostrar el tiempo en pantalla:
+            // view.updateMatchTime(remainingSeconds);
+
+            if (remainingSeconds <= 0) {
+                stopMatchTimer();
+                gameFinished = true;
+            }
+        });
+
+        gameTimer.start();
+    }
+
+    private void stopMatchTimer() {
+        if (gameTimer != null && gameTimer.isRunning()) {
+            gameTimer.stop();
+        }
     }
 
     private void checkFinish(Car car, List<Player> players) {
@@ -81,7 +122,7 @@ public class GamePresenter {
     private void checkGameEnd(List<Player> players) {
         if (gameFinished) return;
         if (!gameStarted || !movementEnabled) return;
-        if (players.isEmpty() || view.isBackgroundFinished()) return;
+        if (players.isEmpty()) return;
 
         int aliveCount = 0;
         boolean someoneReachedFinish = false;
@@ -98,13 +139,18 @@ public class GamePresenter {
             }
         }
 
-        if (someoneReachedFinish || aliveCount <= 1) {
+        if (someoneReachedFinish || aliveCount <= 1 || remainingSeconds <= 0 || view.isBackgroundFinished()) {
             finishGame(players);
         }
     }
 
     private void finishGame(List<Player> players) {
+        if (gameFinished && !timerStarted) return;
+
         gameFinished = true;
+        movementEnabled = false;
+        stopMatchTimer();
+
         List<Player> ranking = resultManager.calculateRanking(players);
         view.showGameResult(ranking);
     }
@@ -119,5 +165,9 @@ public class GamePresenter {
 
     public boolean isGameFinished() {
         return gameFinished;
+    }
+
+    public int getRemainingSeconds() {
+        return remainingSeconds;
     }
 }

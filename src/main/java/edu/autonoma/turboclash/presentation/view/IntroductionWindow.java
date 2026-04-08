@@ -171,7 +171,7 @@ public class IntroductionWindow {
                         "- Regla 2: Chocar con obstáculos resta -10 puntos.\n" +
                         "- Regla 3: Chocar contra otro carro resta 1 vida.\n" +
                         "- Regla 4: Si el puntaje llega a cero por colisiones, se resta 1 vida.\n" +
-                        "- Regla 5: El primero en llegar recibe +50 puntos.";
+                        "- Regla 5: El primero en llegar a la meta, recibe +50 puntos.";
 
         JOptionPane.showMessageDialog(
                 null,
