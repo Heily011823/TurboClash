@@ -29,7 +29,7 @@ public class GameWindow {
     private final Map<Integer, JLabel> healthLabels = new HashMap<>();
 
     private boolean gameFinished = false;
-
+    private boolean gameStarted = false;
     private final GameRulesManager gameRulesManager;
     private final edu.autonoma.turboclash.domain.services.GameResultManager gameResultManager;
     private final List<Player> players = new ArrayList<>();
@@ -69,6 +69,15 @@ public class GameWindow {
         return players;
     }
 
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    public void startGame() {
+        if (gameStarted) return;
+        gameStarted = true;
+        startCountdown();
+    }
     public void updateScore(int points) {
         Puntaje.setText("Puntaje: " + points);
     }
@@ -261,22 +270,22 @@ public class GameWindow {
 
     private void checkGameEnd() {
         if (gameFinished) return;
+        if (!gameStarted) return;
         if (players.isEmpty() || fondoAnimadoPanel == null || fondoAnimadoPanel.isJuegoTerminado()) {
             return;
         }
 
         int aliveCount = 0;
-        for (Player player : players) {
-            if (player != null && player.isAlive()) {
-                aliveCount++;
-            }
-        }
-
         boolean someoneReachedFinish = false;
+
         for (Player player : players) {
-            if (player != null && player.isFinishReached()) {
-                someoneReachedFinish = true;
-                break;
+            if (player != null) {
+                if (player.isAlive()) {
+                    aliveCount++;
+                }
+                if (player.isFinishReached()) {
+                    someoneReachedFinish = true;
+                }
             }
         }
 
@@ -284,7 +293,6 @@ public class GameWindow {
             finishGame();
         }
     }
-
     private void finishGame() {
         gameFinished = true;
 
