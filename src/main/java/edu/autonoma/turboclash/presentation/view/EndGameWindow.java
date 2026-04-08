@@ -16,12 +16,12 @@ public class EndGameWindow {
     public EndGameWindow() {
         panel1 = new JPanel(null);
         panel1.setOpaque(false);
-        panel1.setPreferredSize(new Dimension(800, 600));
+        panel1.setPreferredSize(new Dimension(1000, 700));
 
-        PrimerLugar = crearLabel("", 330, 300, 150, 40);
-        SegundoLugar = crearLabel("", 180, 380, 150, 40);
-        TercerLugar = crearLabel("", 500, 380, 150, 40);
-        CuartoLugar = crearLabel("", 330, 470, 150, 40);
+        PrimerLugar = crearLabel("", 330, 300, 400, 60);
+        SegundoLugar = crearLabel("", 180, 380, 300, 60);
+        TercerLugar = crearLabel("", 500, 380, 300, 60);
+        CuartoLugar = crearLabel("", 330, 470, 400, 60);
 
         btnFin = crearBotonImagen("/image/btn_fin.png", 540, 510, 180, 55);
         btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 70, 510, 180, 55);
