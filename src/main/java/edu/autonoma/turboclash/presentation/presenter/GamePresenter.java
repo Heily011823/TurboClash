@@ -2,8 +2,8 @@ package edu.autonoma.turboclash.presentation.presenter;
 
 import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.domain.model.Player;
-import edu.autonoma.turboclash.domain.services.GameResultManager;
 import edu.autonoma.turboclash.domain.services.GameRulesManager;
+import edu.autonoma.turboclash.domain.services.GameResultManager;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 
 import java.util.List;
@@ -21,13 +21,6 @@ public class GamePresenter {
     private boolean gameStarted = false;
     private boolean movementEnabled = false;
 
-    /**
-     * Crea una nueva instancia de {@code GamePresenter}.
-     *
-     * @param view valor del parametro {@code view}
-     * @param rulesManager valor del parametro {@code rulesManager}
-     * @param resultManager valor del parametro {@code resultManager}
-     */
     public GamePresenter(GameWindow view,
                          GameRulesManager rulesManager,
                          GameResultManager resultManager) {
@@ -38,12 +31,6 @@ public class GamePresenter {
         this.view.setOnCountdownFinished(() -> movementEnabled = true);
     }
 
-    /**
-     * Actualiza la operacion principal del metodo.
-     *
-     * @param localCar valor del parametro {@code localCar}
-     * @param players valor del parametro {@code players}
-     */
     public void update(Car localCar, List<Player> players) {
         if (players == null || players.isEmpty()) return;
 
@@ -63,11 +50,6 @@ public class GamePresenter {
         checkGameEnd(players);
     }
 
-    /**
-     * Inicia {@code Game}.
-     *
-     * @param players valor del parametro {@code players}
-     */
     private void startGame(List<Player> players) {
         if (gameStarted) return;
 
@@ -79,12 +61,6 @@ public class GamePresenter {
         view.startCountdown();
     }
 
-    /**
-     * Ejecuta la operacion {@code checkFinish}.
-     *
-     * @param car valor del parametro {@code car}
-     * @param players valor del parametro {@code players}
-     */
     private void checkFinish(Car car, List<Player> players) {
         if (!gameStarted || !movementEnabled) return;
         if (car == null) return;
@@ -102,11 +78,6 @@ public class GamePresenter {
         }
     }
 
-    /**
-     * Ejecuta la operacion {@code checkGameEnd}.
-     *
-     * @param players valor del parametro {@code players}
-     */
     private void checkGameEnd(List<Player> players) {
         if (gameFinished) return;
         if (!gameStarted || !movementEnabled) return;
@@ -132,41 +103,20 @@ public class GamePresenter {
         }
     }
 
-    /**
-     * Ejecuta la operacion {@code finishGame}.
-     *
-     * @param players valor del parametro {@code players}
-     */
     private void finishGame(List<Player> players) {
         gameFinished = true;
-
         List<Player> ranking = resultManager.calculateRanking(players);
         view.showGameResult(ranking);
     }
 
-    /**
-     * Indica si {@code MovementEnabled}.
-     *
-     * @return true si se cumple la condicion evaluada; false en caso contrario
-     */
     public boolean isMovementEnabled() {
         return movementEnabled;
     }
 
-    /**
-     * Indica si {@code GameStarted}.
-     *
-     * @return true si se cumple la condicion evaluada; false en caso contrario
-     */
     public boolean isGameStarted() {
         return gameStarted;
     }
 
-    /**
-     * Indica si {@code GameFinished}.
-     *
-     * @return true si se cumple la condicion evaluada; false en caso contrario
-     */
     public boolean isGameFinished() {
         return gameFinished;
     }
