@@ -46,7 +46,7 @@ public class GamePresenter {
         }
 
         if (!gameStarted) {
-            if (players.size() < 2) {
+            if (players.size() < 4) {
                 view.showWaitingPlayers();
                 view.updateCars(players);
                 return;

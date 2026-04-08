@@ -60,7 +60,7 @@ public class Match {
      *
      * @return valor de {@code Players}
      */
-    public List<Player> getPlayers() {
+    public synchronized List<Player> getPlayers() {
         List<Player> all = new ArrayList<>();
         if (localPlayer != null) {
             all.add(localPlayer);
@@ -87,7 +87,7 @@ public class Match {
         this.localPlayer = localPlayer;
     }
 
-    public List<Player> getRemotePlayers() {
+    public synchronized List<Player> getRemotePlayers() {
         return remotePlayers;
     }
 
@@ -104,11 +104,11 @@ public class Match {
     }
 
     /**
-     * Ejecuta la operacion {@code addPlayer}.
+     * Agrega o actualiza un jugador remoto.
      *
-     * @param newPlayer valor del parametro {@code newPlayer}
+     * @param newPlayer jugador remoto recibido por red
      */
-    public void addPlayer(Player newPlayer) {
+    public synchronized void addPlayer(Player newPlayer) {
         if (newPlayer == null) {
             return;
         }
@@ -117,16 +117,19 @@ public class Match {
             return;
         }
 
-        boolean exists = remotePlayers.stream()
-                .anyMatch(existing -> samePlayer(existing, newPlayer));
+        Player existing = findRemotePlayer(newPlayer.getId(), newPlayer.getName());
 
-        if (!exists) {
-            remotePlayers.add(newPlayer);
-            System.out.println("Jugador remoto agregado al Match: " + newPlayer.getName());
+        if (existing != null) {
+            syncPlayerData(existing, newPlayer);
+            System.out.println("Jugador remoto actualizado en Match: " + existing.getName());
+            return;
         }
+
+        remotePlayers.add(newPlayer);
+        System.out.println("Jugador remoto agregado al Match: " + newPlayer.getName());
     }
 
-    public void removePlayer(Player player) {
+    public synchronized void removePlayer(Player player) {
         if (player == null) {
             return;
         }
@@ -134,7 +137,7 @@ public class Match {
         remotePlayers.removeIf(existing -> samePlayer(existing, player));
     }
 
-    public void removePlayerByName(String playerName) {
+    public synchronized void removePlayerByName(String playerName) {
         if (playerName == null || playerName.isBlank()) {
             return;
         }
@@ -143,6 +146,64 @@ public class Match {
                 player != null
                         && player.getName() != null
                         && player.getName().equalsIgnoreCase(playerName));
+    }
+
+    public synchronized Player findPlayerByIdOrName(String playerId, String playerName) {
+        if (localPlayer != null) {
+            boolean sameLocalById = localPlayer.getId() != null
+                    && playerId != null
+                    && localPlayer.getId().equals(playerId);
+
+            boolean sameLocalByName = localPlayer.getName() != null
+                    && playerName != null
+                    && localPlayer.getName().equalsIgnoreCase(playerName);
+
+            if (sameLocalById || sameLocalByName) {
+                return localPlayer;
+            }
+        }
+
+        return findRemotePlayer(playerId, playerName);
+    }
+
+    public synchronized Player findRemotePlayer(String playerId, String playerName) {
+        for (Player player : remotePlayers) {
+            if (player == null) {
+                continue;
+            }
+
+            boolean sameId = player.getId() != null
+                    && playerId != null
+                    && player.getId().equals(playerId);
+
+            boolean sameName = player.getName() != null
+                    && playerName != null
+                    && player.getName().equalsIgnoreCase(playerName);
+
+            if (sameId || sameName) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    private void syncPlayerData(Player target, Player source) {
+        if (target == null || source == null) {
+            return;
+        }
+
+        if (target.getCar() != null && source.getCar() != null) {
+            target.getCar().setPosition(source.getCar().getX(), source.getCar().getY());
+            target.getCar().setLives(source.getCar().getLives());
+            target.getCar().setFinishReached(source.getCar().isFinishReached());
+        }
+
+        target.setScore(source.getCurrentPoints());
+        target.setFinishReached(source.isFinishReached());
+        target.setEliminated(source.isEliminated());
+        target.setFinishOrder(source.getFinishOrder());
+        target.setEliminationOrder(source.getEliminationOrder());
+        target.setHasScored(source.hasScored());
     }
 
     private boolean samePlayer(Player a, Player b) {

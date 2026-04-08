@@ -11,6 +11,14 @@ import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
  */
 public class JoinStrategy implements IMessageStrategy {
 
+    private static final int CAR_WIDTH = 100;
+    private static final int CAR_HEIGHT = 50;
+
+    private static final double START_X = 80;
+
+    // 4 carriles verticales fijos
+    private static final double[] LANES_Y = {120, 220, 320, 420};
+
     private final Match match;
 
     /**
@@ -58,25 +66,15 @@ public class JoinStrategy implements IMessageStrategy {
             }
         }
 
-        boolean exists = match.getPlayers().stream().anyMatch(player -> {
-            if (player == null) {
-                return false;
+        Player existing = match.findRemotePlayer(messagePlayerId, messagePlayerName);
+
+        if (existing != null) {
+            if (existing.getCar() != null) {
+                double x = message.getPosX() > 0 ? message.getPosX() : existing.getCar().getX();
+                double y = message.getPosY() > 0 ? message.getPosY() : existing.getCar().getY();
+                existing.getCar().setPosition(x, y);
             }
-
-            boolean sameId =
-                    player.getId() != null
-                            && messagePlayerId != null
-                            && player.getId().equals(messagePlayerId);
-
-            boolean sameName =
-                    player.getName() != null
-                            && messagePlayerName != null
-                            && player.getName().equalsIgnoreCase(messagePlayerName);
-
-            return sameId || sameName;
-        });
-
-        if (exists) {
+            existing.setScore(message.getScore());
             return;
         }
 
@@ -85,15 +83,15 @@ public class JoinStrategy implements IMessageStrategy {
             image = message.getCarSkin().getFileName();
         }
 
-        double posX = Math.max(80, message.getPosX());
-        double posY = message.getPosY();
+        double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
+        double posY = resolveLaneY();
 
         Car car = new Car(
-                messagePlayerId,
+                messagePlayerId != null ? messagePlayerId : messagePlayerName,
                 posX,
                 posY,
-                100,
-                50,
+                CAR_WIDTH,
+                CAR_HEIGHT,
                 image
         );
 
@@ -103,9 +101,43 @@ public class JoinStrategy implements IMessageStrategy {
                 car
         );
 
+        newPlayer.setScore(message.getScore());
         match.addPlayer(newPlayer);
 
-        System.out.println("Jugador agregado: " + messagePlayerName);
+        System.out.println("Jugador agregado: " + messagePlayerName
+                + " en carril Y=" + posY);
         System.out.println("Remotos actuales: " + match.getRemotePlayers().size());
+    }
+
+    private double resolveLaneY() {
+        boolean[] used = new boolean[LANES_Y.length];
+
+        Player local = match.getLocalPlayer();
+        if (local != null && local.getCar() != null) {
+            markUsedLane(local.getCar().getY(), used);
+        }
+
+        for (Player remote : match.getRemotePlayers()) {
+            if (remote != null && remote.getCar() != null) {
+                markUsedLane(remote.getCar().getY(), used);
+            }
+        }
+
+        for (int i = 0; i < LANES_Y.length; i++) {
+            if (!used[i]) {
+                return LANES_Y[i];
+            }
+        }
+
+        return LANES_Y[LANES_Y.length - 1];
+    }
+
+    private void markUsedLane(double y, boolean[] used) {
+        for (int i = 0; i < LANES_Y.length; i++) {
+            if (Math.abs(LANES_Y[i] - y) < 20) {
+                used[i] = true;
+                return;
+            }
+        }
     }
 }

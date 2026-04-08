@@ -18,16 +18,29 @@ public class GameMessageFactory {
      * @return resultado de la operacion {@code create}
      */
     public GameMessage create(Player player, MessageType type) {
+        if (player == null) {
+            throw new IllegalArgumentException("El jugador no puede ser nulo");
+        }
+
         GameMessage msg = new GameMessage();
 
         msg.setType(type);
         msg.setPlayerId(player.getId());
         msg.setPlayerName(player.getName());
-        msg.setPosX(player.getCar().getX());
-        msg.setPosY(player.getCar().getY());
+
+        if (player.getCar() != null) {
+            msg.setPosX(player.getCar().getX());
+            msg.setPosY(player.getCar().getY());
+            msg.setCarSkin(resolveSkin(player));
+        } else {
+            msg.setPosX(80);
+            msg.setPosY(80);
+            msg.setCarSkin(CarSkin.BLUE);
+        }
+
         msg.setScore(player.getCurrentPoints());
         msg.setTime(System.currentTimeMillis());
-        msg.setCarSkin(resolveSkin(player));
+        msg.setEvent(null);
 
         return msg;
     }

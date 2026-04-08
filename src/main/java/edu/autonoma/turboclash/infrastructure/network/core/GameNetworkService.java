@@ -44,6 +44,15 @@ public class GameNetworkService {
         peer.enviarATodos(msg);
     }
 
+    public void sendHandshake(Player player) {
+        if (player == null || player.getCar() == null || !peer.isActivo()) {
+            return;
+        }
+
+        GameMessage msg = messageFactory.create(player, MessageType.HANDSHAKE);
+        peer.enviarATodos(msg);
+    }
+
     public void sendMovement(Player player) {
         if (player == null || player.getCar() == null || !peer.isActivo()) {
             return;
@@ -93,11 +102,6 @@ public class GameNetworkService {
 
     /**
      * Inicia conexión P2P.
-     *
-     * Corregido:
-     * - ya no se detiene cuando aparece el primer remoto
-     * - sigue intentando hasta completar los remotos esperados
-     *   o hasta agotar intentos
      */
     public void connect(GameContext context, Player player) {
         if (context == null || player == null || !peer.isActivo() || connecting) {
@@ -108,7 +112,7 @@ public class GameNetworkService {
 
         Thread connectionThread = new Thread(() -> {
             try {
-                int maxAttempts = 10;
+                int maxAttempts = 15;
 
                 for (int i = 0; i < maxAttempts; i++) {
                     if (!peer.isActivo()) {
@@ -126,6 +130,7 @@ public class GameNetworkService {
                     }
 
                     discover();
+                    sendHandshake(player);
                     sendJoin(player);
 
                     try {
