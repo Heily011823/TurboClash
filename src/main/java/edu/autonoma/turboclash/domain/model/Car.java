@@ -76,6 +76,19 @@ public class Car extends GameObject {
     }
 
     /**
+     * Mantiene sincronizadas las coordenadas internas del carro con la posicion del GameObject.
+     *
+     * @param x coordenada horizontal
+     * @param y coordenada vertical
+     */
+    @Override
+    public void setPosition(double x, double y) {
+        this.posX = x;
+        this.posY = y;
+        super.setPosition(x, y);
+    }
+
+    /**
      * Ejecuta la operacion {@code applyDebuff}.
      *
      * @param factor valor del parametro {@code factor}

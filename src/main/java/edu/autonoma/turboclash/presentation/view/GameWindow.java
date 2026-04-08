@@ -5,7 +5,6 @@ import edu.autonoma.turboclash.domain.model.Item;
 import edu.autonoma.turboclash.domain.model.Obstacle;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
-import edu.autonoma.turboclash.presentation.view.EndGameWindowFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,6 +33,9 @@ public class GameWindow {
 
     private FondoAnimadoPanel fondoAnimadoPanel;
 
+    private static final int START_X = 80;
+    private static final int[] LANES_Y = {100, 190, 280, 370};
+
     /**
      * Crea una nueva instancia de {@code GameWindow}.
      */
@@ -55,8 +57,7 @@ public class GameWindow {
         initializeCountdownUI();
 
         btnClose = new JButton("X");
-        btnClose.setBounds(1200, 20, 50, 50); // esquina superior derecha
-
+        btnClose.setBounds(1200, 20, 50, 50);
         btnClose.setFocusPainted(false);
         btnClose.setBorderPainted(false);
         btnClose.setBackground(new Color(150, 0, 0));
@@ -65,7 +66,6 @@ public class GameWindow {
         btnClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         panel1.add(btnClose);
-
         btnClose.addActionListener(e -> System.exit(0));
     }
 
@@ -167,10 +167,12 @@ public class GameWindow {
     /**
      * Actualiza {@code Health}.
      *
-     * @param car   valor del parametro {@code car}
+     * @param car valor del parametro {@code car}
      * @param lives valor del parametro {@code lives}
      */
     public void updateHealth(Car car, int lives) {
+        if (car == null) return;
+
         String carId = car.getId();
 
         for (int i = 0; i < 3; i++) {
@@ -241,23 +243,56 @@ public class GameWindow {
     }
 
     /**
-     * Prepara {@code RaceStart}.
+     * Prepara {@code RaceStart} asignando a cada jugador un carril fijo.
      *
-     * @param cars valor del parametro {@code cars}
+     * @param players valor del parametro {@code players}
      */
-    public void prepareRaceStart(List<Car> cars) {
-        if (cars == null || cars.isEmpty()) return;
+    public void prepareRaceStart(List<Player> players) {
+        if (players == null || players.isEmpty()) return;
 
-        final int startX = 80;
-        final int[] lanesY = {100, 190, 280, 370};
+        for (Player player : players) {
+            if (player == null || player.getCar() == null) continue;
 
-        for (int i = 0; i < cars.size() && i < lanesY.length; i++) {
-            Car car = cars.get(i);
-            car.setPosition(startX, lanesY[i]);
-            updateCarPosition(car);
+            int laneIndex = getLaneIndex(player);
+            player.getCar().setPosition(START_X, LANES_Y[laneIndex]);
+            updateCarPosition(player.getCar());
         }
 
         panel1.repaint();
+    }
+
+    /**
+     * Obtiene el carril segun el id del jugador.
+     * Esto evita depender del orden de la lista.
+     *
+     * @param player jugador a evaluar
+     * @return indice del carril
+     */
+    private int getLaneIndex(Player player) {
+        if (player == null || player.getId() == null) return 0;
+
+        String id = player.getId().trim();
+
+        switch (id) {
+            case "5001":
+            case "player1":
+            case "jugador1":
+                return 0;
+            case "5002":
+            case "player2":
+            case "jugador2":
+                return 1;
+            case "5003":
+            case "player3":
+            case "jugador3":
+                return 2;
+            case "5004":
+            case "player4":
+            case "jugador4":
+                return 3;
+            default:
+                return Math.abs(id.hashCode()) % LANES_Y.length;
+        }
     }
 
     /**
@@ -382,8 +417,8 @@ public class GameWindow {
      * Obtiene el valor de {@code Icon}.
      *
      * @param path valor del parametro {@code path}
-     * @param w    ancho requerido por la operacion
-     * @param h    alto requerido por la operacion
+     * @param w ancho requerido por la operacion
+     * @param h alto requerido por la operacion
      * @return valor de {@code Icon}
      */
     private ImageIcon getIcon(String path, int w, int h) {

@@ -2,8 +2,8 @@ package edu.autonoma.turboclash.presentation.presenter;
 
 import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.domain.model.Player;
-import edu.autonoma.turboclash.domain.services.GameRulesManager;
 import edu.autonoma.turboclash.domain.services.GameResultManager;
+import edu.autonoma.turboclash.domain.services.GameRulesManager;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 
 import java.util.List;
@@ -47,11 +47,10 @@ public class GamePresenter {
     public void update(Car localCar, List<Player> players) {
         if (players == null || players.isEmpty()) return;
 
-        view.updateCars(players);
-
         if (!gameStarted) {
             if (players.size() < 2) {
                 view.showWaitingPlayers();
+                view.updateCars(players);
                 return;
             }
 
@@ -59,6 +58,7 @@ public class GamePresenter {
             return;
         }
 
+        view.updateCars(players);
         checkFinish(localCar, players);
         checkGameEnd(players);
     }
@@ -74,6 +74,7 @@ public class GamePresenter {
         gameStarted = true;
         movementEnabled = false;
 
+        view.prepareRaceStart(players);
         view.showGameStarted();
         view.startCountdown();
     }

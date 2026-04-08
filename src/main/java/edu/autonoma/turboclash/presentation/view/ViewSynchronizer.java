@@ -27,10 +27,7 @@ public class ViewSynchronizer {
         if (localPlayer == null) return;
 
         window.updateScore(localPlayer.getCurrentPoints());
-
-
         window.updateHealth(localPlayer.getCar(), localPlayer.getLives());
-
         window.updateCars(match.getPlayers());
         window.updateObstacles(obstacles);
         window.updateItems(items);
