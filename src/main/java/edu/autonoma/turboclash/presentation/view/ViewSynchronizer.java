@@ -7,7 +7,6 @@ import edu.autonoma.turboclash.domain.model.Player;
 
 import java.util.List;
 
-
 public class ViewSynchronizer {
 
     public void sync(GameWindow window, Match match, List<Obstacle> obstacles, List<Item> items) {
@@ -16,17 +15,14 @@ public class ViewSynchronizer {
         Player localPlayer = match.getLocalPlayer();
         if (localPlayer == null) return;
 
-
         window.updateScore(localPlayer.getCurrentPoints());
 
 
         window.updateHealth(localPlayer.getCar(), localPlayer.getLives());
 
-
         window.updateCars(match.getPlayers());
         window.updateObstacles(obstacles);
         window.updateItems(items);
-
 
         if (window.getPanel() != null) {
             window.getPanel().repaint();

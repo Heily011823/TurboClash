@@ -101,6 +101,7 @@ public class GameWindow {
 
         updateHealth(car, car.getLives());
     }
+
     public void updateHealth(Car car, int lives) {
         String carId = car.getId();
 
