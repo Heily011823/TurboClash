@@ -10,3 +10,5 @@ build/
 # Sistema
 .DS_Store
 Thumbs.db
+
+src/main/resources/peers.json
