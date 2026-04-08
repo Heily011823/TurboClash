@@ -7,11 +7,20 @@ import edu.autonoma.turboclash.infrastructure.input.MouseInput;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Representa y organiza la vista {@code GameWindowFrame} en la capa de presentacion.
+ */
 public class GameWindowFrame extends JFrame {
 
     private final GameWindow view;
     private Runnable countdownAction;
 
+    /**
+     * Crea una nueva instancia de {@code GameWindowFrame}.
+     *
+     * @param keyboardInput valor del parametro {@code keyboardInput}
+     * @param mouseInput valor del parametro {@code mouseInput}
+     */
     public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
         this.view = new GameWindow();
 
@@ -27,6 +36,9 @@ public class GameWindowFrame extends JFrame {
         }
     }
 
+    /**
+     * Configura {@code FrameProperties}.
+     */
     private void setupFrameProperties() {
         setTitle("TurboClash - Racing Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,6 +47,12 @@ public class GameWindowFrame extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
+    /**
+     * Configura {@code ContentLayout}.
+     *
+     * @param keyboardInput valor del parametro {@code keyboardInput}
+     * @param mouseInput valor del parametro {@code mouseInput}
+     */
     private void setupContentLayout(KeyboardInput keyboardInput, MouseInput mouseInput) {
 
         JPanel gamePanel = view.getPanel();
@@ -65,15 +83,30 @@ public class GameWindowFrame extends JFrame {
         new GameInputBinder(keyboardInput, mouseInput).bind(gamePanel);
     }
 
+    /**
+     * Actualiza el valor de {@code CountdownAction}.
+     *
+     * @param countdownAction valor del parametro {@code countdownAction}
+     */
     public void setCountdownAction(Runnable countdownAction) {
         this.countdownAction = countdownAction;
         view.startCountdown();
     }
 
+    /**
+     * Obtiene el valor de {@code View}.
+     *
+     * @return valor de {@code View}
+     */
     public GameWindow getView() {
         return view;
     }
 
+    /**
+     * Obtiene el valor de {@code GameView}.
+     *
+     * @return valor de {@code GameView}
+     */
     public GameWindow getGameView() {
         return view;
     }

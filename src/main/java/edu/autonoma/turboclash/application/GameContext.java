@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Agrupa el contexto compartido de {@code GameContext} en la capa de aplicacion.
+ */
 public class GameContext {
 
     private final Match match;
@@ -24,6 +27,18 @@ public class GameContext {
     private final GameRulesManager rulesManager;
     private final GameResultManager resultManager;
 
+    /**
+     * Crea una nueva instancia de {@code GameContext}.
+     *
+     * @param match valor del parametro {@code match}
+     * @param engine valor del parametro {@code engine}
+     * @param network valor del parametro {@code network}
+     * @param obstacles valor del parametro {@code obstacles}
+     * @param items valor del parametro {@code items}
+     * @param peer valor del parametro {@code peer}
+     * @param rulesManager valor del parametro {@code rulesManager}
+     * @param resultManager valor del parametro {@code resultManager}
+     */
     public GameContext(Match match,
                        GameEngine engine,
                        GameNetworkService network,
@@ -45,6 +60,11 @@ public class GameContext {
         this.resultManager = resultManager;
     }
 
+    /**
+     * Obtiene el valor de {@code Players}.
+     *
+     * @return valor de {@code Players}
+     */
     public List<Player> getPlayers() {
         if (match == null || match.getPlayers() == null) {
             return Collections.emptyList();
@@ -52,45 +72,90 @@ public class GameContext {
         return match.getPlayers();
     }
 
+    /**
+     * Obtiene el valor de {@code Cars}.
+     *
+     * @return valor de {@code Cars}
+     */
     public List<Car> getCars() {
         return getPlayers().stream()
                 .map(Player::getCar)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene el valor de {@code Match}.
+     *
+     * @return valor de {@code Match}
+     */
     public Match getMatch() {
         return match;
     }
 
+    /**
+     * Obtiene el valor de {@code Engine}.
+     *
+     * @return valor de {@code Engine}
+     */
     public GameEngine getEngine() {
         return engine;
     }
 
+    /**
+     * Obtiene el valor de {@code Network}.
+     *
+     * @return valor de {@code Network}
+     */
     public GameNetworkService getNetwork() {
         return network;
     }
 
+    /**
+     * Obtiene el valor de {@code Obstacles}.
+     *
+     * @return valor de {@code Obstacles}
+     */
     public List<Obstacle> getObstacles() {
         return obstacles != null
                 ? Collections.unmodifiableList(obstacles)
                 : Collections.emptyList();
     }
 
+    /**
+     * Obtiene el valor de {@code Items}.
+     *
+     * @return valor de {@code Items}
+     */
     public List<Item> getItems() {
         return items != null
                 ? Collections.unmodifiableList(items)
                 : Collections.emptyList();
     }
 
+    /**
+     * Obtiene el valor de {@code Peer}.
+     *
+     * @return valor de {@code Peer}
+     */
     public UdpPeer getPeer() {
         return peer;
     }
 
 
+    /**
+     * Obtiene el valor de {@code RulesManager}.
+     *
+     * @return valor de {@code RulesManager}
+     */
     public GameRulesManager getRulesManager() {
         return rulesManager;
     }
 
+    /**
+     * Obtiene el valor de {@code ResultManager}.
+     *
+     * @return valor de {@code ResultManager}
+     */
     public GameResultManager getResultManager() {
         return resultManager;
     }

@@ -3,6 +3,9 @@ package edu.autonoma.turboclash.infrastructure.input;
 import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.presentation.view.GameViewport;
 
+/**
+ * Representa la responsabilidad de {@code KeyboardInput} en la gestion de entrada.
+ */
 public class KeyboardInput implements InputHandler {
 
     private boolean up, down, left, right;
@@ -13,6 +16,11 @@ public class KeyboardInput implements InputHandler {
     public void setRight(boolean right) { this.right = right; }
 
     @Override
+    /**
+     * Actualiza la operacion principal del metodo.
+     *
+     * @param car valor del parametro {@code car}
+     */
     public void update(Car car) {
         double dx = 0;
         double dy = 0;

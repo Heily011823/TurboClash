@@ -6,16 +6,30 @@ import edu.autonoma.turboclash.infrastructure.input.MouseInput;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 import edu.autonoma.turboclash.presentation.view.GameWindowFrame;
 
+/**
+ * Representa la responsabilidad de {@code GameApplication} en la capa de aplicacion.
+ */
 public class GameApplication {
 
     private final GameBootstrap bootstrap;
     private final GameConfig config;
 
+    /**
+     * Crea una nueva instancia de {@code GameApplication}.
+     *
+     * @param bootstrap valor del parametro {@code bootstrap}
+     * @param config valor del parametro {@code config}
+     */
     public GameApplication(GameBootstrap bootstrap, GameConfig config) {
         this.bootstrap = bootstrap;
         this.config = config;
     }
 
+    /**
+     * Inicia la operacion principal del metodo.
+     *
+     * @param playerName valor del parametro {@code playerName}
+     */
     public void start(String playerName) {
         int puerto = getPuerto();
 
@@ -49,6 +63,11 @@ public class GameApplication {
     }
 
 
+    /**
+     * Obtiene el valor de {@code Puerto}.
+     *
+     * @return valor de {@code Puerto}
+     */
     private int getPuerto() {
         int puerto = Integer.parseInt(
                 System.getProperty("puerto", String.valueOf(config.getMinPort()))

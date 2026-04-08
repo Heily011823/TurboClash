@@ -6,6 +6,9 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representa la responsabilidad de {@code GameConfig} en la configuracion del juego.
+ */
 public class GameConfig {
 
     private final int minPort;
@@ -20,6 +23,9 @@ public class GameConfig {
     private final List<Point> itemSpawnPoints;
     private final List<SpawnPoint> obstacleSpawnPoints;
 
+    /**
+     * Crea una nueva instancia de {@code GameConfig}.
+     */
     public GameConfig() {
         this.minPort = 5000;
         this.maxPort = 5003;
@@ -51,6 +57,12 @@ public class GameConfig {
     public long getCollisionCooldown() { return collisionCooldown; }
 
 
+    /**
+     * Indica si {@code ValidPort}.
+     *
+     * @param puerto valor del parametro {@code puerto}
+     * @return true si se cumple la condicion evaluada; false en caso contrario
+     */
     public boolean isValidPort(int puerto) {
         return puerto >= minPort && puerto <= maxPort;
     }

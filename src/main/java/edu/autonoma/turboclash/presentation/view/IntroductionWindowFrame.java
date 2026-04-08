@@ -17,15 +17,24 @@ import edu.autonoma.turboclash.domain.rules.PlayerNameValidator;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Representa y organiza la vista {@code IntroductionWindowFrame} en la capa de presentacion.
+ */
 public class IntroductionWindowFrame extends JFrame implements IntroductionWindowListener {
 
     private IntroductionWindow view;
 
+    /**
+     * Crea una nueva instancia de {@code IntroductionWindowFrame}.
+     */
     public IntroductionWindowFrame() {
         this.view = new IntroductionWindow(this, SoundManager.getInstance());
         setupFrame();
     }
 
+    /**
+     * Configura {@code Frame}.
+     */
     private void setupFrame() {
 
         view.panel1.setOpaque(false);
@@ -57,6 +66,11 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
     }
 
     @Override
+    /**
+     * Atiende {@code ContinuePressed}.
+     *
+     * @param playerName valor del parametro {@code playerName}
+     */
     public void onContinuePressed(String playerName) {
         try {
             GameStateValidator.validateStart(!playerName.isBlank());
@@ -70,6 +84,11 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
         }
     }
 
+    /**
+     * Inicia {@code Game}.
+     *
+     * @param playerName valor del parametro {@code playerName}
+     */
     private void startGame(String playerName) {
         GameConfig config = new GameConfig();
 

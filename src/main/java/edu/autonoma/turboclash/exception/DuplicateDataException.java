@@ -1,20 +1,14 @@
 package edu.autonoma.turboclash.exception;
 
 /**
- * Excepción que se lanza cuando se detectan datos duplicados
- * dentro del sistema.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see edu.autonoma.turboclash.exception.DuplicateDataException
- * @since 2026-03-30
+ * Representa la responsabilidad de {@code DuplicateDataException} en el manejo de errores.
  */
 public class DuplicateDataException extends Exception {
 
     /**
-     * Constructor de la excepción.
+     * Crea una nueva instancia de {@code DuplicateDataException}.
      *
-     * @param message mensaje de error asociado a la excepción.
+     * @param message valor del parametro {@code message}
      */
     public DuplicateDataException(String message) {
 

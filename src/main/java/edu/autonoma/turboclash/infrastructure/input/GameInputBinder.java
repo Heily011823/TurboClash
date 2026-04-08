@@ -5,16 +5,30 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionAdapter;
 
+/**
+ * Representa la responsabilidad de {@code GameInputBinder} en la gestion de entrada.
+ */
 public class GameInputBinder {
 
     private final KeyboardInput keyboardInput;
     private final MouseInput mouseInput;
 
+    /**
+     * Crea una nueva instancia de {@code GameInputBinder}.
+     *
+     * @param keyboardInput valor del parametro {@code keyboardInput}
+     * @param mouseInput valor del parametro {@code mouseInput}
+     */
     public GameInputBinder(KeyboardInput keyboardInput, MouseInput mouseInput) {
         this.keyboardInput = keyboardInput;
         this.mouseInput = mouseInput;
     }
 
+    /**
+     * Vincula la operacion principal del metodo.
+     *
+     * @param panel valor del parametro {@code panel}
+     */
     public void bind(JPanel panel) {
         panel.setFocusable(true);
         panel.requestFocusInWindow();
@@ -23,6 +37,11 @@ public class GameInputBinder {
         bindMouse(panel);
     }
 
+    /**
+     * Vincula {@code Keyboard}.
+     *
+     * @param panel valor del parametro {@code panel}
+     */
     private void bindKeyboard(JPanel panel) {
         panel.addKeyListener(new KeyAdapter() {
             @Override
@@ -46,6 +65,11 @@ public class GameInputBinder {
         });
     }
 
+    /**
+     * Vincula {@code Mouse}.
+     *
+     * @param panel valor del parametro {@code panel}
+     */
     private void bindMouse(JPanel panel) {
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override

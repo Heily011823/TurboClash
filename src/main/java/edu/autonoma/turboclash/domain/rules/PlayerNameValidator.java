@@ -4,12 +4,7 @@ import edu.autonoma.turboclash.exception.InvalidNameException;
 
 
 /**
- * Clase encargada de validar el nombre del jugador.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see PlayerNameValidator
- * @since 2026-03-29
+ * Valida las reglas asociadas a {@code PlayerNameValidator} en las reglas del dominio.
  */
 public class PlayerNameValidator {
 

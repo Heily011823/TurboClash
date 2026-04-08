@@ -6,6 +6,9 @@ import java.awt.*;
 import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
 import edu.autonoma.turboclash.presentation.navigation.IstartWindowListener;
 
+/**
+ * Representa y organiza la vista {@code StartWindow} en la capa de presentacion.
+ */
 public class StartWindow {
 
     public JPanel panel1;
@@ -15,6 +18,12 @@ public class StartWindow {
     private final IstartWindowListener listener;
     private final IAudioService audioService;
 
+    /**
+     * Crea una nueva instancia de {@code StartWindow}.
+     *
+     * @param listener valor del parametro {@code listener}
+     * @param audioService valor del parametro {@code audioService}
+     */
     public StartWindow(IstartWindowListener listener, IAudioService audioService) {
         this.listener = listener;
         this.audioService = audioService;
@@ -25,6 +34,9 @@ public class StartWindow {
         setupEvents();
     }
 
+    /**
+     * Configura {@code UI}.
+     */
     private void setupUI() {
         panel1.setLayout(null);
 
@@ -59,6 +71,9 @@ public class StartWindow {
         panel1.add(btnJugar);
     }
 
+    /**
+     * Configura {@code Events}.
+     */
     private void setupEvents() {
 
         btnExit.addActionListener(e -> System.exit(0));

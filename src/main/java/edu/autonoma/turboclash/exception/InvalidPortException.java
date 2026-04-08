@@ -1,20 +1,14 @@
 package edu.autonoma.turboclash.exception;
 
 /**
- * Esta excepción se lanza cuando el puerto no se encuentra
- * dentro del rango permitido.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see edu.autonoma.turboclash.exception.InvalidPortException
- * @since 2026-03-29
+ * Representa la responsabilidad de {@code InvalidPortException} en el manejo de errores.
  */
 public class InvalidPortException extends Exception {
 
     /**
-     * Constructor de la excepción.
+     * Crea una nueva instancia de {@code InvalidPortException}.
      *
-     * @param message Es el mensaje de error asociado a la excepción.
+     * @param message valor del parametro {@code message}
      */
     public InvalidPortException(String message) {
 

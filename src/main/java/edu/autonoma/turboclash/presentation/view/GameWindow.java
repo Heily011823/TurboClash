@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Representa y organiza la vista {@code GameWindow} en la capa de presentacion.
+ */
 public class GameWindow {
 
     public JPanel panel1;
@@ -28,6 +31,9 @@ public class GameWindow {
 
     private FondoAnimadoPanel fondoAnimadoPanel;
 
+    /**
+     * Crea una nueva instancia de {@code GameWindow}.
+     */
     public GameWindow() {
         if (panel1 == null) {
             panel1 = new JPanel(null);
@@ -46,35 +52,69 @@ public class GameWindow {
         initializeCountdownUI();
     }
 
+    /**
+     * Actualiza el valor de {@code BackgroundPanel}.
+     *
+     * @param fondoAnimadoPanel valor del parametro {@code fondoAnimadoPanel}
+     */
     public void setBackgroundPanel(FondoAnimadoPanel fondoAnimadoPanel) {
         this.fondoAnimadoPanel = fondoAnimadoPanel;
     }
 
+    /**
+     * Obtiene el valor de {@code Panel}.
+     *
+     * @return valor de {@code Panel}
+     */
     public JPanel getPanel() {
         return panel1;
     }
 
+    /**
+     * Solicita {@code GameFocus}.
+     */
     public void requestGameFocus() {
         panel1.requestFocusInWindow();
     }
 
+    /**
+     * Actualiza el valor de {@code OnCountdownFinished}.
+     *
+     * @param action valor del parametro {@code action}
+     */
     public void setOnCountdownFinished(Runnable action) {
         this.onCountdownFinished = action;
     }
 
+    /**
+     * Muestra {@code WaitingPlayers}.
+     */
     public void showWaitingPlayers() {
         statusLabel.setText("Esperando al menos 2 jugadores...");
         statusLabel.setVisible(true);
     }
 
+    /**
+     * Muestra {@code GameStarted}.
+     */
     public void showGameStarted() {
         statusLabel.setVisible(false);
     }
 
+    /**
+     * Actualiza {@code Score}.
+     *
+     * @param points valor del parametro {@code points}
+     */
     public void updateScore(int points) {
         Puntaje.setText("Puntaje: " + points);
     }
 
+    /**
+     * Actualiza {@code Cars}.
+     *
+     * @param players valor del parametro {@code players}
+     */
     public void updateCars(List<Player> players) {
         if (players == null) return;
 
@@ -87,6 +127,11 @@ public class GameWindow {
         panel1.repaint();
     }
 
+    /**
+     * Actualiza {@code CarPosition}.
+     *
+     * @param car valor del parametro {@code car}
+     */
     public void updateCarPosition(Car car) {
         if (car == null) return;
 
@@ -102,6 +147,12 @@ public class GameWindow {
         updateHealth(car, car.getLives());
     }
 
+    /**
+     * Actualiza {@code Health}.
+     *
+     * @param car valor del parametro {@code car}
+     * @param lives valor del parametro {@code lives}
+     */
     public void updateHealth(Car car, int lives) {
         String carId = car.getId();
 
@@ -122,6 +173,11 @@ public class GameWindow {
         }
     }
 
+    /**
+     * Actualiza {@code Obstacles}.
+     *
+     * @param obstacles valor del parametro {@code obstacles}
+     */
     public void updateObstacles(List<Obstacle> obstacles) {
         obstacleLabels.values().forEach(l -> l.setVisible(false));
 
@@ -150,6 +206,11 @@ public class GameWindow {
         }
     }
 
+    /**
+     * Actualiza {@code Items}.
+     *
+     * @param items valor del parametro {@code items}
+     */
     public void updateItems(List<Item> items) {
         itemLabels.values().forEach(l -> l.setVisible(false));
 
@@ -167,6 +228,11 @@ public class GameWindow {
         }
     }
 
+    /**
+     * Prepara {@code RaceStart}.
+     *
+     * @param cars valor del parametro {@code cars}
+     */
     public void prepareRaceStart(List<Car> cars) {
         if (cars == null || cars.isEmpty()) return;
 
@@ -182,6 +248,9 @@ public class GameWindow {
         panel1.repaint();
     }
 
+    /**
+     * Inicia {@code Countdown}.
+     */
     public void startCountdown() {
         final int[] seconds = {3};
 
@@ -208,19 +277,39 @@ public class GameWindow {
         timer.start();
     }
 
+    /**
+     * Obtiene el valor de {@code MetaX}.
+     *
+     * @return valor de {@code MetaX}
+     */
     public int getMetaX() {
         if (fondoAnimadoPanel == null) return Integer.MAX_VALUE;
         return fondoAnimadoPanel.getMetaX();
     }
 
+    /**
+     * Indica si {@code MetaVisible}.
+     *
+     * @return true si se cumple la condicion evaluada; false en caso contrario
+     */
     public boolean isMetaVisible() {
         return fondoAnimadoPanel != null && fondoAnimadoPanel.isMetaVisible();
     }
 
+    /**
+     * Indica si {@code BackgroundFinished}.
+     *
+     * @return true si se cumple la condicion evaluada; false en caso contrario
+     */
     public boolean isBackgroundFinished() {
         return fondoAnimadoPanel != null && fondoAnimadoPanel.isJuegoTerminado();
     }
 
+    /**
+     * Muestra {@code GameResult}.
+     *
+     * @param ranking valor del parametro {@code ranking}
+     */
     public void showGameResult(List<Player> ranking) {
         if (fondoAnimadoPanel != null) {
             fondoAnimadoPanel.terminarJuego(ranking);
@@ -237,6 +326,11 @@ public class GameWindow {
         );
     }
 
+    /**
+     * Crea {@code ScoreLabel}.
+     *
+     * @return instancia creada para {@code ScoreLabel}
+     */
     private JLabel createScoreLabel() {
         JLabel label = new JLabel("Puntaje: 0");
         label.setForeground(Color.YELLOW);
@@ -245,6 +339,11 @@ public class GameWindow {
         return label;
     }
 
+    /**
+     * Crea {@code StatusLabel}.
+     *
+     * @return instancia creada para {@code StatusLabel}
+     */
     private JLabel createStatusLabel() {
         JLabel label = new JLabel("Esperando al menos 2 jugadores...");
         label.setForeground(Color.WHITE);
@@ -254,6 +353,9 @@ public class GameWindow {
         return label;
     }
 
+    /**
+     * Inicializa {@code CountdownUI}.
+     */
     private void initializeCountdownUI() {
         countdownLabel = new JLabel("", SwingConstants.CENTER);
         countdownLabel.setFont(new Font("Arial", Font.BOLD, 48));
@@ -263,6 +365,14 @@ public class GameWindow {
         panel1.add(countdownLabel);
     }
 
+    /**
+     * Obtiene el valor de {@code Icon}.
+     *
+     * @param path valor del parametro {@code path}
+     * @param w ancho requerido por la operacion
+     * @param h alto requerido por la operacion
+     * @return valor de {@code Icon}
+     */
     private ImageIcon getIcon(String path, int w, int h) {
         java.net.URL url = getClass().getResource(path);
         if (url == null) return new ImageIcon();

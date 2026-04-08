@@ -4,12 +4,7 @@ import edu.autonoma.turboclash.exception.InvalidGameStateException;
 
 
 /**
- * Clase encargada de validar el estado de la partida.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see GameStateValidator
- * @since 2026-03-29
+ * Valida las reglas asociadas a {@code GameStateValidator} en las reglas del dominio.
  */
 public class GameStateValidator {
 

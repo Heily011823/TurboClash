@@ -2,6 +2,9 @@ package edu.autonoma.turboclash.domain.services;
 
 import edu.autonoma.turboclash.domain.model.Player;
 
+/**
+ * Administra la responsabilidad principal de {@code GameRulesManager} en los servicios de dominio.
+ */
 public class GameRulesManager {
 
     private final int targetScore;
@@ -10,11 +13,21 @@ public class GameRulesManager {
     private int currentFinishOrder = 1;
     private int currentEliminationOrder = 1;
 
+    /**
+     * Crea una nueva instancia de {@code GameRulesManager}.
+     *
+     * @param targetScore valor del parametro {@code targetScore}
+     */
     public GameRulesManager(int targetScore) {
         this.targetScore = targetScore;
     }
 
 
+    /**
+     * Ejecuta la operacion {@code applyCoinReward}.
+     *
+     * @param p valor del parametro {@code p}
+     */
     public void applyCoinReward(Player p) {
         if (p == null) return;
 
@@ -23,6 +36,11 @@ public class GameRulesManager {
     }
 
 
+    /**
+     * Ejecuta la operacion {@code applyObstaclePenalty}.
+     *
+     * @param p valor del parametro {@code p}
+     */
     public void applyObstaclePenalty(Player p) {
         if (p == null) return;
 
@@ -36,6 +54,12 @@ public class GameRulesManager {
     }
 
 
+    /**
+     * Procesa {@code PlayersCollision}.
+     *
+     * @param p1 valor del parametro {@code p1}
+     * @param p2 valor del parametro {@code p2}
+     */
     public void handlePlayersCollision(Player p1, Player p2) {
 
         if (p1 != null) {
@@ -52,6 +76,11 @@ public class GameRulesManager {
     }
 
 
+    /**
+     * Ejecuta la operacion {@code checkZeroLifeRule}.
+     *
+     * @param p valor del parametro {@code p}
+     */
     private void checkZeroLifeRule(Player p) {
         if (p.getCurrentPoints() <= 0 && p.hasScored()) {
             p.resetScore();
@@ -60,6 +89,11 @@ public class GameRulesManager {
     }
 
 
+    /**
+     * Ejecuta la operacion {@code checkElimination}.
+     *
+     * @param p valor del parametro {@code p}
+     */
     private void checkElimination(Player p) {
         if (p != null && !p.isAlive() && !p.isEliminated()) {
             p.setEliminated(true);
@@ -68,6 +102,11 @@ public class GameRulesManager {
     }
 
 
+    /**
+     * Ejecuta la operacion {@code applySpeedDebuff}.
+     *
+     * @param p valor del parametro {@code p}
+     */
     private void applySpeedDebuff(Player p) {
         if (p != null && p.getCar() != null) {
             p.getCar().applyDebuff(
@@ -78,6 +117,11 @@ public class GameRulesManager {
     }
 
     // META
+    /**
+     * Ejecuta la operacion {@code applyFinishBonus}.
+     *
+     * @param p valor del parametro {@code p}
+     */
     public void applyFinishBonus(Player p) {
         if (p == null || p.getCar() == null) return;
 
@@ -90,6 +134,12 @@ public class GameRulesManager {
         }
     }
 
+    /**
+     * Indica si {@code Won}.
+     *
+     * @param p valor del parametro {@code p}
+     * @return true si se cumple la condicion evaluada; false en caso contrario
+     */
     public boolean hasWon(Player p) {
         if (p == null || p.getCar() == null) return false;
 

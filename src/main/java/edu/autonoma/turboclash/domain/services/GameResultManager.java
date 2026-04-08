@@ -5,8 +5,17 @@ import edu.autonoma.turboclash.domain.model.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Administra la responsabilidad principal de {@code GameResultManager} en los servicios de dominio.
+ */
 public class GameResultManager {
 
+    /**
+     * Ejecuta la operacion {@code calculateRanking}.
+     *
+     * @param players valor del parametro {@code players}
+     * @return resultado de la operacion {@code calculateRanking}
+     */
     public List<Player> calculateRanking(List<Player> players) {
         List<Player> ranking = new ArrayList<>(players);
 

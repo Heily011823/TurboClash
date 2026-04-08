@@ -9,16 +9,33 @@ import edu.autonoma.turboclash.presentation.view.ViewSynchronizer;
 
 import javax.swing.*;
 
+/**
+ * Controla el ciclo principal asociado a {@code GameLoop} en la capa de aplicacion.
+ */
 public class GameLoop {
 
     private final int frameDelay;
     private final NetworkSync networkSync;
 
+    /**
+     * Crea una nueva instancia de {@code GameLoop}.
+     *
+     * @param frameDelay valor del parametro {@code frameDelay}
+     */
     public GameLoop(int frameDelay) {
         this.frameDelay = frameDelay;
         this.networkSync = new NetworkSync();
     }
 
+    /**
+     * Ejecuta la tarea principal de {@code GameLoop}.
+     *
+     * @param context valor del parametro {@code context}
+     * @param window valor del parametro {@code window}
+     * @param keyboard valor del parametro {@code keyboard}
+     * @param mouse valor del parametro {@code mouse}
+     * @param puertoLocal valor del parametro {@code puertoLocal}
+     */
     public void run(GameContext context,
                     GameWindow window,
                     KeyboardInput keyboard,
@@ -71,6 +88,12 @@ public class GameLoop {
         shutdown(context, local);
     }
 
+    /**
+     * Ejecuta la operacion {@code shutdown}.
+     *
+     * @param context valor del parametro {@code context}
+     * @param local valor del parametro {@code local}
+     */
     private void shutdown(GameContext context, Player local) {
         networkSync.leave(context, local);
 
@@ -79,6 +102,9 @@ public class GameLoop {
         }
     }
 
+    /**
+     * Ejecuta la operacion {@code sleep}.
+     */
     private void sleep() {
         try {
             Thread.sleep(frameDelay);

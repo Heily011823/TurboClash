@@ -7,6 +7,9 @@ import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.domain.rules.PortValidator;
 import edu.autonoma.turboclash.exception.InvalidPortException;
 
+/**
+ * Representa la responsabilidad de {@code UdpPeer} en la infraestructura de red.
+ */
 public class UdpPeer {
 
     private final DatagramSocket socket;
@@ -17,6 +20,13 @@ public class UdpPeer {
 
     private Thread receiverThread;
 
+    /**
+     * Crea una nueva instancia de {@code UdpPeer}.
+     *
+     * @param socket valor del parametro {@code socket}
+     * @param sender valor del parametro {@code sender}
+     * @param receiver valor del parametro {@code receiver}
+     */
     public UdpPeer(DatagramSocket socket, IMessageSender sender, IMessageReceiver receiver) {
 
         if (socket == null) {
@@ -30,6 +40,12 @@ public class UdpPeer {
         System.out.println("UDP Peer iniciado en puerto: " + socket.getLocalPort());
     }
 
+    /**
+     * Agrega {@code Peer}.
+     *
+     * @param ip direccion IP asociada a la operacion
+     * @param puerto valor del parametro {@code puerto}
+     */
     public void agregarPeer(String ip, int puerto) {
         try {
             PortValidator.validate(puerto);
@@ -39,17 +55,28 @@ public class UdpPeer {
         }
     }
 
+    /**
+     * Inicia la operacion principal del metodo.
+     */
     public void iniciar() {
         receiverThread = new Thread(receiver::escuchar);
         receiverThread.start();
     }
 
+    /**
+     * Envia {@code ATodos}.
+     *
+     * @param mensaje valor del parametro {@code mensaje}
+     */
     public void enviarATodos(GameMessage mensaje) {
         for (PeerInfo peer : peers) {
             sender.enviarMensaje(mensaje, peer.getIp(), peer.getPuerto());
         }
     }
 
+    /**
+     * Cierra la operacion principal del metodo.
+     */
     public void cerrar() {
         receiver.detener();
 
@@ -62,10 +89,20 @@ public class UdpPeer {
         }
     }
 
+    /**
+     * Obtiene el valor de {@code Receiver}.
+     *
+     * @return valor de {@code Receiver}
+     */
     public IMessageReceiver getReceiver() {
         return receiver;
     }
 
+    /**
+     * Obtiene el valor de {@code Sender}.
+     *
+     * @return valor de {@code Sender}
+     */
     public IMessageSender getSender() {
         return sender;
     }

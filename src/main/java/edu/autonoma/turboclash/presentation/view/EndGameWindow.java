@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+/**
+ * Representa y organiza la vista {@code EndGameWindow} en la capa de presentacion.
+ */
 public class EndGameWindow {
     public JPanel panel1;
     private JLabel PrimerLugar;
@@ -13,6 +16,9 @@ public class EndGameWindow {
     private JButton btnFin;
     private JButton btnReiniciar;
 
+    /**
+     * Crea una nueva instancia de {@code EndGameWindow}.
+     */
     public EndGameWindow() {
         panel1 = new JPanel(null);
         panel1.setOpaque(false);
@@ -44,6 +50,16 @@ public class EndGameWindow {
         panel1.add(btnReiniciar);
     }
 
+    /**
+     * Ejecuta la operacion {@code crearLabel}.
+     *
+     * @param texto valor del parametro {@code texto}
+     * @param x coordenada horizontal utilizada en la operacion
+     * @param y coordenada vertical utilizada en la operacion
+     * @param w ancho requerido por la operacion
+     * @param h alto requerido por la operacion
+     * @return resultado de la operacion {@code crearLabel}
+     */
     private JLabel crearLabel(String texto, int x, int y, int w, int h) {
         JLabel label = new JLabel(texto, SwingConstants.CENTER);
         label.setBounds(x, y, w, h);
@@ -52,6 +68,16 @@ public class EndGameWindow {
         return label;
     }
 
+    /**
+     * Ejecuta la operacion {@code crearBotonImagen}.
+     *
+     * @param ruta valor del parametro {@code ruta}
+     * @param x coordenada horizontal utilizada en la operacion
+     * @param y coordenada vertical utilizada en la operacion
+     * @param w ancho requerido por la operacion
+     * @param h alto requerido por la operacion
+     * @return resultado de la operacion {@code crearBotonImagen}
+     */
     private JButton crearBotonImagen(String ruta, int x, int y, int w, int h) {
         JButton boton = new JButton();
         boton.setBounds(x, y, w, h);
@@ -72,6 +98,14 @@ public class EndGameWindow {
         return boton;
     }
 
+    /**
+     * Actualiza el valor de {@code Resultados}.
+     *
+     * @param primero valor del parametro {@code primero}
+     * @param segundo valor del parametro {@code segundo}
+     * @param tercero valor del parametro {@code tercero}
+     * @param cuarto valor del parametro {@code cuarto}
+     */
     public void setResultados(String primero, String segundo, String tercero, String cuarto) {
         PrimerLugar.setText(primero);
         SegundoLugar.setText(segundo);
@@ -79,10 +113,20 @@ public class EndGameWindow {
         CuartoLugar.setText(cuarto);
     }
 
+    /**
+     * Ejecuta la operacion {@code addFinListener}.
+     *
+     * @param listener valor del parametro {@code listener}
+     */
     public void addFinListener(ActionListener listener) {
         btnFin.addActionListener(listener);
     }
 
+    /**
+     * Ejecuta la operacion {@code addReiniciarListener}.
+     *
+     * @param listener valor del parametro {@code listener}
+     */
     public void addReiniciarListener(ActionListener listener) {
         btnReiniciar.addActionListener(listener);
     }

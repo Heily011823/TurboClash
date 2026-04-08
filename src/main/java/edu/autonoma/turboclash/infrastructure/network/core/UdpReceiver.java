@@ -6,12 +6,20 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * Representa la responsabilidad de {@code UdpReceiver} en la infraestructura de red.
+ */
 public class UdpReceiver implements IMessageReceiver {
 
     private final DatagramSocket socket;
     private volatile boolean activo;
     private IMessageListener listener;
 
+    /**
+     * Crea una nueva instancia de {@code UdpReceiver}.
+     *
+     * @param socket valor del parametro {@code socket}
+     */
     public UdpReceiver(DatagramSocket socket) {
         if (socket == null) {
             throw new IllegalArgumentException("El socket no puede ser nulo");
@@ -21,11 +29,19 @@ public class UdpReceiver implements IMessageReceiver {
     }
 
     @Override
+    /**
+     * Actualiza el valor de {@code Listener}.
+     *
+     * @param listener valor del parametro {@code listener}
+     */
     public void setListener(IMessageListener listener) {
         this.listener = listener;
     }
 
     @Override
+    /**
+     * Inicia la escucha de la operacion principal del metodo.
+     */
     public void escuchar() {
         try {
             while (activo && !socket.isClosed()) {
@@ -65,6 +81,9 @@ public class UdpReceiver implements IMessageReceiver {
     }
 
     @Override
+    /**
+     * Detiene la operacion principal del metodo.
+     */
     public void detener() {
         activo = false;
 

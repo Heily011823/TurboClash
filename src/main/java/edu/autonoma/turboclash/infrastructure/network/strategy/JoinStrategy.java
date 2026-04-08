@@ -5,15 +5,28 @@ import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
+/**
+ * Representa la responsabilidad de {@code JoinStrategy} en las estrategias de mensajeria.
+ */
 public class JoinStrategy implements IMessageStrategy {
 
     private final Match match;
 
+    /**
+     * Crea una nueva instancia de {@code JoinStrategy}.
+     *
+     * @param match valor del parametro {@code match}
+     */
     public JoinStrategy(Match match) {
         this.match = match;
     }
 
     @Override
+    /**
+     * Procesa la operacion principal del metodo.
+     *
+     * @param message valor del parametro {@code message}
+     */
     public void handle(GameMessage message) {
 
 

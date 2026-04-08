@@ -1,20 +1,14 @@
 package edu.autonoma.turboclash.exception;
 
 /**
- * Esta excepción se lanza cuando se intenta realizar una acción
- * en un estado inválido de la partida.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see edu.autonoma.turboclash.exception.InvalidGameStateException
- * @since 2026-03-29
+ * Representa la responsabilidad de {@code InvalidGameStateException} en el manejo de errores.
  */
 public class InvalidGameStateException extends Exception {
 
     /**
-     * Constructor de la excepción.
+     * Crea una nueva instancia de {@code InvalidGameStateException}.
      *
-     * @param message Es el mensaje de error asociado a la excepción.
+     * @param message valor del parametro {@code message}
      */
     public InvalidGameStateException(String message) {
 

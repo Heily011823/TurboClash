@@ -1,20 +1,14 @@
 package edu.autonoma.turboclash.exception;
 
 /**
- * Esta excepción se lanza cuando el movimiento del jugador
- * se encuentra fuera de los límites permitidos.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see edu.autonoma.turboclash.exception.InvalidMovementException
- * @since 2026-03-29
+ * Representa la responsabilidad de {@code InvalidMovementException} en el manejo de errores.
  */
 public class InvalidMovementException extends Exception {
 
     /**
-     * Constructor de la excepción.
+     * Crea una nueva instancia de {@code InvalidMovementException}.
      *
-     * @param message Es el mensaje de error asociado a la excepción.
+     * @param message valor del parametro {@code message}
      */
     public InvalidMovementException(String message) {
 

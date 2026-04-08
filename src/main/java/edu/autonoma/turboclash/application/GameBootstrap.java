@@ -14,6 +14,9 @@ import edu.autonoma.turboclash.infrastructure.sound.SoundCollisionListener;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Coordina la inicializacion de {@code GameBootstrap} en la capa de aplicacion.
+ */
 public class GameBootstrap {
 
     private final GameFactory gameFactory;
@@ -22,6 +25,15 @@ public class GameBootstrap {
     private final GameConfig config;
     private final IAudioService audioService;
 
+    /**
+     * Crea una nueva instancia de {@code GameBootstrap}.
+     *
+     * @param gameFactory valor del parametro {@code gameFactory}
+     * @param worldFactory valor del parametro {@code worldFactory}
+     * @param networkFactory valor del parametro {@code networkFactory}
+     * @param config valor del parametro {@code config}
+     * @param audioService valor del parametro {@code audioService}
+     */
     public GameBootstrap(GameFactory gameFactory,
                          WorldFactory worldFactory,
                          NetworkFactory networkFactory,
@@ -35,6 +47,13 @@ public class GameBootstrap {
         this.audioService = audioService;
     }
 
+    /**
+     * Inicializa la operacion principal del metodo.
+     *
+     * @param puertoLocal valor del parametro {@code puertoLocal}
+     * @param playerName valor del parametro {@code playerName}
+     * @return resultado de la operacion {@code init}
+     */
     public GameContext init(int puertoLocal, String playerName) {
 
         String playerId = String.valueOf(puertoLocal);

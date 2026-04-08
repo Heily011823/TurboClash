@@ -3,6 +3,9 @@ package edu.autonoma.turboclash.domain.model;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Representa la responsabilidad de {@code Match} dentro del dominio del juego.
+ */
 public class Match {
 
     private Player localPlayer;
@@ -12,12 +15,22 @@ public class Match {
     private boolean finished = false;
     private Player winner;
 
+    /**
+     * Crea una nueva instancia de {@code Match}.
+     *
+     * @param localPlayer valor del parametro {@code localPlayer}
+     * @param remotePlayers valor del parametro {@code remotePlayers}
+     * @param targetScore valor del parametro {@code targetScore}
+     */
     public Match(Player localPlayer, List<Player> remotePlayers, int targetScore) {
         this.localPlayer = localPlayer;
         this.remotePlayers = remotePlayers;
         this.targetScore = targetScore;
     }
 
+    /**
+     * Ejecuta la operacion {@code check}.
+     */
     public void check() {
         if (finished) return;
 
@@ -39,6 +52,11 @@ public class Match {
         }
     }
 
+    /**
+     * Obtiene el valor de {@code Players}.
+     *
+     * @return valor de {@code Players}
+     */
     public List<Player> getPlayers() {
         List<Player> all = new ArrayList<>();
         if (localPlayer != null) all.add(localPlayer);
@@ -46,6 +64,11 @@ public class Match {
         return all;
     }
 
+    /**
+     * Actualiza el valor de {@code Finished}.
+     *
+     * @param winner valor del parametro {@code winner}
+     */
     public void setFinished(Player winner) {
         this.finished = true;
         this.winner = winner;
@@ -56,6 +79,11 @@ public class Match {
     public boolean isFinished() { return finished; }
     public Player getWinner() { return winner; }
 
+    /**
+     * Ejecuta la operacion {@code addPlayer}.
+     *
+     * @param newPlayer valor del parametro {@code newPlayer}
+     */
     public void addPlayer(Player newPlayer) {
         if (newPlayer == null) return;
 
