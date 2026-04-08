@@ -1,9 +1,13 @@
 package edu.autonoma.turboclash.application;
 
+import edu.autonoma.turboclash.domain.model.Car;
+import edu.autonoma.turboclash.domain.model.Item;
+import edu.autonoma.turboclash.domain.model.Match;
+import edu.autonoma.turboclash.domain.model.Obstacle;
+import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.domain.services.GameEngine;
-import edu.autonoma.turboclash.domain.services.GameRulesManager;
 import edu.autonoma.turboclash.domain.services.GameResultManager;
-import edu.autonoma.turboclash.domain.model.*;
+import edu.autonoma.turboclash.domain.services.GameRulesManager;
 import edu.autonoma.turboclash.infrastructure.network.core.GameNetworkService;
 import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
 
@@ -12,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Agrupa el contexto compartido de {@code GameContext} en la capa de aplicacion.
+ * Contexto compartido del juego.
  */
 public class GameContext {
 
@@ -22,7 +26,6 @@ public class GameContext {
     private final List<Obstacle> obstacles;
     private final List<Item> items;
     private final UdpPeer peer;
-
     private final GameRulesManager rulesManager;
     private final GameResultManager resultManager;
 
@@ -47,9 +50,6 @@ public class GameContext {
         this.resultManager = resultManager;
     }
 
-    /**
-     * Obtiene la lista de jugadores.
-     */
     public List<Player> getPlayers() {
         if (match == null || match.getPlayers() == null) {
             return Collections.emptyList();
@@ -57,9 +57,6 @@ public class GameContext {
         return match.getPlayers();
     }
 
-    /**
-     * Obtiene la lista de autos de los jugadores.
-     */
     public List<Car> getCars() {
         return getPlayers().stream()
                 .map(Player::getCar)
@@ -110,11 +107,8 @@ public class GameContext {
         this.localPlayer = localPlayer;
     }
 
-    /**
-     * Agrega un jugador al match correctamente usando Match.addPlayer()
-     */
     public void addPlayer(Player player) {
-        if (match != null) {
+        if (match != null && player != null) {
             match.addPlayer(player);
         }
     }
