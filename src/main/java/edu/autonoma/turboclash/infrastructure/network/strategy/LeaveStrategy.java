@@ -14,9 +14,13 @@ public class LeaveStrategy implements IMessageStrategy {
     @Override
     public void handle(GameMessage message) {
 
-        match.getPlayers().removeIf(
-                p -> p.getId().equals(message.getPlayerId())
-        );
+
+        if (message.getPlayerId().equals(match.getLocalPlayer().getId())) {
+            return;
+        }
+
+        match.getRemotePlayers()
+                .removeIf(p -> p.getId().equals(message.getPlayerId()));
 
         System.out.println("Jugador eliminado: " + message.getPlayerId());
     }
