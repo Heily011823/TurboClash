@@ -1,22 +1,18 @@
 package edu.autonoma.turboclash.application;
 
 import edu.autonoma.turboclash.config.GameConfig;
-import edu.autonoma.turboclash.domain.model.Item;
-import edu.autonoma.turboclash.domain.model.Match;
-import edu.autonoma.turboclash.domain.model.Obstacle;
-import edu.autonoma.turboclash.domain.model.Player;
-import edu.autonoma.turboclash.infrastructure.GameFactory;
-import edu.autonoma.turboclash.infrastructure.NetworkFactory;
-import edu.autonoma.turboclash.infrastructure.WorldFactory;
+import edu.autonoma.turboclash.domain.events.CollisionListener;
+import edu.autonoma.turboclash.domain.model.*;
 import edu.autonoma.turboclash.domain.services.*;
-import edu.autonoma.turboclash.infrastructure.network.core.GameNetworkService;
-import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
+import edu.autonoma.turboclash.infrastructure.*;
+import edu.autonoma.turboclash.infrastructure.network.core.*;
 import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.infrastructure.network.handler.GameMessageHandler;
 import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
+import edu.autonoma.turboclash.infrastructure.sound.SoundCollisionListener;
 
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameBootstrap {
 
@@ -41,35 +37,31 @@ public class GameBootstrap {
 
     public GameContext init(int puertoLocal, String playerName) {
 
-        String playerId = String.valueOf(puertoLocal);
 
+        String playerId = String.valueOf(puertoLocal);
 
         Player localPlayer = gameFactory.createPlayer(playerId, playerName, puertoLocal);
         List<Player> remotePlayers = new ArrayList<>();
-        Match match = new Match(localPlayer, remotePlayers, config.getTargetScore());
 
+        Match match = new Match(
+                localPlayer,
+                remotePlayers,
+                config.getTargetScore()
+        );
 
         List<Item> items = new CopyOnWriteArrayList<>(worldFactory.createItems());
         List<Obstacle> obstacles = new CopyOnWriteArrayList<>(worldFactory.createObstacles());
 
 
-        GameRulesManager rules = new GameRulesManager(config.getTargetScore());
+        CollisionListener listener = new SoundCollisionListener();
+
         CollisionManager collisionManager =
-                new CollisionManager(rules, config.getCollisionCooldown(), audioService);
-
-
-        PlayerService playerService = new PlayerService();
-        WorldService worldService = new WorldService();
-        CollisionManager collisionService = new CollisionManager(collisionManager);
-        RuleService ruleService = new RuleService();
+                new CollisionManager(listener);
 
 
         GameEngine engine = new GameEngine(
                 match,
-                playerService,
-                worldService,
-                collisionService,
-                ruleService,
+                collisionManager,
                 items,
                 obstacles
         );
@@ -79,7 +71,9 @@ public class GameBootstrap {
         spawner.start();
 
 
-        GameMessageHandler messageHandler = new GameMessageHandler(remotePlayers, match);
+        GameMessageHandler messageHandler =
+                new GameMessageHandler(remotePlayers, match);
+
         GameMessageFactory messageFactory = new GameMessageFactory();
 
         UdpPeer peer = networkFactory.createPeer(
@@ -90,10 +84,19 @@ public class GameBootstrap {
                 messageFactory
         );
 
-        GameNetworkService network = new GameNetworkService(peer, messageFactory);
+        GameNetworkService network =
+                new GameNetworkService(peer, messageFactory);
 
         network.sendJoin(localPlayer);
 
-        return new GameContext(match, engine, network, obstacles, items, peer);
+
+        return new GameContext(
+                match,
+                engine,
+                network,
+                obstacles,
+                items,
+                peer
+        );
     }
 }

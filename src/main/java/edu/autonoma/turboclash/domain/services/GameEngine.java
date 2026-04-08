@@ -1,9 +1,6 @@
 package edu.autonoma.turboclash.domain.services;
 
-import edu.autonoma.turboclash.domain.model.Item;
-import edu.autonoma.turboclash.domain.model.Match;
-import edu.autonoma.turboclash.domain.model.Obstacle;
-import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.domain.model.*;
 
 import java.util.List;
 
@@ -62,12 +59,7 @@ public class GameEngine {
     }
 
     private void processCollisions() {
-        collisionManager.process(
-                match.getLocalPlayer(),
-                match.getRemotePlayers(),
-                items,
-                obstacles
-        );
+        collisionManager.process(match, items, obstacles);
     }
 
     private void checkPlayerOut() {

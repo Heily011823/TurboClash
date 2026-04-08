@@ -1,9 +1,6 @@
 package edu.autonoma.turboclash.domain.model;
 
-/**
- * Item: Represents collectible objects like coins.
- * Pure model class: contains only data and logic, no rendering.
- */
+
 public class Item extends GameObject {
 
     private final int scoreValue = 20;
