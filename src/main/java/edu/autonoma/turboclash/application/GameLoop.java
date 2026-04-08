@@ -9,9 +9,6 @@ import edu.autonoma.turboclash.presentation.view.ViewSynchronizer;
 
 import javax.swing.SwingUtilities;
 
-/**
- * Controla el ciclo principal del juego.
- */
 public class GameLoop {
 
     private final int frameDelay;
@@ -31,15 +28,12 @@ public class GameLoop {
         ViewSynchronizer viewSync = new ViewSynchronizer();
         Player local = context.getLocalPlayer();
 
-        InputCoordinator inputCoordinator = new InputCoordinator(keyboard, mouse, puertoLocal);
-
         GamePresenter presenter = new GamePresenter(
                 window,
                 context.getRulesManager(),
                 context.getResultManager()
         );
 
-        // Solo anunciarse, NO volver a connect aquí
         networkSync.join(context, local);
 
         long timeout = System.currentTimeMillis() + 5000;
@@ -58,18 +52,23 @@ public class GameLoop {
 
         while (!context.getMatch().isFinished()) {
 
+
             context.getEngine().update();
+
 
             presenter.update(
                     local != null ? local.getCar() : null,
                     context.getMatch().getPlayers()
             );
 
+
             if (local != null && local.getCar() != null && presenter.isMovementEnabled()) {
                 local.getCar().updateDebuff();
-                local.getCar().stop();
-                inputCoordinator.handle(local);
+
+
+                keyboard.update(local.getCar());
             }
+
 
             SwingUtilities.invokeLater(() -> viewSync.sync(
                     window,
@@ -78,7 +77,9 @@ public class GameLoop {
                     context.getEngine().getItems()
             ));
 
+
             networkSync.sync(context, local);
+
             sleep();
         }
 

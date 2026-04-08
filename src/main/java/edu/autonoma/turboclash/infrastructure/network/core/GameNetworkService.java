@@ -17,6 +17,12 @@ public class GameNetworkService {
 
     private volatile boolean connecting = false;
 
+    /**
+     * Numero esperado de remotos.
+     * Si juegan 4 en total, cada cliente debe ver 3 remotos.
+     */
+    private static final int EXPECTED_REMOTE_PLAYERS = 3;
+
     public GameNetworkService(UdpPeer peer,
                               GameMessageFactory messageFactory,
                               NetworkConfig networkConfig) {
@@ -86,8 +92,12 @@ public class GameNetworkService {
     }
 
     /**
-     * Inicia conexión P2P enviando algunos DISCOVERY y JOIN,
-     * pero se detiene si ya detecta jugadores remotos.
+     * Inicia conexión P2P.
+     *
+     * Corregido:
+     * - ya no se detiene cuando aparece el primer remoto
+     * - sigue intentando hasta completar los remotos esperados
+     *   o hasta agotar intentos
      */
     public void connect(GameContext context, Player player) {
         if (context == null || player == null || !peer.isActivo() || connecting) {
@@ -98,12 +108,20 @@ public class GameNetworkService {
 
         Thread connectionThread = new Thread(() -> {
             try {
-                for (int i = 0; i < 4; i++) {
+                int maxAttempts = 10;
+
+                for (int i = 0; i < maxAttempts; i++) {
                     if (!peer.isActivo()) {
                         break;
                     }
 
-                    if (!context.getMatch().getRemotePlayers().isEmpty()) {
+                    int remoteCount = context.getMatch().getRemotePlayers().size();
+
+                    System.out.println("Intento de conexión " + (i + 1)
+                            + " | remotos detectados: " + remoteCount);
+
+                    if (remoteCount >= EXPECTED_REMOTE_PLAYERS) {
+                        System.out.println("Conexión completa. Remotos detectados: " + remoteCount);
                         break;
                     }
 
@@ -117,6 +135,10 @@ public class GameNetworkService {
                         break;
                     }
                 }
+
+                System.out.println("Jugadores remotos conectados: "
+                        + context.getMatch().getRemotePlayers().size());
+
             } catch (Exception e) {
                 if (peer.isActivo()) {
                     System.err.println("Error durante connect(): " + e.getMessage());
@@ -127,7 +149,7 @@ public class GameNetworkService {
         });
 
         connectionThread.setName("Network-Connect-Thread");
-        connectionThread.setDaemon(true);
+        connectionThread.setDaemon(false);
         connectionThread.start();
     }
 }
