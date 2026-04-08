@@ -21,18 +21,24 @@ public class ScoreStrategy implements IMessageStrategy {
     }
 
     @Override
-    /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param message valor del parametro {@code message}
-     */
     public void handle(GameMessage message) {
 
         for (Player p : match.getPlayers()) {
 
-            if (p.getId().equals(message.getPlayerId())) {
+            boolean sameId =
+                    p.getId() != null &&
+                            message.getPlayerId() != null &&
+                            p.getId().equals(message.getPlayerId());
+
+            boolean sameName =
+                    p.getName() != null &&
+                            message.getPlayerName() != null &&
+                            p.getName().equalsIgnoreCase(message.getPlayerName());
+
+            if (sameId || sameName) {
 
                 p.setScore(message.getScore());
+                System.out.println("Score actualizado para: " + p.getName());
                 break;
             }
         }

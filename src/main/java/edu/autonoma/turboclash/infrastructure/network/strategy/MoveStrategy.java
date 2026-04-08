@@ -20,17 +20,28 @@ public class MoveStrategy implements IMessageStrategy {
         this.match = match;
     }
 
-    @Override
+
     /**
      * Procesa la operacion principal del metodo.
      *
      * @param message valor del parametro {@code message}
      */
+    @Override
     public void handle(GameMessage message) {
 
         for (Player p : match.getPlayers()) {
 
-            if (p.getId().equals(message.getPlayerId())) {
+            boolean sameId =
+                    p.getId() != null &&
+                            message.getPlayerId() != null &&
+                            p.getId().equals(message.getPlayerId());
+
+            boolean sameName =
+                    p.getName() != null &&
+                            message.getPlayerName() != null &&
+                            p.getName().equalsIgnoreCase(message.getPlayerName());
+
+            if (sameId || sameName) {
 
                 p.syncFromNetwork(
                         message.getPosX(),
