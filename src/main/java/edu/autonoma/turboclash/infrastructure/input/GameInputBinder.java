@@ -16,6 +16,9 @@ public class GameInputBinder {
     }
 
     public void bind(JPanel panel) {
+        panel.setFocusable(true);
+        panel.requestFocusInWindow();
+
         bindKeyboard(panel);
         bindMouse(panel);
     }
