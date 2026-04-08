@@ -1,6 +1,7 @@
 package edu.autonoma.turboclash.application;
 
 import edu.autonoma.turboclash.config.GameConfig;
+import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
 import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigEntry;
@@ -35,6 +36,7 @@ public class GameApplication {
         GameWindow view = mainFrame.getGameView();
 
         GameContext context = bootstrap.init(puerto, playerName);
+        Player localPlayer = context.getLocalPlayer();
 
         if (context.getPeer() != null) {
             context.getPeer().iniciar();
@@ -47,6 +49,9 @@ public class GameApplication {
                 context.getPeer().agregarPeer(peerInfo.getIp(), peerInfo.getPuerto());
             }
         }
+
+        // IMPORTANTE: comenzar descubrimiento/conexión ANTES de esperar remotos
+        context.getNetwork().connect(context, localPlayer);
 
         view.updateCars(context.getPlayers());
         view.showWaitingPlayers();
