@@ -123,23 +123,18 @@ public class GameWindow {
     }
 
     public void updateObstacles(List<Obstacle> obstacles) {
-        obstacleLabels.values().forEach(l -> l.setVisible(false));
+        obstacleLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         if (obstacles == null) return;
 
         for (Obstacle obs : obstacles) {
             JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
                 String path;
-                String typeStr = obs.getType().toString();
-
-                if ("OIL".equals(typeStr)) {
-                    path = "/image/Oil_Spill.png";
-                } else if ("BARRIER".equals(typeStr)) {
-                    path = "/image/Barrier.png";
-                } else {
-                    path = "/image/Cone.png";
+                switch (obs.getType()) {
+                    case OIL -> path = "/image/Oil_Spill.png";
+                    case BARRIER -> path = "/image/Barrier.png";
+                    default -> path = "/image/Cone.png";
                 }
-
                 JLabel newLbl = new JLabel(getIcon(path, 45, 45));
                 panel1.add(newLbl);
                 return newLbl;
@@ -151,7 +146,7 @@ public class GameWindow {
     }
 
     public void updateItems(List<Item> items) {
-        itemLabels.values().forEach(l -> l.setVisible(false));
+        itemLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         if (items == null) return;
 
