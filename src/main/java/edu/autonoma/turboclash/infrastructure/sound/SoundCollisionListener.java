@@ -1,26 +1,22 @@
 package edu.autonoma.turboclash.infrastructure.sound;
 
 import edu.autonoma.turboclash.domain.events.CollisionListener;
-import edu.autonoma.turboclash.domain.model.GameObject;
-import edu.autonoma.turboclash.domain.model.Item;
-import edu.autonoma.turboclash.domain.model.Obstacle;
+import edu.autonoma.turboclash.domain.model.Player;
 
-/**
- * Representa la responsabilidad de {@code SoundCollisionListener} en la infraestructura de audio.
- */
 public class SoundCollisionListener implements CollisionListener {
 
     @Override
-    /**
-     * Atiende {@code Collision}.
-     *
-     * @param object valor del parametro {@code object}
-     */
-    public void onCollision(GameObject object) {
-        if (object instanceof Item) {
-            SoundManager.getInstance().playEffect(SoundManager.Sound.POINT);
-        } else if (object instanceof Obstacle) {
-            SoundManager.getInstance().playEffect(SoundManager.Sound.BRAKE);
-        }
+    public void onItemCollision(Player player) {
+        SoundManager.getInstance().playEffect(SoundManager.Sound.POINT);
+    }
+
+    @Override
+    public void onObstacleCollision(Player player) {
+        SoundManager.getInstance().playEffect(SoundManager.Sound.BRAKE);
+    }
+
+    @Override
+    public void onPlayersCollision(Player p1, Player p2) {
+        SoundManager.getInstance().playEffect(SoundManager.Sound.COLLISION);
     }
 }
