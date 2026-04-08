@@ -52,7 +52,7 @@ public class GameMessageHandler {
             if (peer != null && messageFactory != null && match.getLocalPlayer() != null) {
                 GameMessage response = messageFactory.create(
                         match.getLocalPlayer(),
-                        MessageType.PLAYER_JOINED
+                        MessageType.HANDSHAKE
                 );
                 peer.getSender().enviarMensaje(response, ip, port);
             }

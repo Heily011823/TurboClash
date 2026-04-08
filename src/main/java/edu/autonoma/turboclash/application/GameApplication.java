@@ -54,6 +54,13 @@ public class GameApplication {
                 && hostPortInput != null && !hostPortInput.trim().isEmpty()) {
             int hostPort = Integer.parseInt(hostPortInput.trim());
 
+            if (!config.isValidPort(hostPort)) {
+                throw new IllegalArgumentException(
+                        "Invalid host port. Use between "
+                                + config.getMinPort() + " and " + config.getMaxPort()
+                );
+            }
+
             context.getNetwork().getPeer().agregarPeer(hostIp.trim(), hostPort);
             context.getNetwork().discover(hostIp.trim(), hostPort);
             context.getNetwork().join(context, context.getLocalPlayer());
