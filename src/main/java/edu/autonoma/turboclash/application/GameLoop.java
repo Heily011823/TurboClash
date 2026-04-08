@@ -3,9 +3,11 @@ package edu.autonoma.turboclash.application;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
-import edu.autonoma.turboclash.infrastructure.sound.SoundCollisionListener;
+import edu.autonoma.turboclash.presentation.presenter.GamePresenter;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 import edu.autonoma.turboclash.presentation.view.ViewSynchronizer;
+
+import javax.swing.*;
 
 public class GameLoop {
 
@@ -26,32 +28,46 @@ public class GameLoop {
         ViewSynchronizer viewSync = new ViewSynchronizer();
         Player local = context.getMatch().getLocalPlayer();
 
+
+        GamePresenter presenter = new GamePresenter(
+                window,
+                context.getRulesManager(),
+                context.getResultManager()
+        );
+
         networkSync.join(context, local);
 
         while (!context.getMatch().isFinished()) {
 
-            if (local != null && local.getCar() != null) {
+
+            context.getEngine().update();
+
+
+            presenter.update(
+                    local != null ? local.getCar() : null,
+                    context.getMatch().getPlayers()
+            );
+
+
+            if (local != null && local.getCar() != null && presenter.isMovementEnabled()) {
 
                 local.getCar().updateDebuff();
                 local.getCar().stop();
 
                 keyboard.update(local.getCar());
                 mouse.update(local.getCar());
-
-                window.updateScore(local.getCurrentPoints());
             }
 
 
-            context.getEngine().update();
+            SwingUtilities.invokeLater(() -> {
+                viewSync.sync(
+                        window,
+                        context.getMatch(),
+                        context.getObstacles(),
+                        context.getEngine().getItems()
+                );
+            });
 
-            window.updateCars(context.getMatch().getPlayers());
-
-            viewSync.sync(
-                    window,
-                    context.getMatch(),
-                    context.getObstacles(),
-                    context.getEngine().getItems()
-            );
 
             networkSync.sync(context, local);
 

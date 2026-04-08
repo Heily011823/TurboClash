@@ -96,7 +96,9 @@ public class GameBootstrap {
                 network,
                 obstacles,
                 items,
-                peer
+                peer,
+                new GameRulesManager(100),
+                new GameResultManager()
         );
     }
 }
