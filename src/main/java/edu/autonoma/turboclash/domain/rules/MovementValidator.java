@@ -4,12 +4,7 @@ import edu.autonoma.turboclash.exception.InvalidMovementException;
 
 
 /**
- * Clase encargada de validar los movimientos dentro del juego.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see MovementValidator
- * @since 2026-03-29
+ * Valida las reglas asociadas a {@code MovementValidator} en las reglas del dominio.
  */
 public class MovementValidator {
 

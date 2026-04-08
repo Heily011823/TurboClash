@@ -5,10 +5,21 @@ import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Representa y organiza la vista {@code EndGameWindowFrame} en la capa de presentacion.
+ */
 public class EndGameWindowFrame extends JFrame {
 
     private EndGameWindow view;
 
+    /**
+     * Crea una nueva instancia de {@code EndGameWindowFrame}.
+     *
+     * @param primero valor del parametro {@code primero}
+     * @param segundo valor del parametro {@code segundo}
+     * @param tercero valor del parametro {@code tercero}
+     * @param cuarto valor del parametro {@code cuarto}
+     */
     public EndGameWindowFrame(String primero, String segundo, String tercero, String cuarto) {
 
         SoundManager.getInstance().stopMusic();

@@ -6,6 +6,9 @@ import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Representa y organiza la vista {@code IntroductionWindow} en la capa de presentacion.
+ */
 public class IntroductionWindow {
 
     public JPanel panel1;
@@ -18,10 +21,21 @@ public class IntroductionWindow {
     private final IntroductionWindowListener listener;
     private final IAudioService audioService;
 
+    /**
+     * Crea una nueva instancia de {@code IntroductionWindow}.
+     *
+     * @param listener valor del parametro {@code listener}
+     */
     public IntroductionWindow(IntroductionWindowListener listener) {
         this(listener, null);
     }
 
+    /**
+     * Crea una nueva instancia de {@code IntroductionWindow}.
+     *
+     * @param listener valor del parametro {@code listener}
+     * @param audioService valor del parametro {@code audioService}
+     */
     public IntroductionWindow(IntroductionWindowListener listener, IAudioService audioService) {
         this.listener = listener;
         this.audioService = audioService;
@@ -30,6 +44,9 @@ public class IntroductionWindow {
         setupEvents();
     }
 
+    /**
+     * Configura {@code UI}.
+     */
     private void setupUI() {
         panel1.setLayout(null);
         panel1.setBackground(new Color(12, 12, 12));
@@ -62,6 +79,9 @@ public class IntroductionWindow {
         });
     }
 
+    /**
+     * Centra {@code Components}.
+     */
     private void centerComponents() {
         int width = panel1.getWidth();
         int height = panel1.getHeight();
@@ -120,6 +140,9 @@ public class IntroductionWindow {
         btnStart.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+    /**
+     * Configura {@code Events}.
+     */
     private void setupEvents() {
 
         btnClose.addActionListener(e -> System.exit(0));
@@ -174,6 +197,9 @@ public class IntroductionWindow {
         });
     }
 
+    /**
+     * Muestra {@code Rules}.
+     */
     private void showRules() {
         String rules = """
                 GAME RULES

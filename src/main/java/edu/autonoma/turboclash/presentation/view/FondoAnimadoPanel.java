@@ -9,6 +9,9 @@ import java.awt.*;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * Representa y organiza la vista {@code FondoAnimadoPanel} en la capa de presentacion.
+ */
 public class FondoAnimadoPanel extends JPanel {
 
     private Image carretera;
@@ -27,6 +30,11 @@ public class FondoAnimadoPanel extends JPanel {
 
     private int metaX;
 
+    /**
+     * Crea una nueva instancia de {@code FondoAnimadoPanel}.
+     *
+     * @param ruta valor del parametro {@code ruta}
+     */
     public FondoAnimadoPanel(String ruta) {
         URL rutaCarretera = getClass().getResource(ruta);
         if (rutaCarretera != null) {
@@ -48,6 +56,9 @@ public class FondoAnimadoPanel extends JPanel {
         iniciarTiempo();
     }
 
+    /**
+     * Inicia {@code Movimiento}.
+     */
     private void iniciarMovimiento() {
         timerMovimiento = new Timer(15, e -> {
             if (juegoTerminado) return;
@@ -70,6 +81,9 @@ public class FondoAnimadoPanel extends JPanel {
         timerMovimiento.start();
     }
 
+    /**
+     * Inicia {@code Tiempo}.
+     */
     private void iniciarTiempo() {
         timerTiempo = new Timer(1000, e -> {
             if (juegoTerminado) return;
@@ -91,18 +105,38 @@ public class FondoAnimadoPanel extends JPanel {
         timerTiempo.start();
     }
 
+    /**
+     * Obtiene el valor de {@code MetaX}.
+     *
+     * @return valor de {@code MetaX}
+     */
     public int getMetaX() {
         return metaX;
     }
 
+    /**
+     * Indica si {@code MetaVisible}.
+     *
+     * @return true si se cumple la condicion evaluada; false en caso contrario
+     */
     public boolean isMetaVisible() {
         return mostrarMeta;
     }
 
+    /**
+     * Indica si {@code JuegoTerminado}.
+     *
+     * @return true si se cumple la condicion evaluada; false en caso contrario
+     */
     public boolean isJuegoTerminado() {
         return juegoTerminado;
     }
 
+    /**
+     * Ejecuta la operacion {@code terminarJuego}.
+     *
+     * @param ranking valor del parametro {@code ranking}
+     */
     public void terminarJuego(List<Player> ranking) {
         if (juegoTerminado) return;
 
@@ -125,6 +159,11 @@ public class FondoAnimadoPanel extends JPanel {
     }
 
     @Override
+    /**
+     * Ejecuta la operacion {@code paintComponent}.
+     *
+     * @param g contexto grafico utilizado para el renderizado
+     */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -145,6 +184,12 @@ public class FondoAnimadoPanel extends JPanel {
         g.drawString("Tiempo: " + formatear(segundosRestantes), 20, 30);
     }
 
+    /**
+     * Ejecuta la operacion {@code formatear}.
+     *
+     * @param s valor del parametro {@code s}
+     * @return resultado de la operacion {@code formatear}
+     */
     private String formatear(int s) {
         int min = s / 60;
         int seg = s % 60;

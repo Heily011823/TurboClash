@@ -4,12 +4,7 @@ import edu.autonoma.turboclash.exception.InvalidPortException;
 
 
 /**
- * Clase encargada de validar puertos de conexión.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see PortValidator
- * @since 2026-03-29
+ * Valida las reglas asociadas a {@code PortValidator} en las reglas del dominio.
  */
 public class PortValidator {
 

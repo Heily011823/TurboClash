@@ -2,6 +2,9 @@ package edu.autonoma.turboclash.infrastructure.network.message;
 
 import edu.autonoma.turboclash.domain.model.CarSkin;
 
+/**
+ * Representa la responsabilidad de {@code GameMessage} en el intercambio de mensajes.
+ */
 public class GameMessage {
 
     private MessageType type;
@@ -18,6 +21,19 @@ public class GameMessage {
 
     public GameMessage() {}
 
+    /**
+     * Crea una nueva instancia de {@code GameMessage}.
+     *
+     * @param type valor del parametro {@code type}
+     * @param playerId valor del parametro {@code playerId}
+     * @param playerName valor del parametro {@code playerName}
+     * @param posX valor del parametro {@code posX}
+     * @param posY valor del parametro {@code posY}
+     * @param score valor del parametro {@code score}
+     * @param time valor del parametro {@code time}
+     * @param event valor del parametro {@code event}
+     * @param carSkin valor del parametro {@code carSkin}
+     */
     public GameMessage(MessageType type, String playerId, String playerName,
                        double posX, double posY, int score, long time, String event, CarSkin carSkin) {
         this.type = type;
@@ -61,6 +77,11 @@ public class GameMessage {
     public void setCarSkin(CarSkin carSkin) { this.carSkin = carSkin; }
 
 
+    /**
+     * Ejecuta la operacion {@code serialize}.
+     *
+     * @return resultado de la operacion {@code serialize}
+     */
     public String serialize() {
         return getType() + "|" +
                 safe(playerId) + "|" +
@@ -74,6 +95,12 @@ public class GameMessage {
     }
 
 
+    /**
+     * Ejecuta la operacion {@code deserialize}.
+     *
+     * @param data valor del parametro {@code data}
+     * @return resultado de la operacion {@code deserialize}
+     */
     public static GameMessage deserialize(String data) {
 
         if (data == null || data.trim().isEmpty()) {
@@ -110,6 +137,12 @@ public class GameMessage {
         return msg;
     }
 
+    /**
+     * Ejecuta la operacion {@code safe}.
+     *
+     * @param value valor del parametro {@code value}
+     * @return resultado de la operacion {@code safe}
+     */
     private String safe(String value) {
         if (value == null) return "";
         return value.replace("|", "/");

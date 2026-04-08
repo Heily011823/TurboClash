@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Administra la responsabilidad principal de {@code SoundManager} en la infraestructura de audio.
+ */
 public class SoundManager implements IAudioService {
 
     private static SoundManager instance;
@@ -13,21 +16,34 @@ public class SoundManager implements IAudioService {
     private final Map<Sound, Clip> effectClips = new HashMap<>();
 
     @Override
+    /**
+     * Reproduce {@code MenuMusic}.
+     */
     public void playMenuMusic() {
         playBackground(Sound.MENU);
     }
 
     @Override
+    /**
+     * Reproduce {@code CoinSound}.
+     */
     public void playCoinSound() {
         playEffect(Sound.POINT);
     }
 
     @Override
+    /**
+     * Reproduce {@code BrakeSound}.
+     */
     public void playBrakeSound() {
         playEffect(Sound.BRAKE);
     }
 
     @Override
+    /**
+     * Detiene {@code Music}.
+     */
+
     public void playCountdownSound() {
         playEffect(Sound.START);
     }
@@ -37,7 +53,6 @@ public class SoundManager implements IAudioService {
         playEffect(Sound.WIN);
     }
 
-    @Override
     public void stopMusic() {
         stopBackground();
     }
@@ -65,6 +80,11 @@ public class SoundManager implements IAudioService {
 
     private SoundManager() {}
 
+    /**
+     * Obtiene el valor de {@code Instance}.
+     *
+     * @return valor de {@code Instance}
+     */
     public static SoundManager getInstance() {
         if (instance == null) {
                 instance = new SoundManager();
@@ -73,6 +93,11 @@ public class SoundManager implements IAudioService {
     }
 
     // Música en loop
+    /**
+     * Reproduce {@code Background}.
+     *
+     * @param sound valor del parametro {@code sound}
+     */
     public void playBackground(Sound sound) {
         try {
             stopBackground();
@@ -96,6 +121,9 @@ public class SoundManager implements IAudioService {
     }
 
     // Detener música
+    /**
+     * Detiene {@code Background}.
+     */
     public void stopBackground() {
         if (backgroundClip != null) {
             backgroundClip.stop();
@@ -105,6 +133,11 @@ public class SoundManager implements IAudioService {
     }
 
     // Efectos
+    /**
+     * Reproduce {@code Effect}.
+     *
+     * @param sound valor del parametro {@code sound}
+     */
     public void playEffect(Sound sound) {
         try {
             Clip clip = effectClips.get(sound);

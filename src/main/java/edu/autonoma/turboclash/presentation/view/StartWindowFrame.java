@@ -7,8 +7,14 @@ import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Representa y organiza la vista {@code StartWindowFrame} en la capa de presentacion.
+ */
 public class StartWindowFrame extends JFrame implements IstartWindowListener, IntroductionWindowListener {
 
+    /**
+     * Crea una nueva instancia de {@code StartWindowFrame}.
+     */
     public StartWindowFrame() {
 
         setUndecorated(true);
@@ -28,12 +34,20 @@ public class StartWindowFrame extends JFrame implements IstartWindowListener, In
     }
 
     @Override
+    /**
+     * Atiende {@code PlayPressed}.
+     */
     public void onPlayPressed() {
         dispose();
         new IntroductionWindowFrame();
     }
 
     @Override
+    /**
+     * Atiende {@code ContinuePressed}.
+     *
+     * @param playerName valor del parametro {@code playerName}
+     */
     public void onContinuePressed(String playerName) {
         dispose();
     }

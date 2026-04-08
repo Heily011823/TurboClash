@@ -7,10 +7,18 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 
+/**
+ * Representa la responsabilidad de {@code UdpSender} en la infraestructura de red.
+ */
 public class UdpSender implements IMessageSender {
 
     private final DatagramSocket socket;
 
+    /**
+     * Crea una nueva instancia de {@code UdpSender}.
+     *
+     * @param socket valor del parametro {@code socket}
+     */
     public UdpSender(DatagramSocket socket) {
         if (socket == null) {
             throw new IllegalArgumentException("El socket no puede ser nulo");
@@ -19,6 +27,13 @@ public class UdpSender implements IMessageSender {
     }
 
     @Override
+    /**
+     * Envia {@code Mensaje}.
+     *
+     * @param message valor del parametro {@code message}
+     * @param ipDestino valor del parametro {@code ipDestino}
+     * @param puertoDestino valor del parametro {@code puertoDestino}
+     */
     public void enviarMensaje(GameMessage message, String ipDestino, int puertoDestino) {
 
         if (message == null) {
@@ -47,6 +62,12 @@ public class UdpSender implements IMessageSender {
         }
     }
 
+    /**
+     * Ejecuta la operacion {@code serialize}.
+     *
+     * @param message valor del parametro {@code message}
+     * @return resultado de la operacion {@code serialize}
+     */
     private byte[] serialize(GameMessage message) {
         return message.serialize().getBytes();
     }

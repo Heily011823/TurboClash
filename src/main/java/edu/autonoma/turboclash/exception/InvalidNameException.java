@@ -1,19 +1,14 @@
 package edu.autonoma.turboclash.exception;
 
 /**
- * Esta excepción se lanza cuando el nombre del jugador es inválido.
- *
- * @author María Paz Puerta Acevedo <mariap.puertaa@autonoma.edu.co>
- * @version 1.0.0
- * @see edu.autonoma.turboclash.exception.InvalidNameException
- * @since 2026-03-29
+ * Representa la responsabilidad de {@code InvalidNameException} en el manejo de errores.
  */
 public class InvalidNameException extends Exception {
 
     /**
-     * Constructor de la excepción.
+     * Crea una nueva instancia de {@code InvalidNameException}.
      *
-     * @param message Es el mensaje de error.
+     * @param message valor del parametro {@code message}
      */
     public InvalidNameException(String message) {
 
