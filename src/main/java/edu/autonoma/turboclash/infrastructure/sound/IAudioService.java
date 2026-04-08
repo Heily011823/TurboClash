@@ -10,6 +10,8 @@ public interface IAudioService {
 
     void playCountdownSound();
 
+    void playWinSound();
+
     void stopMusic();
 
 }

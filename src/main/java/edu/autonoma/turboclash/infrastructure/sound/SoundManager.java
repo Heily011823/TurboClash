@@ -33,6 +33,11 @@ public class SoundManager implements IAudioService {
     }
 
     @Override
+    public void playWinSound() {
+        playEffect(Sound.WIN);
+    }
+
+    @Override
     public void stopMusic() {
         stopBackground();
     }
