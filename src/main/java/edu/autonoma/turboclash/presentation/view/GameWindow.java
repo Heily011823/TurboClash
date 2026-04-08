@@ -36,8 +36,8 @@ public class GameWindow {
     private static final int CAR_HEIGHT = 50;
     private static final int START_X = 80;
 
-    // 4 carriles SOLO para la salida inicial
-    private static final int[] START_LANES_Y = {90, 210, 330, 450};
+    // 4 carriles iniciales, bien separados
+    private static final int[] START_LANES_Y = {80, 220, 360, 500};
 
     public GameWindow() {
         if (panel1 == null) {
@@ -122,7 +122,6 @@ public class GameWindow {
 
     /**
      * Dibuja el carro donde realmente esta.
-     * No vuelve a asignar carril.
      */
     public void updateCarPosition(Car car) {
         if (car == null || car.getId() == null) {
@@ -216,25 +215,61 @@ public class GameWindow {
 
     /**
      * SOLO acomoda la salida inicial.
-     * Despues los carros se mueven libremente.
+     * Cada jugador sale en una posicion diferente.
+     * Despues se pueden mover libremente.
      */
     public void prepareRaceStart(List<Player> players) {
         if (players == null || players.isEmpty()) {
             return;
         }
 
-        for (int i = 0; i < players.size() && i < START_LANES_Y.length; i++) {
-            Player player = players.get(i);
+        for (Player player : players) {
             if (player == null || player.getCar() == null) {
                 continue;
             }
 
             Car car = player.getCar();
-            car.setPosition(START_X, START_LANES_Y[i]);
+            car.setPosition(START_X, getStartLaneY(player));
             updateCarPosition(car);
         }
 
         panel1.repaint();
+    }
+
+    /**
+     * Asigna 1 de 4 carriles iniciales.
+     */
+    private int getStartLaneY(Player player) {
+        if (player == null || player.getId() == null) {
+            return START_LANES_Y[0];
+        }
+
+        String id = player.getId().trim();
+
+        switch (id) {
+            case "5001":
+            case "player1":
+            case "jugador1":
+                return START_LANES_Y[0];
+
+            case "5002":
+            case "player2":
+            case "jugador2":
+                return START_LANES_Y[1];
+
+            case "5003":
+            case "player3":
+            case "jugador3":
+                return START_LANES_Y[2];
+
+            case "5004":
+            case "player4":
+            case "jugador4":
+                return START_LANES_Y[3];
+
+            default:
+                return START_LANES_Y[Math.abs(id.hashCode()) % START_LANES_Y.length];
+        }
     }
 
     public void startCountdown() {
