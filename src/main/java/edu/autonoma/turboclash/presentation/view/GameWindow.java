@@ -106,21 +106,15 @@ public class GameWindow {
                 continue;
             }
 
-            Car car = player.getCar();
-
-            int laneY = getLaneY(player);
-            int safeX = Math.max(START_X, (int) car.getX());
-
-            car.setPosition(safeX, laneY);
-            updateCarPosition(car);
+            updateCarPosition(player, player.getCar());
         }
 
         panel1.revalidate();
         panel1.repaint();
     }
 
-    public void updateCarPosition(Car car) {
-        if (car == null || car.getId() == null) {
+    public void updateCarPosition(Player player, Car car) {
+        if (player == null || car == null || car.getId() == null) {
             return;
         }
 
@@ -133,12 +127,13 @@ public class GameWindow {
             return newLbl;
         });
 
-        String imagePath = normalizeCarImagePath(car.getCarImage());
-        lbl.setIcon(getIcon(imagePath, CAR_WIDTH, CAR_HEIGHT));
-        lbl.setBounds((int) car.getX(), (int) car.getY(), CAR_WIDTH, CAR_HEIGHT);
+        int drawX = Math.max(START_X, (int) car.getX());
+        int drawY = getLaneY(player);
+
+        lbl.setBounds(drawX, drawY, CAR_WIDTH, CAR_HEIGHT);
         lbl.setVisible(car.isActive());
 
-        updateHealth(car, car.getLives());
+        updateHealthVisual(drawX, drawY, car.getId(), car.isActive(), car.getLives());
     }
 
     public void updateHealth(Car car, int lives) {
@@ -146,8 +141,10 @@ public class GameWindow {
             return;
         }
 
-        String carId = car.getId();
+        updateHealthVisual((int) car.getX(), (int) car.getY(), car.getId(), car.isActive(), lives);
+    }
 
+    private void updateHealthVisual(int x, int y, String carId, boolean active, int lives) {
         for (int i = 0; i < 3; i++) {
             String heartKey = carId + "_heart_" + i;
 
@@ -157,11 +154,8 @@ public class GameWindow {
                 return lbl;
             });
 
-            heart.setBounds((int) car.getX() + (i * 28),
-                    (int) car.getY() - 30,
-                    25, 25);
-
-            heart.setVisible(i < lives && car.isActive());
+            heart.setBounds(x + (i * 28), y - 30, 25, 25);
+            heart.setVisible(i < lives && active);
         }
     }
 
@@ -221,7 +215,7 @@ public class GameWindow {
 
             Car car = player.getCar();
             car.setPosition(START_X, getLaneY(player));
-            updateCarPosition(car);
+            updateCarPosition(player, car);
         }
 
         panel1.repaint();

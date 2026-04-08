@@ -39,8 +39,8 @@ public class GameLoop {
                 context.getResultManager()
         );
 
+        // Solo anunciarse, NO volver a connect aquí
         networkSync.join(context, local);
-        context.getNetwork().connect(context, local);
 
         long timeout = System.currentTimeMillis() + 5000;
         while (context.getMatch().getRemotePlayers().isEmpty()
