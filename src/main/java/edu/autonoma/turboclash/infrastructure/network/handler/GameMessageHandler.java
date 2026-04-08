@@ -1,15 +1,21 @@
 package edu.autonoma.turboclash.infrastructure.network.handler;
 
-import edu.autonoma.turboclash.infrastructure.network.strategy.*;
 import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
 import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
+import edu.autonoma.turboclash.infrastructure.network.strategy.IMessageStrategy;
+import edu.autonoma.turboclash.infrastructure.network.strategy.JoinStrategy;
+import edu.autonoma.turboclash.infrastructure.network.strategy.LeaveStrategy;
+import edu.autonoma.turboclash.infrastructure.network.strategy.MoveStrategy;
+import edu.autonoma.turboclash.infrastructure.network.strategy.ScoreStrategy;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Representa la responsabilidad de {@code GameMessageHandler} en el procesamiento de mensajes de red.
@@ -21,11 +27,8 @@ public class GameMessageHandler {
     private UdpPeer peer;
     private GameMessageFactory messageFactory;
 
-    /**
-     * Crea una nueva instancia de {@code GameMessageHandler}.
-     *
-     * @param match valor del parametro {@code match}
-     */
+    private final Set<String> processedJoins = new HashSet<>();
+
     public GameMessageHandler(Match match) {
         this.match = match;
 
@@ -36,13 +39,6 @@ public class GameMessageHandler {
         strategies.put(MessageType.PLAYER_LEFT, new LeaveStrategy(match));
     }
 
-    /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param msg valor del parametro {@code msg}
-     * @param ip direccion IP asociada a la operacion
-     * @param port valor del parametro {@code port}
-     */
     public void handle(GameMessage msg, String ip, int port) {
         if (msg == null || match == null) {
             return;
@@ -62,10 +58,6 @@ public class GameMessageHandler {
             return;
         }
 
-        if (msg.getType() == MessageType.HANDSHAKE && peer != null) {
-            peer.agregarPeer(ip, port);
-        }
-
         if (localPlayer != null) {
             boolean sameAsLocalById =
                     localPlayer.getId() != null
@@ -82,8 +74,21 @@ public class GameMessageHandler {
             }
         }
 
-        IMessageStrategy strategy = strategies.get(msg.getType());
+        if (msg.getType() == MessageType.HANDSHAKE || msg.getType() == MessageType.PLAYER_JOINED) {
+            String joinKey = buildJoinKey(msg, ip, port);
 
+            if (processedJoins.contains(joinKey)) {
+                return;
+            }
+
+            processedJoins.add(joinKey);
+
+            if (peer != null) {
+                peer.agregarPeer(ip, port);
+            }
+        }
+
+        IMessageStrategy strategy = strategies.get(msg.getType());
         if (strategy == null) {
             return;
         }
@@ -94,48 +99,21 @@ public class GameMessageHandler {
                 + " de " + msg.getPlayerName()
                 + " | remotos: " + match.getRemotePlayers().size());
 
-        if (msg.getType() == MessageType.PLAYER_JOINED
-                && peer != null
-                && messageFactory != null
-                && localPlayer != null) {
+        // IMPORTANTE:
+        // ya no responder PLAYER_JOINED con más PLAYER_JOINED ni HANDSHAKE,
+        // porque eso crea bucle de anuncios.
 
-            GameMessage localPlayerMessage = messageFactory.create(
-                    localPlayer,
-                    MessageType.HANDSHAKE
-            );
-            peer.getSender().enviarMensaje(localPlayerMessage, ip, port);
-
-            for (Player remotePlayer : match.getRemotePlayers()) {
-                if (remotePlayer == null) {
-                    continue;
-                }
-
-                boolean sameRemote =
-                        remotePlayer.getId() != null
-                                && msg.getPlayerId() != null
-                                && remotePlayer.getId().equals(msg.getPlayerId());
-
-                if (sameRemote) {
-                    continue;
-                }
-
-                GameMessage knownRemoteMessage = messageFactory.create(
-                        remotePlayer,
-                        MessageType.PLAYER_JOINED
-                );
-                peer.getSender().enviarMensaje(knownRemoteMessage, ip, port);
-            }
-
-            return;
-        }
-
-        // No reenviar MOVEMENT para evitar eco y titileo
-        // No reenviar SCORE_UPDATE por ahora
         if (msg.getType() == MessageType.PLAYER_LEFT
                 && peer != null
                 && peer.getPeerCount() > 1) {
             peer.enviarATodosExcepto(msg, ip, port);
         }
+    }
+
+    private String buildJoinKey(GameMessage msg, String ip, int port) {
+        String playerId = msg.getPlayerId() != null ? msg.getPlayerId() : "";
+        String playerName = msg.getPlayerName() != null ? msg.getPlayerName() : "";
+        return msg.getType() + "|" + playerId + "|" + playerName + "|" + ip + "|" + port;
     }
 
     public void setPeer(UdpPeer peer) {
