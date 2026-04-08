@@ -1,7 +1,5 @@
 package edu.autonoma.turboclash.domain.services;
 
-
-
 import edu.autonoma.turboclash.domain.model.Player;
 
 import java.util.ArrayList;
