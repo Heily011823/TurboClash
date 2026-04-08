@@ -50,7 +50,6 @@ public class GameApplication {
             }
         }
 
-        // IMPORTANTE: comenzar descubrimiento/conexión ANTES de esperar remotos
         context.getNetwork().connect(context, localPlayer);
 
         view.updateCars(context.getPlayers());
@@ -74,7 +73,7 @@ public class GameApplication {
         new Thread(() -> {
             long timeout = System.currentTimeMillis() + 15000;
 
-            while (context.getMatch().getRemotePlayers().isEmpty()
+            while (context.getMatch().getRemotePlayers().size() < 3
                     && System.currentTimeMillis() < timeout) {
                 try {
                     Thread.sleep(200);
@@ -85,11 +84,11 @@ public class GameApplication {
             }
 
             SwingUtilities.invokeLater(() -> {
-                if (context.getMatch().getRemotePlayers().isEmpty()) {
+                if (context.getMatch().getRemotePlayers().size() < 3) {
                     view.showWaitingPlayers();
                     JOptionPane.showMessageDialog(
                             null,
-                            "No se encontraron jugadores remotos. Verifica que todos estén conectados y usando puertos distintos."
+                            "No se conectaron todos los jugadores remotos. Verifica que todos estén conectados y usando puertos distintos."
                     );
                     return;
                 }
