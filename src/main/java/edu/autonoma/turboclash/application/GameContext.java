@@ -26,20 +26,6 @@ public class GameContext {
     private final GameRulesManager rulesManager;
     private final GameResultManager resultManager;
 
-
-    /**
-     * Crea una nueva instancia de {@code GameContext}.
-     *
-     * @param match valor del parametro {@code match}
-     * @param engine valor del parametro {@code engine}
-     * @param network valor del parametro {@code network}
-     * @param obstacles valor del parametro {@code obstacles}
-     * @param items valor del parametro {@code items}
-     * @param peer valor del parametro {@code peer}
-     * @param rulesManager valor del parametro {@code rulesManager}
-     * @param resultManager valor del parametro {@code resultManager}
-     */
-
     private Player localPlayer;
 
     public GameContext(Match match,
@@ -57,15 +43,12 @@ public class GameContext {
         this.obstacles = obstacles;
         this.items = items;
         this.peer = peer;
-
         this.rulesManager = rulesManager;
         this.resultManager = resultManager;
     }
 
     /**
-     * Obtiene el valor de {@code Players}.
-     *
-     * @return valor de {@code Players}
+     * Obtiene la lista de jugadores.
      */
     public List<Player> getPlayers() {
         if (match == null || match.getPlayers() == null) {
@@ -75,9 +58,7 @@ public class GameContext {
     }
 
     /**
-     * Obtiene el valor de {@code Cars}.
-     *
-     * @return valor de {@code Cars}
+     * Obtiene la lista de autos de los jugadores.
      */
     public List<Car> getCars() {
         return getPlayers().stream()
@@ -85,83 +66,41 @@ public class GameContext {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Obtiene el valor de {@code Match}.
-     *
-     * @return valor de {@code Match}
-     */
     public Match getMatch() {
         return match;
     }
 
-    /**
-     * Obtiene el valor de {@code Engine}.
-     *
-     * @return valor de {@code Engine}
-     */
     public GameEngine getEngine() {
         return engine;
     }
 
-    /**
-     * Obtiene el valor de {@code Network}.
-     *
-     * @return valor de {@code Network}
-     */
     public GameNetworkService getNetwork() {
         return network;
     }
 
-    /**
-     * Obtiene el valor de {@code Obstacles}.
-     *
-     * @return valor de {@code Obstacles}
-     */
     public List<Obstacle> getObstacles() {
         return obstacles != null
                 ? Collections.unmodifiableList(obstacles)
                 : Collections.emptyList();
     }
 
-    /**
-     * Obtiene el valor de {@code Items}.
-     *
-     * @return valor de {@code Items}
-     */
     public List<Item> getItems() {
         return items != null
                 ? Collections.unmodifiableList(items)
                 : Collections.emptyList();
     }
 
-    /**
-     * Obtiene el valor de {@code Peer}.
-     *
-     * @return valor de {@code Peer}
-     */
     public UdpPeer getPeer() {
         return peer;
     }
 
-
-    /**
-     * Obtiene el valor de {@code RulesManager}.
-     *
-     * @return valor de {@code RulesManager}
-     */
     public GameRulesManager getRulesManager() {
         return rulesManager;
     }
 
-    /**
-     * Obtiene el valor de {@code ResultManager}.
-     *
-     * @return valor de {@code ResultManager}
-     */
     public GameResultManager getResultManager() {
         return resultManager;
     }
-
 
     public Player getLocalPlayer() {
         return localPlayer;
@@ -170,15 +109,13 @@ public class GameContext {
     public void setLocalPlayer(Player localPlayer) {
         this.localPlayer = localPlayer;
     }
+
+    /**
+     * Agrega un jugador al match correctamente usando Match.addPlayer()
+     */
     public void addPlayer(Player player) {
-        if (match != null && match.getPlayers() != null) {
-
-            boolean exists = match.getPlayers().stream()
-                    .anyMatch(p -> p.getId().equals(player.getId()));
-
-            if (!exists) {
-                match.getPlayers().add(player);
-            }
+        if (match != null) {
+            match.addPlayer(player);
         }
     }
 }

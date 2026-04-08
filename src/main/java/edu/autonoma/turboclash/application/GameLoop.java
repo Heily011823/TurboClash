@@ -53,17 +53,37 @@ public class GameLoop {
                 context.getResultManager()
         );
 
+        // Unirse a la partida en la red
         networkSync.join(context, local);
+
+        // Esperar hasta 5 segundos a que llegue al menos un jugador remoto
+        long timeout = System.currentTimeMillis() + 5000;
+        while (context.getMatch().getRemotePlayers().isEmpty()
+                && System.currentTimeMillis() < timeout) {
+            try {
+                Thread.sleep(200); // esperar 200ms antes de volver a revisar
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        System.out.println("Jugadores remotos conectados: " + context.getMatch().getRemotePlayers().size());
         System.out.println("ANTES DEL LOOP: " + context.getMatch().isFinished());
+
+        // Ciclo principal del juego
         while (!context.getMatch().isFinished()) {
 
+            // Actualizar la lógica del juego
             context.getEngine().update();
 
+            // Actualizar la presentación
             presenter.update(
                     local != null ? local.getCar() : null,
                     context.getMatch().getPlayers()
             );
 
+            // Manejar entrada y efectos del jugador local
             if (local != null && local.getCar() != null && presenter.isMovementEnabled()) {
                 local.getCar().updateDebuff();
                 local.getCar().stop();
@@ -71,6 +91,7 @@ public class GameLoop {
                 inputCoordinator.handle(local);
             }
 
+            // Actualizar la vista en el hilo de Swing
             SwingUtilities.invokeLater(() -> {
                 viewSync.sync(
                         window,
@@ -80,7 +101,9 @@ public class GameLoop {
                 );
             });
 
+            // Sincronización de red
             networkSync.sync(context, local);
+
             System.out.println("ENTRO AL LOOP");
             sleep();
         }
@@ -89,7 +112,7 @@ public class GameLoop {
     }
 
     /**
-     * Ejecuta la operacion {@code shutdown}.
+     * Cierra la sesión de red y libera recursos.
      *
      * @param context valor del parametro {@code context}
      * @param local valor del parametro {@code local}
@@ -103,7 +126,7 @@ public class GameLoop {
     }
 
     /**
-     * Ejecuta la operacion {@code sleep}.
+     * Pausa entre frames según {@code frameDelay}.
      */
     private void sleep() {
         try {

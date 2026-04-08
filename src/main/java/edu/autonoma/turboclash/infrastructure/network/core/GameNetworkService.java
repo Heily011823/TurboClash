@@ -14,6 +14,7 @@ public class GameNetworkService {
     private final UdpPeer peer;
     private final GameMessageFactory messageFactory;
     private final NetworkConfig networkConfig;
+    private Thread connectionThread;
 
     /**
      * Crea una nueva instancia de {@code GameNetworkService}.
@@ -40,6 +41,10 @@ public class GameNetworkService {
      * @param player valor del parametro {@code player}
      */
     public void sendJoin(Player player) {
+        if (player == null || !peer.isActivo()) {
+            return;
+        }
+
         GameMessage msg = messageFactory.create(player, MessageType.PLAYER_JOINED);
         peer.enviarATodos(msg);
     }
@@ -50,6 +55,10 @@ public class GameNetworkService {
      * @param player valor del parametro {@code player}
      */
     public void sendMovement(Player player) {
+        if (player == null || !peer.isActivo()) {
+            return;
+        }
+
         GameMessage msg = messageFactory.create(player, MessageType.MOVEMENT);
         msg.setScore(player.getCurrentPoints());
         peer.enviarATodos(msg);
@@ -61,6 +70,10 @@ public class GameNetworkService {
      * @param player valor del parametro {@code player}
      */
     public void sendLeave(Player player) {
+        if (player == null || !peer.isActivo()) {
+            return;
+        }
+
         GameMessage msg = messageFactory.create(player, MessageType.PLAYER_LEFT);
         peer.enviarATodos(msg);
     }
@@ -71,8 +84,11 @@ public class GameNetworkService {
      */
 
     public void discover() {
-        GameMessage msg = messageFactory.createDiscovery();
+        if (!peer.isActivo()) {
+            return;
+        }
 
+        GameMessage msg = messageFactory.createDiscovery();
 
         for (int port : networkConfig.getPorts()) {
             try {
@@ -84,15 +100,57 @@ public class GameNetworkService {
     }
 
     public void discover(String hostIp, int hostPort) {
+        if (!peer.isActivo()) {
+            return;
+        }
+
         GameMessage msg = messageFactory.createDiscovery();
         peer.getSender().enviarMensaje(msg, hostIp, hostPort);
     }
 
     public void join(GameContext context, Player player) {
+        if (!peer.isActivo()) {
+            return;
+        }
 
         sendJoin(player);
-
-
         context.addPlayer(player);
+    }
+
+    public void connect(GameContext context, Player player, String hostIp, int hostPort) {
+        if (connectionThread != null && connectionThread.isAlive()) {
+            return;
+        }
+
+        connectionThread = new Thread(() -> {
+            for (int i = 0; i < 20; i++) {
+                if (!peer.isActivo()) {
+                    break;
+                }
+
+                if (!context.getMatch().getRemotePlayers().isEmpty()) {
+                    break;
+                }
+
+                try {
+                    peer.agregarPeer(hostIp, hostPort);
+                    discover(hostIp, hostPort);
+                    sendJoin(player);
+                    Thread.sleep(500);
+                } catch (RuntimeException e) {
+                    if (!peer.isActivo()) {
+                        break;
+                    }
+                    throw e;
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+
+        connectionThread.setName("Network-Connect-Thread");
+        connectionThread.setDaemon(true);
+        connectionThread.start();
     }
 }

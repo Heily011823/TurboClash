@@ -21,21 +21,10 @@ public class IntroductionWindow {
     private final IntroductionWindowListener listener;
     private final IAudioService audioService;
 
-    /**
-     * Crea una nueva instancia de {@code IntroductionWindow}.
-     *
-     * @param listener valor del parametro {@code listener}
-     */
     public IntroductionWindow(IntroductionWindowListener listener) {
         this(listener, null);
     }
 
-    /**
-     * Crea una nueva instancia de {@code IntroductionWindow}.
-     *
-     * @param listener valor del parametro {@code listener}
-     * @param audioService valor del parametro {@code audioService}
-     */
     public IntroductionWindow(IntroductionWindowListener listener, IAudioService audioService) {
         this.listener = listener;
         this.audioService = audioService;
@@ -44,9 +33,6 @@ public class IntroductionWindow {
         setupEvents();
     }
 
-    /**
-     * Configura {@code UI}.
-     */
     private void setupUI() {
         panel1.setLayout(null);
         panel1.setBackground(new Color(12, 12, 12));
@@ -79,9 +65,6 @@ public class IntroductionWindow {
         });
     }
 
-    /**
-     * Centra {@code Components}.
-     */
     private void centerComponents() {
         int width = panel1.getWidth();
         int height = panel1.getHeight();
@@ -112,18 +95,14 @@ public class IntroductionWindow {
 
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/image/Play.png"));
-
             int originalW = icon.getIconWidth();
             int originalH = icon.getIconHeight();
-
             int base = Math.min(width, height);
             int newW = (int) (base * 0.18);
             newW = Math.max(140, Math.min(newW, 200));
-
             int newH = (originalH * newW) / originalW;
 
             Image img = icon.getImage().getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-
             btnStart.setIcon(new ImageIcon(img));
             btnStart.setBounds(centerX - newW / 2, height / 2 + 40, newW, newH);
 
@@ -140,24 +119,14 @@ public class IntroductionWindow {
         btnStart.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    /**
-     * Configura {@code Events}.
-     */
     private void setupEvents() {
-
         btnClose.addActionListener(e -> System.exit(0));
 
         btnStart.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
-                btnStart.setBounds(
-                        btnStart.getX() - 8,
-                        btnStart.getY() - 4,
-                        btnStart.getWidth() + 16,
-                        btnStart.getHeight() + 8
-                );
+                btnStart.setBounds(btnStart.getX() - 8, btnStart.getY() - 4, btnStart.getWidth() + 16, btnStart.getHeight() + 8);
             }
-
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 centerComponents();
@@ -169,12 +138,10 @@ public class IntroductionWindow {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 infoIcon.setBounds(18, 18, 55, 55);
             }
-
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 infoIcon.setBounds(20, 20, 50, 50);
             }
-
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 showRules();
@@ -183,36 +150,33 @@ public class IntroductionWindow {
 
         btnStart.addActionListener(e -> {
             String name = txtName.getText().trim();
-
             if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "INGRRESA TU NOMBRE");
+                JOptionPane.showMessageDialog(null, "INGRESA TU NOMBRE");
                 return;
             }
-
             if (audioService != null) {
                 audioService.stopMusic();
             }
-
             listener.onContinuePressed(name);
         });
     }
 
     /**
-     * Muestra {@code Rules}.
+     * Muestra las reglas detalladas cuando se hace clic en el infoIcon.
      */
     private void showRules() {
-        String rules = """
-                GAME RULES
-
-                - Use arrow keys to move
-                - Avoid obstacles
-                - Survive as long as possible
-                """;
+        String rules =
+                "--- REGLAS DE TURBOCLASH ---\n\n" +
+                        "- Regla 1: Recoger monedas suma +20 puntos.\n" +
+                        "- Regla 2: Chocar con obstáculos resta -10 puntos.\n" +
+                        "- Regla 3: Chocar contra otro carro resta 1 vida.\n" +
+                        "- Regla 4: Si el puntaje llega a cero por colisiones, se resta 1 vida.\n" +
+                        "- Regla 5: El primero en llegar recibe +50 puntos.";
 
         JOptionPane.showMessageDialog(
                 null,
                 rules,
-                "Game Rules",
+                "Reglas del Juego",
                 JOptionPane.INFORMATION_MESSAGE
         );
     }

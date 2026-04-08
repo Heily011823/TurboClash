@@ -62,7 +62,7 @@ public class GameBootstrap {
 
         Match match = new Match(
                 localPlayer,
-                new ArrayList<>(),
+                new CopyOnWriteArrayList<>(),
                 config.getTargetScore()
         );
 

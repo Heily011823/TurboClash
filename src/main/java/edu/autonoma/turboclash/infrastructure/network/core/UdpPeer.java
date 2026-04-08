@@ -17,6 +17,7 @@ public class UdpPeer {
 
     private final IMessageSender sender;
     private final IMessageReceiver receiver;
+    private volatile boolean activo;
 
     private Thread receiverThread;
 
@@ -36,6 +37,7 @@ public class UdpPeer {
         this.socket = socket;
         this.sender = sender;
         this.receiver = receiver;
+        this.activo = true;
 
         System.out.println("UDP Peer iniciado en puerto: " + socket.getLocalPort());
     }
@@ -57,7 +59,7 @@ public class UdpPeer {
                 peers.add(new PeerInfo(ip, puerto));
             }
         } catch (InvalidPortException e) {
-            System.err.println("Puerto invÃ¡lido: " + e.getMessage());
+            System.err.println("Puerto invÃƒÂ¡lido: " + e.getMessage());
         }
     }
 
@@ -65,6 +67,10 @@ public class UdpPeer {
      * Inicia la operacion principal del metodo.
      */
     public void iniciar() {
+        if (!activo || socket.isClosed()) {
+            return;
+        }
+
         receiverThread = new Thread(receiver::escuchar);
         receiverThread.start();
     }
@@ -75,7 +81,25 @@ public class UdpPeer {
      * @param mensaje valor del parametro {@code mensaje}
      */
     public void enviarATodos(GameMessage mensaje) {
+        if (!isActivo()) {
+            return;
+        }
+
         for (PeerInfo peer : peers) {
+            sender.enviarMensaje(mensaje, peer.getIp(), peer.getPuerto());
+        }
+    }
+
+    public void enviarATodosExcepto(GameMessage mensaje, String ip, int puerto) {
+        if (!isActivo()) {
+            return;
+        }
+
+        for (PeerInfo peer : peers) {
+            if (peer.getIp().equals(ip) && peer.getPuerto() == puerto) {
+                continue;
+            }
+
             sender.enviarMensaje(mensaje, peer.getIp(), peer.getPuerto());
         }
     }
@@ -84,6 +108,7 @@ public class UdpPeer {
      * Cierra la operacion principal del metodo.
      */
     public void cerrar() {
+        activo = false;
         receiver.detener();
 
         if (receiverThread != null) {
@@ -111,5 +136,13 @@ public class UdpPeer {
      */
     public IMessageSender getSender() {
         return sender;
+    }
+
+    public boolean isActivo() {
+        return activo && !socket.isClosed();
+    }
+
+    public int getPeerCount() {
+        return peers.size();
     }
 }
