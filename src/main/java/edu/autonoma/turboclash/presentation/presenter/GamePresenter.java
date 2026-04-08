@@ -19,7 +19,7 @@ public class GamePresenter {
 
     private boolean gameFinished = false;
     private boolean gameStarted = false;
-    private boolean movementEnabled = false;
+    private boolean movementEnabled = true;
 
     public GamePresenter(GameWindow view,
                          GameRulesManager rulesManager,
@@ -27,12 +27,12 @@ public class GamePresenter {
         this.view = view;
         this.rulesManager = rulesManager;
         this.resultManager = resultManager;
-
-        this.view.setOnCountdownFinished(() -> movementEnabled = true);
     }
 
     public void update(Car localCar, List<Player> players) {
-        if (players == null || players.isEmpty()) return;
+        if (players == null || players.isEmpty()) {
+            return;
+        }
 
         if (!gameStarted) {
             if (players.size() < 2) {
@@ -51,20 +51,29 @@ public class GamePresenter {
     }
 
     private void startGame(List<Player> players) {
-        if (gameStarted) return;
+        if (gameStarted) {
+            return;
+        }
 
         gameStarted = true;
-        movementEnabled = false;
+        movementEnabled = true;
 
         view.prepareRaceStart(players);
         view.showGameStarted();
-        view.startCountdown();
     }
 
     private void checkFinish(Car car, List<Player> players) {
-        if (!gameStarted || !movementEnabled) return;
-        if (car == null) return;
-        if (!view.isMetaVisible()) return;
+        if (!gameStarted || !movementEnabled) {
+            return;
+        }
+
+        if (car == null) {
+            return;
+        }
+
+        if (!view.isMetaVisible()) {
+            return;
+        }
 
         int metaX = view.getMetaX();
 
@@ -79,9 +88,17 @@ public class GamePresenter {
     }
 
     private void checkGameEnd(List<Player> players) {
-        if (gameFinished) return;
-        if (!gameStarted || !movementEnabled) return;
-        if (players.isEmpty() || view.isBackgroundFinished()) return;
+        if (gameFinished) {
+            return;
+        }
+
+        if (!gameStarted || !movementEnabled) {
+            return;
+        }
+
+        if (players.isEmpty() || view.isBackgroundFinished()) {
+            return;
+        }
 
         int aliveCount = 0;
         boolean someoneReachedFinish = false;
@@ -105,6 +122,8 @@ public class GamePresenter {
 
     private void finishGame(List<Player> players) {
         gameFinished = true;
+        movementEnabled = false;
+
         List<Player> ranking = resultManager.calculateRanking(players);
         view.showGameResult(ranking);
     }
