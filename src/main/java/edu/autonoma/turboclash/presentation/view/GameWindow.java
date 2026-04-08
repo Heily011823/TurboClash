@@ -4,14 +4,10 @@ import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.domain.model.Item;
 import edu.autonoma.turboclash.domain.model.Obstacle;
 import edu.autonoma.turboclash.domain.model.Player;
-import edu.autonoma.turboclash.domain.services.GameConstants;
-
-import edu.autonoma.turboclash.domain.services.GameResultManager;
-import edu.autonoma.turboclash.domain.services.GameRulesManager;
+import edu.autonoma.turboclash.presentation.view.EndGameWindowFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,21 +15,16 @@ import java.util.Map;
 public class GameWindow {
 
     public JPanel panel1;
-    public JLabel Puntaje;
+    public JLabel puntaje;
 
     private JLabel countdownLabel;
+    private JLabel statusLabel;
     private Runnable onCountdownFinished;
 
     private final Map<String, JLabel> carLabels = new HashMap<>();
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
-    private final Map<Integer, JLabel> healthLabels = new HashMap<>();
-
-    private boolean gameFinished = false;
-    private boolean gameStarted = false;
-    private final GameRulesManager gameRulesManager;
-    private final edu.autonoma.turboclash.domain.services.GameResultManager gameResultManager;
-    private final List<Player> players = new ArrayList<>();
+    private final Map<String, JLabel> healthLabels = new HashMap<>();
 
     private FondoAnimadoPanel fondoAnimadoPanel;
 
@@ -46,11 +37,11 @@ public class GameWindow {
         panel1.setOpaque(false);
         panel1.setPreferredSize(new Dimension(1000, 700));
 
-        Puntaje = createScoreLabel();
-        panel1.add(Puntaje);
+        puntaje = createScoreLabel();
+        panel1.add(puntaje);
 
-        gameRulesManager = new GameRulesManager(GameConstants.DEFAULT_TARGET_SCORE);
-        gameResultManager = new edu.autonoma.turboclash.domain.services.GameResultManager();
+        statusLabel = createStatusLabel();
+        panel1.add(statusLabel);
 
         initializeCountdownUI();
     }
@@ -59,28 +50,41 @@ public class GameWindow {
         this.fondoAnimadoPanel = fondoAnimadoPanel;
     }
 
-    public void setPlayers(List<Player> players) {
-        this.players.clear();
-        if (players != null) {
-            this.players.addAll(players);
-        }
+    public JPanel getPanel() {
+        return panel1;
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public void requestGameFocus() {
+        panel1.requestFocusInWindow();
     }
 
-    public boolean isGameStarted() {
-        return gameStarted;
+    public void setOnCountdownFinished(Runnable action) {
+        this.onCountdownFinished = action;
     }
 
-    public void startGame() {
-        if (gameStarted) return;
-        gameStarted = true;
-        startCountdown();
+    public void showWaitingPlayers() {
+        statusLabel.setText("Esperando al menos 2 jugadores...");
+        statusLabel.setVisible(true);
     }
+
+    public void showGameStarted() {
+        statusLabel.setVisible(false);
+    }
+
     public void updateScore(int points) {
-        Puntaje.setText("Puntaje: " + points);
+        puntaje.setText("Puntaje: " + points);
+    }
+
+    public void updateCars(List<Player> players) {
+        if (players == null) return;
+
+        for (Player p : players) {
+            if (p != null && p.getCar() != null) {
+                updateCarPosition(p.getCar());
+            }
+        }
+
+        panel1.repaint();
     }
 
     public void updateCarPosition(Car car) {
@@ -95,36 +99,23 @@ public class GameWindow {
         lbl.setBounds((int) car.getX(), (int) car.getY(), 100, 50);
         lbl.setVisible(car.isActive());
 
-        updateHealth(car.getLives(), car);
-        checkFinishForCar(car);
+        updateHealth(car);
     }
 
-    public void updateCars(List<Player> players) {
-        if (players == null) return;
+    private void updateHealth(Car car) {
+        String carId = car.getId();
 
-        setPlayers(players);
-
-        for (Player p : players) {
-            if (p != null && p.getCar() != null) {
-                updateCarPosition(p.getCar());
-            }
-        }
-
-        checkGameEnd();
-    }
-
-    public void updateHealth(int lives, Car car) {
         for (int i = 0; i < 3; i++) {
-            final int heartIndex = i;
+            String heartKey = carId + "_heart_" + i;
 
-            JLabel heart = healthLabels.computeIfAbsent(heartIndex, id -> {
+            JLabel heart = healthLabels.computeIfAbsent(heartKey, id -> {
                 JLabel lbl = new JLabel(getIcon("/image/Health.png", 25, 25));
                 panel1.add(lbl);
                 return lbl;
             });
 
             heart.setBounds((int) car.getX() + (i * 30), (int) car.getY() - 30, 25, 25);
-            heart.setVisible(i < lives && car.isActive());
+            heart.setVisible(i < car.getLives() && car.isActive());
         }
     }
 
@@ -173,10 +164,6 @@ public class GameWindow {
         }
     }
 
-    public void setOnCountdownFinished(Runnable action) {
-        this.onCountdownFinished = action;
-    }
-
     public void prepareRaceStart(List<Car> cars) {
         if (cars == null || cars.isEmpty()) return;
 
@@ -198,7 +185,7 @@ public class GameWindow {
         countdownLabel.setText("3");
         countdownLabel.setVisible(true);
 
-        javax.swing.Timer timer = new javax.swing.Timer(1000, null);
+        Timer timer = new Timer(1000, null);
         timer.addActionListener(e -> {
             seconds[0]--;
 
@@ -218,16 +205,33 @@ public class GameWindow {
         timer.start();
     }
 
-    public void requestGameFocus() {
-        panel1.requestFocusInWindow();
+    public int getMetaX() {
+        if (fondoAnimadoPanel == null) return Integer.MAX_VALUE;
+        return fondoAnimadoPanel.getMetaX();
     }
 
-    public JPanel getPanel() {
-        return panel1;
+    public boolean isMetaVisible() {
+        return fondoAnimadoPanel != null && fondoAnimadoPanel.isMetaVisible();
     }
 
-    public GameRulesManager getGameRulesManager() {
-        return gameRulesManager;
+    public boolean isBackgroundFinished() {
+        return fondoAnimadoPanel != null && fondoAnimadoPanel.isJuegoTerminado();
+    }
+
+    public void showGameResult(List<Player> ranking) {
+        if (fondoAnimadoPanel != null) {
+            fondoAnimadoPanel.terminarJuego(ranking);
+            return;
+        }
+
+        String primero = ranking.size() > 0 ? ranking.get(0).getName() : "";
+        String segundo = ranking.size() > 1 ? ranking.get(1).getName() : "";
+        String tercero = ranking.size() > 2 ? ranking.get(2).getName() : "";
+        String cuarto = ranking.size() > 3 ? ranking.get(3).getName() : "";
+
+        SwingUtilities.invokeLater(() ->
+                new EndGameWindowFrame(primero, segundo, tercero, cuarto)
+        );
     }
 
     private JLabel createScoreLabel() {
@@ -235,6 +239,15 @@ public class GameWindow {
         label.setForeground(Color.YELLOW);
         label.setFont(new Font("Arial", Font.BOLD, 24));
         label.setBounds(20, 40, 250, 40);
+        return label;
+    }
+
+    private JLabel createStatusLabel() {
+        JLabel label = new JLabel("Esperando al menos 2 jugadores...");
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.BOLD, 22));
+        label.setBounds(20, 80, 450, 40);
+        label.setVisible(false);
         return label;
     }
 
@@ -253,64 +266,5 @@ public class GameWindow {
 
         Image scaled = new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
         return new ImageIcon(scaled);
-    }
-
-    private void checkFinishForCar(Car car) {
-        if (car == null || fondoAnimadoPanel == null || !fondoAnimadoPanel.isMetaVisible()) return;
-
-        for (Player player : players) {
-            if (player != null && player.getCar() == car && !player.isFinishReached()) {
-                if ((int) car.getX() + 100 >= fondoAnimadoPanel.getMetaX()) {
-                    gameRulesManager.applyFinishBonus(player);
-                    checkGameEnd();
-                }
-                break;
-            }
-        }
-    }
-
-    private void checkGameEnd() {
-        if (gameFinished) return;
-        if (!gameStarted) return;
-        if (players.isEmpty() || fondoAnimadoPanel == null || fondoAnimadoPanel.isJuegoTerminado()) {
-            return;
-        }
-
-        int aliveCount = 0;
-        boolean someoneReachedFinish = false;
-
-        for (Player player : players) {
-            if (player != null) {
-                if (player.isAlive()) {
-                    aliveCount++;
-                }
-                if (player.isFinishReached()) {
-                    someoneReachedFinish = true;
-                }
-            }
-        }
-
-        if (someoneReachedFinish || aliveCount <= 1) {
-            finishGame();
-        }
-    }
-    private void finishGame() {
-        gameFinished = true;
-
-        List<Player> ranking = gameResultManager.calculateRanking(players);
-
-        if (fondoAnimadoPanel != null) {
-            fondoAnimadoPanel.terminarJuego(ranking);
-            return;
-        }
-
-        String primero = !ranking.isEmpty() ? ranking.get(0).getName() : "";
-        String segundo = ranking.size() > 1 ? ranking.get(1).getName() : "";
-        String tercero = ranking.size() > 2 ? ranking.get(2).getName() : "";
-        String cuarto = ranking.size() > 3 ? ranking.get(3).getName() : "";
-
-        SwingUtilities.invokeLater(() ->
-                new EndGameWindowFrame(primero, segundo, tercero, cuarto)
-        );
     }
 }
