@@ -34,9 +34,10 @@ public class GameMessage {
      */
     public GameMessage(MessageType type, String playerId, String playerName,
                        double posX, double posY, int score, long time, String event, CarSkin carSkin) {
+
         this.type = type;
-        this.playerId = playerId;
-        this.playerName = playerName;
+        this.playerId = playerId != null ? playerId : "unknown";
+        this.playerName = playerName != null ? playerName : "unknown";
         this.posX = posX;
         this.posY = posY;
         this.score = score;
