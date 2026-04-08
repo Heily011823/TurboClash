@@ -31,7 +31,7 @@ public class GameWindow {
     private boolean gameFinished = false;
 
     private final GameRulesManager gameRulesManager;
-    private final edu.autonoma.turboclash.logic.GameResultManager gameResultManager;
+    private final edu.autonoma.turboclash.domain.services.GameResultManager gameResultManager;
     private final List<Player> players = new ArrayList<>();
 
     private FondoAnimadoPanel fondoAnimadoPanel;
@@ -49,7 +49,7 @@ public class GameWindow {
         panel1.add(Puntaje);
 
         gameRulesManager = new GameRulesManager(GameConstants.DEFAULT_TARGET_SCORE);
-        gameResultManager = new edu.autonoma.turboclash.logic.GameResultManager();
+        gameResultManager = new edu.autonoma.turboclash.domain.services.GameResultManager();
 
         initializeCountdownUI();
     }

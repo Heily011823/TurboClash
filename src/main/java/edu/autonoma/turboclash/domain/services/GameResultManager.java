@@ -1,6 +1,6 @@
-package edu.autonoma.turboclash.logic;
+package edu.autonoma.turboclash.domain.services;
 
-import edu.autonoma.turboclash.model.Player;
+import edu.autonoma.turboclash.domain.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
