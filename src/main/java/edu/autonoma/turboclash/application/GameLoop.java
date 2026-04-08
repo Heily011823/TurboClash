@@ -28,6 +28,7 @@ public class GameLoop {
         ViewSynchronizer viewSync = new ViewSynchronizer();
         Player local = context.getMatch().getLocalPlayer();
 
+        InputCoordinator inputCoordinator = new InputCoordinator(keyboard, mouse, puertoLocal);
 
         GamePresenter presenter = new GamePresenter(
                 window,
@@ -39,25 +40,19 @@ public class GameLoop {
 
         while (!context.getMatch().isFinished()) {
 
-
             context.getEngine().update();
-
 
             presenter.update(
                     local != null ? local.getCar() : null,
                     context.getMatch().getPlayers()
             );
 
-
             if (local != null && local.getCar() != null && presenter.isMovementEnabled()) {
-
                 local.getCar().updateDebuff();
                 local.getCar().stop();
 
-                keyboard.update(local.getCar());
-                mouse.update(local.getCar());
+                inputCoordinator.handle(local);
             }
-
 
             SwingUtilities.invokeLater(() -> {
                 viewSync.sync(
@@ -67,7 +62,6 @@ public class GameLoop {
                         context.getEngine().getItems()
                 );
             });
-
 
             networkSync.sync(context, local);
 

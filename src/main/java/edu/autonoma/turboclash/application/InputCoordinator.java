@@ -9,35 +9,26 @@ public class InputCoordinator {
 
     private final KeyboardInput keyboardInput;
     private final MouseInput mouseInput;
+    private final int puertoLocal;
 
-    public InputCoordinator(KeyboardInput keyboardInput, MouseInput mouseInput) {
+    public InputCoordinator(KeyboardInput keyboardInput, MouseInput mouseInput, int puertoLocal) {
         this.keyboardInput = keyboardInput;
         this.mouseInput = mouseInput;
+        this.puertoLocal = puertoLocal;
     }
 
     public void handle(Player player) {
         if (player == null || player.getCar() == null) return;
 
-        InputHandler selectedInput = selectInput(player);
-        if (selectedInput != null) {
-            selectedInput.update(player.getCar());
-        }
+        InputHandler input = selectInput();
+        input.update(player.getCar());
     }
 
-    private InputHandler selectInput(Player player) {
-        String port = player.getId();
-
-        switch (port) {
-            case"5000":
-            case "5003":
-                return keyboardInput;
-
-            case "5002":
-            case "5004":
-                return mouseInput;
-
-            default:
-                return null;
-        }
+    private InputHandler selectInput() {
+        return switch (puertoLocal) {
+            case 5000,5002 -> keyboardInput;
+            case 5001, 5003 -> mouseInput;
+            default -> keyboardInput;
+        };
     }
 }
