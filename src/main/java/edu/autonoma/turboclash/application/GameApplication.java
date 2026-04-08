@@ -3,44 +3,30 @@ package edu.autonoma.turboclash.application;
 import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
+import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigEntry;
+import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigLoader;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 import edu.autonoma.turboclash.presentation.view.GameWindowFrame;
 
-/**
- * Representa la responsabilidad de {@code GameApplication} en la capa de aplicacion.
- */
+import java.util.List;
+
 import javax.swing.JOptionPane;
 
+/**
+ * Aplicación principal del juego.
+ */
 public class GameApplication {
 
     private final GameBootstrap bootstrap;
     private final GameConfig config;
 
-    /**
-     * Crea una nueva instancia de {@code GameApplication}.
-     *
-     * @param bootstrap valor del parametro {@code bootstrap}
-     * @param config valor del parametro {@code config}
-     */
     public GameApplication(GameBootstrap bootstrap, GameConfig config) {
         this.bootstrap = bootstrap;
         this.config = config;
     }
 
-    /**
-     * Inicia la operacion principal del metodo.
-     *
-     * @param playerName valor del parametro {@code playerName}
-     */
     public void start(String playerName) {
-
         int puerto = getPuerto();
-
-        String hostIp = JOptionPane.showInputDialog("Ingrese la IP del host:");
-        String hostPortInput = JOptionPane.showInputDialog(
-                "Ingrese el puerto del host:",
-                String.valueOf(config.getMinPort())
-        );
 
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
@@ -50,19 +36,18 @@ public class GameApplication {
 
         GameContext context = bootstrap.init(puerto, playerName);
 
-        if (hostIp != null && !hostIp.trim().isEmpty()
-                && hostPortInput != null && !hostPortInput.trim().isEmpty()) {
-            int hostPort = Integer.parseInt(hostPortInput.trim());
+        // Asegurar que el peer esté escuchando
+        if (context.getPeer() != null) {
+            context.getPeer().iniciar();
+        }
 
-            if (!config.isValidPort(hostPort)) {
-                throw new IllegalArgumentException(
-                        "Invalid host port. Use between "
-                                + config.getMinPort() + " and " + config.getMaxPort()
-                );
+        // Cargar peers desde JSON
+        List<PeerConfigEntry> peers = PeerConfigLoader.loadFromResource("/peers.json");
+
+        for (PeerConfigEntry peerInfo : peers) {
+            if (peerInfo.getPuerto() != puerto) {
+                context.getPeer().agregarPeer(peerInfo.getIp(), peerInfo.getPuerto());
             }
-
-            context.getNetwork().getPeer().agregarPeer(hostIp.trim(), hostPort);
-            context.getNetwork().connect(context, context.getLocalPlayer(), hostIp.trim(), hostPort);
         }
 
         view.updateCars(context.getPlayers());
@@ -70,9 +55,7 @@ public class GameApplication {
         GameLoop loop = new GameLoop(config.getFrameDelay());
 
         Runnable startGame = () -> {
-            Thread gameThread = new Thread(() ->
-                    loop.run(context, view, keyboard, mouse, puerto)
-            );
+            Thread gameThread = new Thread(() -> loop.run(context, view, keyboard, mouse, puerto));
             gameThread.setName("GameLoop-Thread");
             gameThread.start();
         };
@@ -82,11 +65,6 @@ public class GameApplication {
         view.startCountdown();
     }
 
-    /**
-     * Obtiene el valor de {@code Puerto}.
-     *
-     * @return valor de {@code Puerto}
-     */
     private int getPuerto() {
         String puertoProperty = System.getProperty("puerto");
         String puertoInput = puertoProperty;
@@ -99,15 +77,15 @@ public class GameApplication {
         }
 
         if (puertoInput == null || puertoInput.trim().isEmpty()) {
-            throw new IllegalArgumentException("Local port is required");
+            throw new IllegalArgumentException("El puerto local es obligatorio");
         }
 
         int puerto = Integer.parseInt(puertoInput.trim());
 
         if (!config.isValidPort(puerto)) {
             throw new IllegalArgumentException(
-                    "Invalid port. Use between "
-                            + config.getMinPort() + " and " + config.getMaxPort()
+                    "Puerto inválido. Use entre "
+                            + config.getMinPort() + " y " + config.getMaxPort()
             );
         }
 

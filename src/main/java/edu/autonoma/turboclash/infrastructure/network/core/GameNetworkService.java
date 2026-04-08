@@ -2,26 +2,18 @@ package edu.autonoma.turboclash.infrastructure.network.core;
 
 import edu.autonoma.turboclash.application.GameContext;
 import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
-import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 
 /**
- * Representa la responsabilidad de {@code GameNetworkService} en la infraestructura de red.
+ * Servicio de red del juego para operaciones P2P.
  */
 public class GameNetworkService {
 
     private final UdpPeer peer;
     private final GameMessageFactory messageFactory;
     private final NetworkConfig networkConfig;
-    private Thread connectionThread;
-
-    /**
-     * Crea una nueva instancia de {@code GameNetworkService}.
-     *
-     * @param peer valor del parametro {@code peer}
-     * @param messageFactory valor del parametro {@code messageFactory}
-     */
 
     public GameNetworkService(UdpPeer peer,
                               GameMessageFactory messageFactory,
@@ -35,11 +27,6 @@ public class GameNetworkService {
         return peer;
     }
 
-    /**
-     * Ejecuta la operacion {@code sendJoin}.
-     *
-     * @param player valor del parametro {@code player}
-     */
     public void sendJoin(Player player) {
         if (player == null || !peer.isActivo()) {
             return;
@@ -49,11 +36,6 @@ public class GameNetworkService {
         peer.enviarATodos(msg);
     }
 
-    /**
-     * Ejecuta la operacion {@code sendMovement}.
-     *
-     * @param player valor del parametro {@code player}
-     */
     public void sendMovement(Player player) {
         if (player == null || !peer.isActivo()) {
             return;
@@ -64,11 +46,6 @@ public class GameNetworkService {
         peer.enviarATodos(msg);
     }
 
-    /**
-     * Ejecuta la operacion {@code sendLeave}.
-     *
-     * @param player valor del parametro {@code player}
-     */
     public void sendLeave(Player player) {
         if (player == null || !peer.isActivo()) {
             return;
@@ -77,11 +54,6 @@ public class GameNetworkService {
         GameMessage msg = messageFactory.create(player, MessageType.PLAYER_LEFT);
         peer.enviarATodos(msg);
     }
-
-    /**
-     * Ejecuta la operacion {@code send}.
-     *
-     */
 
     public void discover() {
         if (!peer.isActivo()) {
@@ -94,57 +66,49 @@ public class GameNetworkService {
             try {
                 peer.getSender().enviarMensaje(msg, "255.255.255.255", port);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Error enviando discovery al puerto " + port + ": " + e.getMessage());
             }
         }
     }
 
-    public void discover(String hostIp, int hostPort) {
-        if (!peer.isActivo()) {
-            return;
-        }
-
-        GameMessage msg = messageFactory.createDiscovery();
-        peer.getSender().enviarMensaje(msg, hostIp, hostPort);
-    }
-
+    /**
+     * Envía join y agrega el jugador local al contexto.
+     */
     public void join(GameContext context, Player player) {
-        if (!peer.isActivo()) {
+        if (context == null || player == null || !peer.isActivo()) {
             return;
         }
 
-        sendJoin(player);
         context.addPlayer(player);
+        sendJoin(player);
     }
 
-    public void connect(GameContext context, Player player, String hostIp, int hostPort) {
-        if (connectionThread != null && connectionThread.isAlive()) {
+    /**
+     * Inicia conexión P2P enviando varios DISCOVERY y JOIN.
+     */
+    public void connect(GameContext context, Player player) {
+        if (context == null || player == null || !peer.isActivo()) {
             return;
         }
 
-        connectionThread = new Thread(() -> {
-            for (int i = 0; i < 20; i++) {
+        Thread connectionThread = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
                 if (!peer.isActivo()) {
                     break;
                 }
 
-                if (!context.getMatch().getRemotePlayers().isEmpty()) {
-                    break;
-                }
-
                 try {
-                    peer.agregarPeer(hostIp, hostPort);
-                    discover(hostIp, hostPort);
+                    discover();
                     sendJoin(player);
-                    Thread.sleep(500);
-                } catch (RuntimeException e) {
-                    if (!peer.isActivo()) {
-                        break;
-                    }
-                    throw e;
+                    Thread.sleep(700);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
+                } catch (Exception e) {
+                    if (!peer.isActivo()) {
+                        break;
+                    }
+                    System.err.println("Error durante connect(): " + e.getMessage());
                 }
             }
         });
