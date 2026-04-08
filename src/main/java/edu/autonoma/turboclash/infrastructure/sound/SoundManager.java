@@ -2,12 +2,15 @@ package edu.autonoma.turboclash.infrastructure.sound;
 
 import javax.sound.sampled.*;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SoundManager implements IAudioService {
 
     private static SoundManager instance;
     private Clip backgroundClip;
     private static final String BASE_PATH = "/sound/";
+    private final Map<Sound, Clip> effectClips = new HashMap<>();
 
     @Override
     public void playMenuMusic() {
@@ -22,6 +25,11 @@ public class SoundManager implements IAudioService {
     @Override
     public void playBrakeSound() {
         playEffect(Sound.BRAKE);
+    }
+
+    @Override
+    public void playCountdownSound() {
+        playEffect(Sound.START);
     }
 
     @Override
@@ -94,18 +102,22 @@ public class SoundManager implements IAudioService {
     // Efectos
     public void playEffect(Sound sound) {
         try {
-            InputStream input = getClass().getResourceAsStream(BASE_PATH + sound.getFileName());
+            Clip clip = effectClips.get(sound);
 
-            if (input == null) {
-                System.err.println("No se encontró: " + sound.getFileName());
-                return;
-            }
-
-            try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(input)) {
-                Clip clip = AudioSystem.getClip();
+            if (clip == null) {
+                InputStream input = getClass().getResourceAsStream(BASE_PATH + sound.getFileName());
+                if (input == null) return;
+                AudioInputStream audioStream = AudioSystem.getAudioInputStream(input);
+                clip = AudioSystem.getClip();
                 clip.open(audioStream);
-                clip.start();
+                effectClips.put(sound, clip);
             }
+
+            if (clip.isRunning()) {
+                clip.stop();
+            }
+            clip.setFramePosition(0);
+            clip.start();
 
         } catch (Exception e) {
             e.printStackTrace();

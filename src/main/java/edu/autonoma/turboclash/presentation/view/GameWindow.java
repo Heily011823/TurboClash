@@ -4,6 +4,7 @@ import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.domain.model.Item;
 import edu.autonoma.turboclash.domain.model.Obstacle;
 import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
 import edu.autonoma.turboclash.presentation.view.EndGameWindowFrame;
 
 import javax.swing.*;
@@ -189,6 +190,7 @@ public class GameWindow {
 
             if (seconds[0] > 0) {
                 countdownLabel.setText(String.valueOf(seconds[0]));
+                SoundManager.getInstance().playEffect(SoundManager.Sound.START);
             } else if (seconds[0] == 0) {
                 countdownLabel.setText("GO!");
             } else {
