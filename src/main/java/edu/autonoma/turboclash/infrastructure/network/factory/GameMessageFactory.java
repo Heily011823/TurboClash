@@ -1,5 +1,6 @@
 package edu.autonoma.turboclash.infrastructure.network.factory;
 
+import edu.autonoma.turboclash.domain.model.CarSkin;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
@@ -24,11 +25,12 @@ public class GameMessageFactory {
         msg.setPlayerName(player.getName());
         msg.setPosX(player.getCar().getX());
         msg.setPosY(player.getCar().getY());
+        msg.setScore(player.getCurrentPoints());
         msg.setTime(System.currentTimeMillis());
+        msg.setCarSkin(resolveSkin(player));
 
         return msg;
     }
-
 
     public GameMessage createDiscovery() {
         GameMessage msg = new GameMessage();
@@ -37,5 +39,25 @@ public class GameMessageFactory {
         msg.setTime(System.currentTimeMillis());
 
         return msg;
+    }
+
+    private CarSkin resolveSkin(Player player) {
+        if (player == null || player.getCar() == null || player.getCar().getCarImage() == null) {
+            return CarSkin.BLUE;
+        }
+
+        String image = player.getCar().getCarImage().trim();
+
+        if (image.startsWith("/image/")) {
+            image = image.substring("/image/".length());
+        }
+
+        for (CarSkin skin : CarSkin.values()) {
+            if (skin.getFileName().equalsIgnoreCase(image)) {
+                return skin;
+            }
+        }
+
+        return CarSkin.BLUE;
     }
 }

@@ -15,8 +15,6 @@ public class GameMessage {
     private int score;
     private long time;
     private String event;
-
-
     private CarSkin carSkin;
 
     public GameMessage() {}
@@ -47,7 +45,6 @@ public class GameMessage {
         this.carSkin = carSkin;
     }
 
-
     public MessageType getType() { return type; }
     public void setType(MessageType type) { this.type = type; }
 
@@ -72,10 +69,8 @@ public class GameMessage {
     public String getEvent() { return event; }
     public void setEvent(String event) { this.event = event; }
 
-
     public CarSkin getCarSkin() { return carSkin; }
     public void setCarSkin(CarSkin carSkin) { this.carSkin = carSkin; }
-
 
     /**
      * Ejecuta la operacion {@code serialize}.
@@ -93,7 +88,6 @@ public class GameMessage {
                 safe(event) + "|" +
                 safe(carSkin != null ? carSkin.name() : "");
     }
-
 
     /**
      * Ejecuta la operacion {@code deserialize}.
@@ -117,17 +111,16 @@ public class GameMessage {
 
         try {
             msg.setType(MessageType.valueOf(parts[0].trim()));
-            msg.setPlayerId(parts[1]);
-            msg.setPlayerName(parts[2]);
+            msg.setPlayerId(emptyToNull(parts[1]));
+            msg.setPlayerName(emptyToNull(parts[2]));
             msg.setPosX(Double.parseDouble(parts[3]));
             msg.setPosY(Double.parseDouble(parts[4]));
             msg.setScore(Integer.parseInt(parts[5]));
             msg.setTime(Long.parseLong(parts[6]));
-            msg.setEvent(parts[7]);
+            msg.setEvent(emptyToNull(parts[7]));
 
-
-            if (!parts[8].isEmpty()) {
-                msg.setCarSkin(CarSkin.valueOf(parts[8]));
+            if (!parts[8].isBlank()) {
+                msg.setCarSkin(CarSkin.valueOf(parts[8].trim()));
             }
 
         } catch (Exception e) {
@@ -146,5 +139,13 @@ public class GameMessage {
     private String safe(String value) {
         if (value == null) return "";
         return value.replace("|", "/");
+    }
+
+    private static String emptyToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
