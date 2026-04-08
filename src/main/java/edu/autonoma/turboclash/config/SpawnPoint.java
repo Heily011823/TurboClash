@@ -1,6 +1,6 @@
 package edu.autonoma.turboclash.config;
 
-import edu.autonoma.turboclash.model.ObstacleType;
+import edu.autonoma.turboclash.domain.model.ObstacleType;
 
 public class SpawnPoint {
 
