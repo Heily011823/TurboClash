@@ -2,5 +2,5 @@
   { "nombre": "Jugador1", "ip": "26.8.193.114", "puerto": 5001 },
   { "nombre": "Jugador2", "ip": "26.176.207.113", "puerto": 5002 },
   { "nombre": "Jugador3", "ip": "26.14.204.56", "puerto": 5003 },
-  { "nombre": "Jugador4", "ip": "26.98.94.146", "puerto": 5004 }
+  { "nombre": "Jugador4", "ip": "26.98.94.146", "puerto": 5000 }
 ]

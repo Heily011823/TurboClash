@@ -39,7 +39,6 @@ public class GameLoop {
                 context.getResultManager()
         );
 
-        // Unir jugador local y comenzar descubrimiento P2P
         networkSync.join(context, local);
         context.getNetwork().connect(context, local);
 
@@ -72,18 +71,14 @@ public class GameLoop {
                 inputCoordinator.handle(local);
             }
 
-            SwingUtilities.invokeLater(() -> {
-                viewSync.sync(
-                        window,
-                        context.getMatch(),
-                        context.getObstacles(),
-                        context.getEngine().getItems()
-                );
-            });
+            SwingUtilities.invokeLater(() -> viewSync.sync(
+                    window,
+                    context.getMatch(),
+                    context.getObstacles(),
+                    context.getEngine().getItems()
+            ));
 
             networkSync.sync(context, local);
-
-            System.out.println("ENTRO AL LOOP");
             sleep();
         }
 

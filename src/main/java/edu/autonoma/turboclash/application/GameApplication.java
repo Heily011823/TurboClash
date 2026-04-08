@@ -8,9 +8,8 @@ import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigLoader;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 import edu.autonoma.turboclash.presentation.view.GameWindowFrame;
 
+import javax.swing.*;
 import java.util.List;
-
-import javax.swing.JOptionPane;
 
 /**
  * Aplicación principal del juego.
@@ -36,12 +35,10 @@ public class GameApplication {
 
         GameContext context = bootstrap.init(puerto, playerName);
 
-        // Asegurar que el peer esté escuchando
         if (context.getPeer() != null) {
             context.getPeer().iniciar();
         }
 
-        // Cargar peers desde JSON
         List<PeerConfigEntry> peers = PeerConfigLoader.loadFromResource("/peers.json");
 
         for (PeerConfigEntry peerInfo : peers) {
@@ -51,6 +48,7 @@ public class GameApplication {
         }
 
         view.updateCars(context.getPlayers());
+        view.showWaitingPlayers();
 
         GameLoop loop = new GameLoop(config.getFrameDelay());
 
@@ -60,9 +58,26 @@ public class GameApplication {
             gameThread.start();
         };
 
-        view.setOnCountdownFinished(startGame);
-        view.requestGameFocus();
-        view.startCountdown();
+        new Thread(() -> {
+            long timeout = System.currentTimeMillis() + 10000;
+
+            while (context.getMatch().getRemotePlayers().isEmpty()
+                    && System.currentTimeMillis() < timeout) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                view.showGameStarted();
+                view.setOnCountdownFinished(startGame);
+                view.requestGameFocus();
+                view.startCountdown();
+            });
+        }, "WaitingPlayers-Thread").start();
     }
 
     private int getPuerto() {
