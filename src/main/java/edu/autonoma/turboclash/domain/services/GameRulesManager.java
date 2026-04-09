@@ -95,12 +95,13 @@ public class GameRulesManager {
      * @param p valor del parametro {@code p}
      */
     private void checkElimination(Player p) {
-        if (p != null && !p.isAlive() && !p.isEliminated()) {
+        if (p != null && !p.isAlive()) {
+            if (p.getEliminationOrder() == Integer.MAX_VALUE) {
+                p.setEliminationOrder(currentEliminationOrder++);
+            }
             p.setEliminated(true);
-            p.setEliminationOrder(currentEliminationOrder++);
         }
     }
-
 
     /**
      * Ejecuta la operacion {@code applySpeedDebuff}.
