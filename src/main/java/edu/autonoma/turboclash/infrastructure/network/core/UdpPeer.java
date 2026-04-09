@@ -21,13 +21,6 @@ public class UdpPeer {
 
     private Thread receiverThread;
 
-    /**
-     * Crea una nueva instancia de {@code UdpPeer}.
-     *
-     * @param socket valor del parametro {@code socket}
-     * @param sender valor del parametro {@code sender}
-     * @param receiver valor del parametro {@code receiver}
-     */
     public UdpPeer(DatagramSocket socket, IMessageSender sender, IMessageReceiver receiver) {
 
         if (socket == null) {
@@ -42,17 +35,10 @@ public class UdpPeer {
         System.out.println("UDP Peer iniciado en puerto: " + socket.getLocalPort());
     }
 
-    /**
-     * Agrega {@code Peer}.
-     *
-     * @param ip direccion IP asociada a la operacion
-     * @param puerto valor del parametro {@code puerto}
-     */
     public void agregarPeer(String ip, int puerto) {
         try {
             PortValidator.validate(puerto);
 
-            // Evita agregarse a sí mismo
             if (puerto == socket.getLocalPort()) {
                 return;
             }
@@ -69,23 +55,22 @@ public class UdpPeer {
         }
     }
 
-    /**
-     * Inicia la operacion principal del metodo.
-     */
-    public void iniciar() {
+    public synchronized void iniciar() {
         if (!activo || socket.isClosed()) {
             return;
         }
 
+        if (receiverThread != null && receiverThread.isAlive()) {
+            System.out.println("Receiver ya estaba iniciado en puerto: " + socket.getLocalPort());
+            return;
+        }
+
         receiverThread = new Thread(receiver::escuchar);
+        receiverThread.setName("UdpReceiver-" + socket.getLocalPort());
+        receiverThread.setDaemon(true);
         receiverThread.start();
     }
 
-    /**
-     * Envia {@code ATodos}.
-     *
-     * @param mensaje valor del parametro {@code mensaje}
-     */
     public void enviarATodos(GameMessage mensaje) {
         if (!isActivo()) {
             return;
@@ -110,9 +95,6 @@ public class UdpPeer {
         }
     }
 
-    /**
-     * Cierra la operacion principal del metodo.
-     */
     public void cerrar() {
         activo = false;
         receiver.detener();
@@ -126,20 +108,10 @@ public class UdpPeer {
         }
     }
 
-    /**
-     * Obtiene el valor de {@code Receiver}.
-     *
-     * @return valor de {@code Receiver}
-     */
     public IMessageReceiver getReceiver() {
         return receiver;
     }
 
-    /**
-     * Obtiene el valor de {@code Sender}.
-     *
-     * @return valor de {@code Sender}
-     */
     public IMessageSender getSender() {
         return sender;
     }

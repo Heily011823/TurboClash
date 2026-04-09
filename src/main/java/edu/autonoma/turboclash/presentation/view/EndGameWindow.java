@@ -1,11 +1,8 @@
 package edu.autonoma.turboclash.presentation.view;
 
-import edu.autonoma.turboclash.domain.model.Player;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 /**
  * Representa y organiza la vista {@code EndGameWindow} en la capa de presentacion.
@@ -19,15 +16,18 @@ public class EndGameWindow {
     private JButton btnFin;
     private JButton btnReiniciar;
 
+    /**
+     * Crea una nueva instancia de {@code EndGameWindow}.
+     */
     public EndGameWindow() {
         panel1 = new JPanel(null);
         panel1.setOpaque(false);
         panel1.setPreferredSize(new Dimension(1000, 700));
 
-        PrimerLugar = crearLabel("", 242, 208, 420, 50);
-        SegundoLugar = crearLabel("", 80, 260, 360, 50);
-        TercerLugar = crearLabel("", 360, 260, 360, 50);
-        CuartoLugar = crearLabel("", 240, 440, 420, 50);
+        PrimerLugar = crearLabel("", 242, 208, 300, 50);
+        SegundoLugar = crearLabel("", 120, 260, 250, 50);
+        TercerLugar = crearLabel("", 400, 260, 250, 50);
+        CuartoLugar = crearLabel("", 240, 440, 300, 50);
 
         btnFin = crearBotonImagen("/image/btn_fin.png", 540, 510, 180, 55);
         btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 70, 510, 180, 55);
@@ -50,14 +50,36 @@ public class EndGameWindow {
         panel1.add(btnReiniciar);
     }
 
+    /**
+     * Ejecuta la operacion {@code crearLabel}.
+     *
+     * @param texto valor del parametro {@code texto}
+     * @param x coordenada horizontal utilizada en la operacion
+     * @param y coordenada vertical utilizada en la operacion
+     * @param w ancho requerido por la operacion
+     * @param h alto requerido por la operacion
+     * @return resultado de la operacion {@code crearLabel}
+     */
     private JLabel crearLabel(String texto, int x, int y, int w, int h) {
         JLabel label = new JLabel(texto, SwingConstants.CENTER);
+
         label.setBounds(x, y, w, h);
+
         label.setForeground(new Color(255, 215, 0));
         label.setFont(new Font("Arial", Font.BOLD, 20));
         return label;
     }
 
+    /**
+     * Ejecuta la operacion {@code crearBotonImagen}.
+     *
+     * @param ruta valor del parametro {@code ruta}
+     * @param x coordenada horizontal utilizada en la operacion
+     * @param y coordenada vertical utilizada en la operacion
+     * @param w ancho requerido por la operacion
+     * @param h alto requerido por la operacion
+     * @return resultado de la operacion {@code crearBotonImagen}
+     */
     private JButton crearBotonImagen(String ruta, int x, int y, int w, int h) {
         JButton boton = new JButton();
         boton.setBounds(x, y, w, h);
@@ -78,46 +100,35 @@ public class EndGameWindow {
         return boton;
     }
 
-    public void setResultados(List<Player> ranking) {
-        PrimerLugar.setText(formatearJugador(ranking, 0, "1"));
-        SegundoLugar.setText(formatearJugador(ranking, 1, "2"));
-        TercerLugar.setText(formatearJugador(ranking, 2, "3"));
-        CuartoLugar.setText(formatearJugador(ranking, 3, "4"));
+    /**
+     * Actualiza el valor de {@code Resultados}.
+     *
+     * @param primero valor del parametro {@code primero}
+     * @param segundo valor del parametro {@code segundo}
+     * @param tercero valor del parametro {@code tercero}
+     * @param cuarto valor del parametro {@code cuarto}
+     */
+    public void setResultados(String primero, String segundo, String tercero, String cuarto) {
+        PrimerLugar.setText(primero);
+        SegundoLugar.setText(segundo);
+        TercerLugar.setText(tercero);
+        CuartoLugar.setText(cuarto);
     }
 
-    private String formatearJugador(List<Player> ranking, int index, String posicion) {
-        if (ranking == null || index >= ranking.size() || ranking.get(index) == null) {
-            return posicion + ". ---";
-        }
-
-        Player player = ranking.get(index);
-
-        String nombre = obtenerNombreJugador(player);
-        int puntaje = player.getCurrentPoints();
-
-        return posicion + ". " + nombre + " - " + puntaje + " pts";
-    }
-
-    private String obtenerNombreJugador(Player player) {
-        if (player == null) {
-            return "Jugador";
-        }
-
-        if (player.getName() != null && !player.getName().isBlank()) {
-            return player.getName();
-        }
-
-        if (player.getId() != null && !player.getId().isBlank()) {
-            return "Jugador " + player.getId();
-        }
-
-        return "Jugador";
-    }
-
+    /**
+     * Ejecuta la operacion {@code addFinListener}.
+     *
+     * @param listener valor del parametro {@code listener}
+     */
     public void addFinListener(ActionListener listener) {
         btnFin.addActionListener(listener);
     }
 
+    /**
+     * Ejecuta la operacion {@code addReiniciarListener}.
+     *
+     * @param listener valor del parametro {@code listener}
+     */
     public void addReiniciarListener(ActionListener listener) {
         btnReiniciar.addActionListener(listener);
     }

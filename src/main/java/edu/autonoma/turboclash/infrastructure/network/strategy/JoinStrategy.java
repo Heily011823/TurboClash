@@ -13,28 +13,15 @@ public class JoinStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
     private static final int CAR_HEIGHT = 50;
-
     private static final double START_X = 80;
-
-    // 4 carriles verticales fijos
     private static final double[] LANES_Y = {120, 220, 320, 420};
 
     private final Match match;
 
-    /**
-     * Crea una nueva instancia de {@code JoinStrategy}.
-     *
-     * @param match valor del parametro {@code match}
-     */
     public JoinStrategy(Match match) {
         this.match = match;
     }
 
-    /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param message valor del parametro {@code message}
-     */
     @Override
     public void handle(GameMessage message) {
         if (message == null || match == null) {
@@ -84,7 +71,7 @@ public class JoinStrategy implements IMessageStrategy {
         }
 
         double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
-        double posY = resolveLaneY();
+        double posY = message.getPosY() > 0 ? message.getPosY() : resolveLaneY();
 
         Car car = new Car(
                 messagePlayerId != null ? messagePlayerId : messagePlayerName,

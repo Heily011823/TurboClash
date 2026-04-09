@@ -18,6 +18,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class GameApplication {
 
+    /**
+     * Si juegan 4 en total, cada cliente debe ver 3 remotos.
+     */
+    private static final int EXPECTED_REMOTE_PLAYERS = 3;
+
     private final GameBootstrap bootstrap;
     private final GameConfig config;
 
@@ -38,9 +43,6 @@ public class GameApplication {
         GameContext context = bootstrap.init(puerto, playerName);
         Player localPlayer = context.getLocalPlayer();
 
-        if (context.getPeer() != null) {
-            context.getPeer().iniciar();
-        }
 
         List<PeerConfigEntry> peers = PeerConfigLoader.loadFromResource("/peers.json");
 
@@ -50,6 +52,7 @@ public class GameApplication {
             }
         }
 
+        System.out.println("Conectando a peers...");
         context.getNetwork().connect(context, localPlayer);
 
         view.updateCars(context.getPlayers());
@@ -73,7 +76,7 @@ public class GameApplication {
         new Thread(() -> {
             long timeout = System.currentTimeMillis() + 15000;
 
-            while (context.getMatch().getRemotePlayers().size() < 3
+            while (context.getMatch().getRemotePlayers().size() < EXPECTED_REMOTE_PLAYERS
                     && System.currentTimeMillis() < timeout) {
                 try {
                     Thread.sleep(200);
@@ -84,15 +87,21 @@ public class GameApplication {
             }
 
             SwingUtilities.invokeLater(() -> {
-                if (context.getMatch().getRemotePlayers().size() < 3) {
+                int connectedPlayers = context.getMatch().getRemotePlayers().size();
+
+                if (connectedPlayers < EXPECTED_REMOTE_PLAYERS) {
                     view.showWaitingPlayers();
                     JOptionPane.showMessageDialog(
                             null,
-                            "No se conectaron todos los jugadores remotos. Verifica que todos estén conectados y usando puertos distintos."
+                            "Solo se conectaron " + connectedPlayers + " de "
+                                    + EXPECTED_REMOTE_PLAYERS + " jugadores remotos.\n"
+                                    + "Verifica que todos estén conectados, usando puertos distintos\n"
+                                    + "y que la red P2P esté activa en todos los equipos."
                     );
                     return;
                 }
 
+                System.out.println("Todos los jugadores remotos conectados.");
                 view.showGameStarted();
                 view.setOnCountdownFinished(startGame);
                 view.startCountdown();

@@ -13,9 +13,9 @@ import edu.autonoma.turboclash.infrastructure.network.strategy.MoveStrategy;
 import edu.autonoma.turboclash.infrastructure.network.strategy.ScoreStrategy;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Representa la responsabilidad de {@code GameMessageHandler} en el procesamiento de mensajes de red.
@@ -27,7 +27,7 @@ public class GameMessageHandler {
     private UdpPeer peer;
     private GameMessageFactory messageFactory;
 
-    private final Set<String> processedJoins = new HashSet<>();
+    private final Set<String> processedJoins = ConcurrentHashMap.newKeySet();
 
     public GameMessageHandler(Match match) {
         this.match = match;
@@ -54,6 +54,9 @@ public class GameMessageHandler {
             if (peer != null && messageFactory != null && localPlayer != null) {
                 GameMessage response = messageFactory.create(localPlayer, MessageType.HANDSHAKE);
                 peer.getSender().enviarMensaje(response, ip, port);
+
+                GameMessage joinResponse = messageFactory.create(localPlayer, MessageType.PLAYER_JOINED);
+                peer.getSender().enviarMensaje(joinResponse, ip, port);
             }
             return;
         }
@@ -77,14 +80,20 @@ public class GameMessageHandler {
         if (msg.getType() == MessageType.HANDSHAKE || msg.getType() == MessageType.PLAYER_JOINED) {
             String joinKey = buildJoinKey(msg, ip, port);
 
-            if (processedJoins.contains(joinKey)) {
+            if (!processedJoins.add(joinKey)) {
                 return;
             }
 
-            processedJoins.add(joinKey);
-
             if (peer != null) {
                 peer.agregarPeer(ip, port);
+            }
+
+            if (msg.getType() == MessageType.HANDSHAKE
+                    && peer != null
+                    && messageFactory != null
+                    && localPlayer != null) {
+                GameMessage joinResponse = messageFactory.create(localPlayer, MessageType.PLAYER_JOINED);
+                peer.getSender().enviarMensaje(joinResponse, ip, port);
             }
         }
 
@@ -98,8 +107,6 @@ public class GameMessageHandler {
         System.out.println("Procesado: " + msg.getType()
                 + " de " + msg.getPlayerName()
                 + " | remotos: " + match.getRemotePlayers().size());
-
-
     }
 
     private String buildJoinKey(GameMessage msg, String ip, int port) {

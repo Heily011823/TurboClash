@@ -17,10 +17,6 @@ public class GameNetworkService {
 
     private volatile boolean connecting = false;
 
-    /**
-     * Numero esperado de remotos.
-     * Si juegan 4 en total, cada cliente debe ver 3 remotos.
-     */
     private static final int EXPECTED_REMOTE_PLAYERS = 3;
 
     public GameNetworkService(UdpPeer peer,
@@ -89,14 +85,13 @@ public class GameNetworkService {
     }
 
     /**
-     * Envía join y agrega el jugador local al contexto.
+     * Solo envía el join; no agrega el local al match remoto.
      */
     public void join(GameContext context, Player player) {
         if (context == null || player == null || !peer.isActivo()) {
             return;
         }
 
-        context.addPlayer(player);
         sendJoin(player);
     }
 
@@ -112,7 +107,7 @@ public class GameNetworkService {
 
         Thread connectionThread = new Thread(() -> {
             try {
-                int maxAttempts = 15;
+                int maxAttempts = 12;
 
                 for (int i = 0; i < maxAttempts; i++) {
                     if (!peer.isActivo()) {
@@ -129,9 +124,13 @@ public class GameNetworkService {
                         break;
                     }
 
-                    discover();
                     sendHandshake(player);
                     sendJoin(player);
+
+                    // discovery solo como apoyo, no como base
+                    if (i < 2) {
+                        discover();
+                    }
 
                     try {
                         Thread.sleep(1000);
@@ -154,7 +153,7 @@ public class GameNetworkService {
         });
 
         connectionThread.setName("Network-Connect-Thread");
-        connectionThread.setDaemon(false);
+        connectionThread.setDaemon(true);
         connectionThread.start();
     }
 }

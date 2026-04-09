@@ -1,5 +1,7 @@
 package edu.autonoma.turboclash.infrastructure.network.strategy;
 
+import edu.autonoma.turboclash.domain.model.Car;
+import edu.autonoma.turboclash.domain.model.CarSkin;
 import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
@@ -9,22 +11,17 @@ import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
  */
 public class MoveStrategy implements IMessageStrategy {
 
+    private static final int CAR_WIDTH = 100;
+    private static final int CAR_HEIGHT = 50;
+    private static final double START_X = 80;
+    private static final double[] LANES_Y = {120, 220, 320, 420};
+
     private final Match match;
 
-    /**
-     * Crea una nueva instancia de {@code MoveStrategy}.
-     *
-     * @param match valor del parametro {@code match}
-     */
     public MoveStrategy(Match match) {
         this.match = match;
     }
 
-    /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param message valor del parametro {@code message}
-     */
     @Override
     public void handle(GameMessage message) {
         if (message == null || match == null) {
@@ -54,39 +51,83 @@ public class MoveStrategy implements IMessageStrategy {
             }
         }
 
-        for (Player p : match.getRemotePlayers()) {
-            if (p == null || p.getCar() == null) {
-                continue;
+        Player remote = match.findRemotePlayer(message.getPlayerId(), message.getPlayerName());
+
+        if (remote == null) {
+            String image = CarSkin.BLUE.getFileName();
+            if (message.getCarSkin() != null) {
+                image = message.getCarSkin().getFileName();
             }
 
-            boolean sameId =
-                    p.getId() != null
-                            && message.getPlayerId() != null
-                            && p.getId().equals(message.getPlayerId());
+            double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
+            double posY = message.getPosY() > 0 ? message.getPosY() : resolveLaneY();
 
-            boolean sameName =
-                    p.getName() != null
-                            && message.getPlayerName() != null
-                            && p.getName().equalsIgnoreCase(message.getPlayerName());
+            Car car = new Car(
+                    message.getPlayerId() != null ? message.getPlayerId() : message.getPlayerName(),
+                    posX,
+                    posY,
+                    CAR_WIDTH,
+                    CAR_HEIGHT,
+                    image
+            );
 
-            if (sameId || sameName) {
-                p.syncFromNetwork(
-                        message.getPosX(),
-                        message.getPosY(),
-                        message.getScore()
-                );
+            remote = new Player(
+                    message.getPlayerId(),
+                    message.getPlayerName(),
+                    car
+            );
 
-                System.out.println("Movimiento actualizado de "
-                        + p.getName()
-                        + " -> X: " + message.getPosX()
-                        + ", Y: " + message.getPosY()
-                        + ", Score: " + message.getScore());
+            remote.setScore(message.getScore());
+            match.addPlayer(remote);
 
-                return;
+            System.out.println("Jugador remoto creado por MOVEMENT: "
+                    + message.getPlayerName());
+        }
+
+        if (remote.getCar() != null) {
+            remote.syncFromNetwork(
+                    message.getPosX(),
+                    message.getPosY(),
+                    message.getScore()
+            );
+
+            System.out.println("Movimiento actualizado de "
+                    + remote.getName()
+                    + " -> X: " + message.getPosX()
+                    + ", Y: " + message.getPosY()
+                    + ", Score: " + message.getScore());
+        }
+    }
+
+    private double resolveLaneY() {
+        boolean[] used = new boolean[LANES_Y.length];
+
+        Player local = match.getLocalPlayer();
+        if (local != null && local.getCar() != null) {
+            markUsedLane(local.getCar().getY(), used);
+        }
+
+        for (Player p : match.getRemotePlayers()) {
+            if (p != null && p.getCar() != null) {
+                markUsedLane(p.getCar().getY(), used);
             }
         }
 
-        System.out.println("No se encontró jugador remoto para MOVEMENT: "
-                + message.getPlayerName() + " / " + message.getPlayerId());
+        for (int i = 0; i < LANES_Y.length; i++) {
+            if (!used[i]) {
+                return LANES_Y[i];
+            }
+        }
+
+        return LANES_Y[LANES_Y.length - 1];
+    }
+
+    private void markUsedLane(double y, boolean[] used) {
+        for (int i = 0; i < LANES_Y.length; i++) {
+            if (Math.abs(LANES_Y[i] - y) < 20) {
+                used[i] = true;
+                return;
+            }
+        }
     }
 }
