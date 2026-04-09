@@ -36,6 +36,9 @@ public class GameApplication {
         GameContext context = bootstrap.init(puerto, playerName);
         Player localPlayer = context.getLocalPlayer();
 
+        // IMPORTANTE: registrar el local real en la vista
+        view.setLocalPlayer(localPlayer);
+
         List<PeerConfigEntry> peers = PeerConfigLoader.loadFromResource("/peers.json");
 
         for (PeerConfigEntry peerInfo : peers) {
@@ -51,8 +54,13 @@ public class GameApplication {
         System.out.println("Conectando a peers...");
         context.getNetwork().connect(context, localPlayer);
 
+        // Preparar posiciones iniciales y mostrar solo el local mientras espera
+        view.prepareRaceStart(context.getPlayers());
         view.updateCars(context.getPlayers());
-        view.showWaitingPlayers(1 + context.getMatch().getRemotePlayers().size(), 1 + expectedRemotePlayers);
+        view.showWaitingPlayers(
+                1 + context.getMatch().getRemotePlayers().size(),
+                1 + expectedRemotePlayers
+        );
         view.requestGameFocus();
 
         GameLoop loop = new GameLoop(config.getFrameDelay());
@@ -62,6 +70,10 @@ public class GameApplication {
             if (!gameStarted.compareAndSet(false, true)) {
                 return;
             }
+
+            // Aquí sí empieza visualmente la partida
+            view.showGameStarted();
+            view.updateCars(context.getPlayers());
 
             FondoAnimadoPanel fondo = view.getBackgroundPanel();
             if (fondo != null) {
@@ -106,7 +118,7 @@ public class GameApplication {
                     return;
                 }
 
-                view.showGameStarted();
+                // Primero countdown, luego startGame
                 view.setOnCountdownFinished(startGame);
                 view.startCountdown();
             });

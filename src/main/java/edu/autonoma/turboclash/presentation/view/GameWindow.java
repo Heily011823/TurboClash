@@ -38,9 +38,23 @@ public class GameWindow {
     private static final int START_X = 80;
 
     /**
-     * Mantener estos carriles fijos y consistentes con la vista.
+     * Carriles visuales fijos.
      */
     private static final int[] START_LANES_Y = {80, 220, 360, 500};
+
+    /**
+     * Estado visual del juego.
+     * false = esperando jugadores
+     * true = partida iniciada
+     */
+    private boolean gameStarted = false;
+
+    /**
+     * Jugador local real.
+     * Se asigna desde GameApplication con view.setLocalPlayer(localPlayer)
+     */
+    private String localPlayerId;
+    private String localPlayerName;
 
     public GameWindow() {
         if (panel1 == null) {
@@ -76,6 +90,10 @@ public class GameWindow {
         this.fondoAnimadoPanel = fondoAnimadoPanel;
     }
 
+    public FondoAnimadoPanel getBackgroundPanel() {
+        return fondoAnimadoPanel;
+    }
+
     public JPanel getPanel() {
         return panel1;
     }
@@ -88,24 +106,48 @@ public class GameWindow {
         this.onCountdownFinished = action;
     }
 
+    /**
+     * Registra cuál es el jugador local real.
+     */
+    public void setLocalPlayer(Player localPlayer) {
+        if (localPlayer == null) {
+            this.localPlayerId = null;
+            this.localPlayerName = null;
+            return;
+        }
+
+        this.localPlayerId = localPlayer.getId();
+        this.localPlayerName = localPlayer.getName();
+    }
+
     public void showWaitingPlayers() {
+        gameStarted = false;
         statusLabel.setText("Esperando jugadores...");
         statusLabel.setVisible(true);
+        panel1.repaint();
     }
 
     public void showWaitingPlayers(int connectedPlayers, int expectedPlayers) {
+        gameStarted = false;
         statusLabel.setText("Esperando jugadores... " + connectedPlayers + "/" + expectedPlayers);
         statusLabel.setVisible(true);
+        panel1.repaint();
     }
 
     public void showGameStarted() {
+        gameStarted = true;
         statusLabel.setVisible(false);
+        panel1.repaint();
     }
 
     public void updateScore(int points) {
         Puntaje.setText("Puntaje: " + points);
     }
 
+    /**
+     * En espera: solo muestra el jugador local.
+     * En partida: muestra todos.
+     */
     public void updateCars(List<Player> players) {
         if (players == null) {
             return;
@@ -116,7 +158,8 @@ public class GameWindow {
                 continue;
             }
 
-            updateCarPosition(player);
+            boolean visible = gameStarted || isLocalPlayer(player);
+            updateCarPosition(player, visible);
         }
 
         panel1.revalidate();
@@ -124,6 +167,11 @@ public class GameWindow {
     }
 
     public void updateCarPosition(Player player) {
+        boolean visible = gameStarted || isLocalPlayer(player);
+        updateCarPosition(player, visible);
+    }
+
+    private void updateCarPosition(Player player, boolean visible) {
         if (player == null) {
             return;
         }
@@ -149,22 +197,41 @@ public class GameWindow {
         int drawY = Math.max(0, (int) car.getY());
 
         lbl.setBounds(drawX, drawY, CAR_WIDTH, CAR_HEIGHT);
-        lbl.setVisible(car.isActive());
+        lbl.setVisible(visible && car.isActive());
 
-        updateHealthVisual(drawX, drawY, car.getId(), car.isActive(), car.getLives());
-        updateNameVisual(drawX, drawY, player.getName(), car.getId(), car.isActive());
+        updateHealthVisual(drawX, drawY, car.getId(), visible && car.isActive(), car.getLives());
+        updateNameVisual(drawX, drawY, player.getName(), car.getId(), visible && car.isActive());
     }
 
     /**
-     * Compatibilidad por si en otra parte del proyecto se sigue llamando con Car.
+     * Compatibilidad si alguna parte del proyecto sigue llamando con Car.
+     * Este método NO conoce si el carro es local o remoto, así que en espera
+     * solo lo deja visible si el juego ya empezó.
      */
     public void updateCarPosition(Car car) {
-        if (car == null) {
+        if (car == null || car.getId() == null) {
             return;
         }
 
-        Player tempPlayer = new Player(car.getId(), car.getId(), car);
-        updateCarPosition(tempPlayer);
+        JLabel lbl = carLabels.computeIfAbsent(car.getId(), id -> {
+            String imagePath = normalizeCarImagePath(car.getCarImage());
+            JLabel newLbl = new JLabel(getIcon(imagePath, CAR_WIDTH, CAR_HEIGHT));
+            newLbl.setOpaque(false);
+            panel1.add(newLbl);
+            panel1.setComponentZOrder(newLbl, 0);
+            return newLbl;
+        });
+
+        String imagePath = normalizeCarImagePath(car.getCarImage());
+        lbl.setIcon(getIcon(imagePath, CAR_WIDTH, CAR_HEIGHT));
+
+        int drawX = Math.max(0, (int) car.getX());
+        int drawY = Math.max(0, (int) car.getY());
+
+        lbl.setBounds(drawX, drawY, CAR_WIDTH, CAR_HEIGHT);
+        lbl.setVisible(gameStarted && car.isActive());
+
+        updateHealthVisual(drawX, drawY, car.getId(), gameStarted && car.isActive(), car.getLives());
     }
 
     public void updateHealth(Car car, int lives) {
@@ -172,7 +239,7 @@ public class GameWindow {
             return;
         }
 
-        updateHealthVisual((int) car.getX(), (int) car.getY(), car.getId(), car.isActive(), lives);
+        updateHealthVisual((int) car.getX(), (int) car.getY(), car.getId(), gameStarted && car.isActive(), lives);
     }
 
     private void updateHealthVisual(int x, int y, String carId, boolean active, int lives) {
@@ -249,8 +316,7 @@ public class GameWindow {
     }
 
     /**
-     * Solo organiza salida inicial.
-     * No debe pisar posiciones ya sincronizadas por red.
+     * Organiza la salida inicial sin pisar posiciones sincronizadas por red.
      */
     public void prepareRaceStart(List<Player> players) {
         if (players == null || players.isEmpty()) {
@@ -275,8 +341,6 @@ public class GameWindow {
             } else if (stillAtStartX && !isValidLane((int) car.getY())) {
                 car.setPosition(START_X, getStartLaneY(player));
             }
-
-            updateCarPosition(player);
         }
 
         panel1.repaint();
@@ -292,12 +356,11 @@ public class GameWindow {
     }
 
     private int getStartLaneY(Player player) {
-        if (player == null) {
+        if (player == null || player.getId() == null) {
             return START_LANES_Y[0];
         }
 
-        String id = player.getId() != null ? player.getId().trim() : "";
-        String name = player.getName() != null ? player.getName().trim().toLowerCase() : "";
+        String id = player.getId().trim();
 
         switch (id) {
             case "5001":
@@ -321,12 +384,26 @@ public class GameWindow {
                 return START_LANES_Y[3];
 
             default:
-                if (name.contains("1")) return START_LANES_Y[0];
-                if (name.contains("2")) return START_LANES_Y[1];
-                if (name.contains("3")) return START_LANES_Y[2];
-                if (name.contains("4")) return START_LANES_Y[3];
-                return START_LANES_Y[Math.abs((id + name).hashCode()) % START_LANES_Y.length];
+                return START_LANES_Y[Math.abs(id.hashCode()) % START_LANES_Y.length];
         }
+    }
+
+    private boolean isLocalPlayer(Player player) {
+        if (player == null) {
+            return false;
+        }
+
+        boolean sameId =
+                localPlayerId != null
+                        && player.getId() != null
+                        && localPlayerId.equals(player.getId());
+
+        boolean sameName =
+                localPlayerName != null
+                        && player.getName() != null
+                        && localPlayerName.equalsIgnoreCase(player.getName());
+
+        return sameId || sameName;
     }
 
     public void startCountdown() {
@@ -430,13 +507,5 @@ public class GameWindow {
         }
 
         return "/image/" + value;
-    }
-    public FondoAnimadoPanel getBackgroundPanel() {
-        return fondoAnimadoPanel;
-    }
-    public void startBackgroundGame() {
-        if (fondoAnimadoPanel != null) {
-            fondoAnimadoPanel.startGame();
-        }
     }
 }
