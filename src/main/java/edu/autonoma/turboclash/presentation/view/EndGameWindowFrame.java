@@ -10,23 +10,22 @@ import java.awt.*;
  */
 public class EndGameWindowFrame extends JFrame {
 
-    private EndGameWindow view;
+    private final EndGameWindow view;
 
     /**
      * Crea una nueva instancia de {@code EndGameWindowFrame}.
-     *
-     * @param primero valor del parametro {@code primero}
-     * @param segundo valor del parametro {@code segundo}
-     * @param tercero valor del parametro {@code tercero}
-     * @param cuarto valor del parametro {@code cuarto}
      */
-    public EndGameWindowFrame(String primero, String segundo, String tercero, String cuarto) {
+    public EndGameWindowFrame(String ganador,
+                              String tiempoTotal,
+                              String primero,
+                              String segundo,
+                              String tercero,
+                              String cuarto) {
 
         SoundManager.getInstance().stopMusic();
         SoundManager.getInstance().playWinSound();
 
         view = new EndGameWindow();
-
         view.panel1.setOpaque(false);
 
         FondoPanel fondo = new FondoPanel("/image/podium.png");
@@ -40,13 +39,13 @@ public class EndGameWindowFrame extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        view.setResultados(primero, segundo, tercero, cuarto);
+        view.setResultados(ganador, tiempoTotal, primero, segundo, tercero, cuarto);
 
         view.addFinListener(e -> System.exit(0));
 
         view.addReiniciarListener(e -> {
             dispose();
-            new StartWindowFrame(); // cambia esto si tu ventana inicial tiene otro nombre
+            new StartWindowFrame();
         });
 
         setVisible(true);

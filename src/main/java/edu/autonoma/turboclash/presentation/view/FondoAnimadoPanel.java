@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class FondoAnimadoPanel extends JPanel {
 
+    private static final int DURACION_PARTIDA_SEGUNDOS = 180;
+
     private Image carretera;
     private Image meta;
 
@@ -21,7 +23,7 @@ public class FondoAnimadoPanel extends JPanel {
     private Timer timerMovimiento;
     private Timer timerTiempo;
 
-    private int segundosRestantes = 180;
+    private int segundosRestantes = DURACION_PARTIDA_SEGUNDOS;
     private boolean tiempoTerminado = false;
     private boolean mostrarMeta = false;
     private boolean juegoTerminado = false;
@@ -50,7 +52,6 @@ public class FondoAnimadoPanel extends JPanel {
         }
 
         metaX = GameViewport.WIDTH;
-
         crearTimers();
     }
 
@@ -141,7 +142,7 @@ public class FondoAnimadoPanel extends JPanel {
         pauseGame();
 
         x1 = 0;
-        segundosRestantes = 180;
+        segundosRestantes = DURACION_PARTIDA_SEGUNDOS;
         tiempoTerminado = false;
         mostrarMeta = false;
         juegoTerminado = false;
@@ -204,17 +205,63 @@ public class FondoAnimadoPanel extends JPanel {
             timerTiempo.stop();
         }
 
-        String primero = ranking.size() > 0 ? ranking.get(0).getName() : "";
-        String segundo = ranking.size() > 1 ? ranking.get(1).getName() : "";
-        String tercero = ranking.size() > 2 ? ranking.get(2).getName() : "";
-        String cuarto = ranking.size() > 3 ? ranking.get(3).getName() : "";
+        String ganador = ranking != null && !ranking.isEmpty()
+                ? safeName(ranking.get(0))
+                : "Sin ganador";
+
+        String tiempoTotal = formatear(DURACION_PARTIDA_SEGUNDOS - segundosRestantes);
+
+        String primero = formatRankingLine(1, ranking, 0);
+        String segundo = formatRankingLine(2, ranking, 1);
+        String tercero = formatRankingLine(3, ranking, 2);
+        String cuarto = formatRankingLine(4, ranking, 3);
 
         Window ventana = SwingUtilities.getWindowAncestor(this);
         if (ventana != null) {
             ventana.dispose();
         }
 
-        new EndGameWindowFrame(primero, segundo, tercero, cuarto);
+        new EndGameWindowFrame(ganador, tiempoTotal, primero, segundo, tercero, cuarto);
+    }
+
+    private String formatRankingLine(int posicion, List<Player> ranking, int index) {
+        if (ranking == null || ranking.size() <= index || ranking.get(index) == null) {
+            return posicion + ". ---";
+        }
+
+        Player player = ranking.get(index);
+        String estado = getEstado(player);
+
+        return posicion + ". "
+                + safeName(player)
+                + " - "
+                + player.getCurrentPoints()
+                + " pts"
+                + " - "
+                + estado;
+    }
+
+    private String getEstado(Player player) {
+        if (player == null) {
+            return "Sin estado";
+        }
+
+        if (player.isFinishReached()) {
+            return "Llegó a la meta";
+        }
+
+        if (player.isAlive()) {
+            return "Sigue activo";
+        }
+
+        return "Eliminado";
+    }
+
+    private String safeName(Player player) {
+        if (player == null || player.getName() == null || player.getName().isBlank()) {
+            return "Jugador";
+        }
+        return player.getName();
     }
 
     @Override

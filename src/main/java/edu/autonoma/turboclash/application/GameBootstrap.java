@@ -2,8 +2,17 @@ package edu.autonoma.turboclash.application;
 
 import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.domain.events.CollisionListener;
-import edu.autonoma.turboclash.domain.model.*;
-import edu.autonoma.turboclash.domain.services.*;
+import edu.autonoma.turboclash.domain.model.Item;
+import edu.autonoma.turboclash.domain.model.Match;
+import edu.autonoma.turboclash.domain.model.Obstacle;
+import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.domain.services.CollisionManager;
+import edu.autonoma.turboclash.domain.services.CompositeCollisionListener;
+import edu.autonoma.turboclash.domain.services.GameCollisionHandler;
+import edu.autonoma.turboclash.domain.services.GameEngine;
+import edu.autonoma.turboclash.domain.services.GameResultManager;
+import edu.autonoma.turboclash.domain.services.GameRulesManager;
+import edu.autonoma.turboclash.domain.services.GameSpawner;
 import edu.autonoma.turboclash.infrastructure.GameFactory;
 import edu.autonoma.turboclash.infrastructure.NetworkFactory;
 import edu.autonoma.turboclash.infrastructure.WorldFactory;
@@ -73,7 +82,12 @@ public class GameBootstrap {
         List<Item> items = new CopyOnWriteArrayList<>(worldFactory.createItems());
         List<Obstacle> obstacles = new CopyOnWriteArrayList<>(worldFactory.createObstacles());
 
-        CollisionListener listener = new SoundCollisionListener();
+        GameRulesManager rulesManager = new GameRulesManager(100);
+
+        CollisionListener listener = new CompositeCollisionListener(
+                new GameCollisionHandler(rulesManager),
+                new SoundCollisionListener()
+        );
 
         CollisionManager collisionManager = new CollisionManager(listener);
 
@@ -116,7 +130,7 @@ public class GameBootstrap {
                 obstacles,
                 items,
                 peer,
-                new GameRulesManager(100),
+                rulesManager,
                 new GameResultManager()
         );
 
