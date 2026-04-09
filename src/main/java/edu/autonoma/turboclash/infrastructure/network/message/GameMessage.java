@@ -16,6 +16,7 @@ public class GameMessage {
     private long time;
     private String event;
     private CarSkin carSkin;
+    private int port;
 
     public GameMessage() {}
 
@@ -31,9 +32,11 @@ public class GameMessage {
      * @param time valor del parametro {@code time}
      * @param event valor del parametro {@code event}
      * @param carSkin valor del parametro {@code carSkin}
+     * @param port valor del parametro {@code port}
      */
     public GameMessage(MessageType type, String playerId, String playerName,
-                       double posX, double posY, int score, long time, String event, CarSkin carSkin) {
+                       double posX, double posY, int score, long time,
+                       String event, CarSkin carSkin, int port) {
 
         this.type = type;
         this.playerId = playerId != null ? playerId : "unknown";
@@ -44,6 +47,7 @@ public class GameMessage {
         this.time = time;
         this.event = event;
         this.carSkin = carSkin;
+        this.port = port;
     }
 
     public MessageType getType() { return type; }
@@ -73,6 +77,9 @@ public class GameMessage {
     public CarSkin getCarSkin() { return carSkin; }
     public void setCarSkin(CarSkin carSkin) { this.carSkin = carSkin; }
 
+    public int getPort() { return port; }
+    public void setPort(int port) { this.port = port; }
+
     /**
      * Ejecuta la operacion {@code serialize}.
      *
@@ -87,7 +94,8 @@ public class GameMessage {
                 score + "|" +
                 time + "|" +
                 safe(event) + "|" +
-                safe(carSkin != null ? carSkin.name() : "");
+                safe(carSkin != null ? carSkin.name() : "") + "|" +
+                port;
     }
 
     /**
@@ -104,7 +112,7 @@ public class GameMessage {
 
         String[] parts = data.split("\\|", -1);
 
-        if (parts.length < 9) {
+        if (parts.length < 10) {
             throw new IllegalArgumentException("Mensaje UDP inválido: " + data);
         }
 
@@ -123,6 +131,8 @@ public class GameMessage {
             if (!parts[8].isBlank()) {
                 msg.setCarSkin(CarSkin.valueOf(parts[8].trim()));
             }
+
+            msg.setPort(Integer.parseInt(parts[9].trim()));
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Error al parsear mensaje UDP: " + data, e);

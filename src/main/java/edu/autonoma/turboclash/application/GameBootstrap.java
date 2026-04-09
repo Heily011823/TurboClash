@@ -4,14 +4,18 @@ import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.domain.events.CollisionListener;
 import edu.autonoma.turboclash.domain.model.*;
 import edu.autonoma.turboclash.domain.services.*;
-import edu.autonoma.turboclash.infrastructure.*;
-import edu.autonoma.turboclash.infrastructure.network.core.*;
+import edu.autonoma.turboclash.infrastructure.GameFactory;
+import edu.autonoma.turboclash.infrastructure.NetworkFactory;
+import edu.autonoma.turboclash.infrastructure.WorldFactory;
+import edu.autonoma.turboclash.infrastructure.network.core.GameNetworkService;
+import edu.autonoma.turboclash.infrastructure.network.core.NetworkConfig;
+import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
 import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.infrastructure.network.handler.GameMessageHandler;
 import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
 import edu.autonoma.turboclash.infrastructure.sound.SoundCollisionListener;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -71,8 +75,7 @@ public class GameBootstrap {
 
         CollisionListener listener = new SoundCollisionListener();
 
-        CollisionManager collisionManager =
-                new CollisionManager(listener);
+        CollisionManager collisionManager = new CollisionManager(listener);
 
         GameEngine engine = new GameEngine(
                 match,
@@ -84,8 +87,7 @@ public class GameBootstrap {
         GameSpawner spawner = new GameSpawner(items, obstacles);
         spawner.start();
 
-        GameMessageHandler messageHandler =
-                new GameMessageHandler(match);
+        GameMessageHandler messageHandler = new GameMessageHandler(match);
 
         GameMessageFactory messageFactory = new GameMessageFactory();
 
@@ -99,6 +101,7 @@ public class GameBootstrap {
 
         messageHandler.setPeer(peer);
         messageHandler.setMessageFactory(messageFactory);
+
         peer.iniciar();
 
         NetworkConfig networkConfig = new NetworkConfig(config);

@@ -14,7 +14,6 @@ public class GameNetworkService {
     private final UdpPeer peer;
     private final GameMessageFactory messageFactory;
     private final NetworkConfig networkConfig;
-
     private volatile boolean connecting = false;
 
     private static final int EXPECTED_REMOTE_PLAYERS = 3;
@@ -36,7 +35,7 @@ public class GameNetworkService {
             return;
         }
 
-        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_JOINED);
+        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_JOINED, peer.getLocalPort());
         peer.enviarATodos(msg);
     }
 
@@ -45,7 +44,7 @@ public class GameNetworkService {
             return;
         }
 
-        GameMessage msg = messageFactory.create(player, MessageType.HANDSHAKE);
+        GameMessage msg = messageFactory.create(player, MessageType.HANDSHAKE, peer.getLocalPort());
         peer.enviarATodos(msg);
     }
 
@@ -54,7 +53,7 @@ public class GameNetworkService {
             return;
         }
 
-        GameMessage msg = messageFactory.create(player, MessageType.MOVEMENT);
+        GameMessage msg = messageFactory.create(player, MessageType.MOVEMENT, peer.getLocalPort());
         msg.setScore(player.getCurrentPoints());
         peer.enviarATodos(msg);
     }
@@ -64,7 +63,7 @@ public class GameNetworkService {
             return;
         }
 
-        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_LEFT);
+        GameMessage msg = messageFactory.create(player, MessageType.PLAYER_LEFT, peer.getLocalPort());
         peer.enviarATodos(msg);
     }
 
@@ -73,9 +72,13 @@ public class GameNetworkService {
             return;
         }
 
-        GameMessage msg = messageFactory.createDiscovery();
+        GameMessage msg = messageFactory.createDiscovery(peer.getLocalPort());
 
         for (int port : networkConfig.getPorts()) {
+            if (port == peer.getLocalPort()) {
+                continue;
+            }
+
             try {
                 peer.getSender().enviarMensaje(msg, "255.255.255.255", port);
             } catch (Exception e) {
@@ -84,9 +87,6 @@ public class GameNetworkService {
         }
     }
 
-    /**
-     * Solo envía el join; no agrega el local al match remoto.
-     */
     public void join(GameContext context, Player player) {
         if (context == null || player == null || !peer.isActivo()) {
             return;
@@ -95,9 +95,6 @@ public class GameNetworkService {
         sendJoin(player);
     }
 
-    /**
-     * Inicia conexión P2P.
-     */
     public void connect(GameContext context, Player player) {
         if (context == null || player == null || !peer.isActivo() || connecting) {
             return;
@@ -120,14 +117,12 @@ public class GameNetworkService {
                             + " | remotos detectados: " + remoteCount);
 
                     if (remoteCount >= EXPECTED_REMOTE_PLAYERS) {
-                        System.out.println("Conexión completa. Remotos detectados: " + remoteCount);
                         break;
                     }
 
                     sendHandshake(player);
                     sendJoin(player);
 
-                    // discovery solo como apoyo, no como base
                     if (i < 2) {
                         discover();
                     }
@@ -140,13 +135,6 @@ public class GameNetworkService {
                     }
                 }
 
-                System.out.println("Jugadores remotos conectados: "
-                        + context.getMatch().getRemotePlayers().size());
-
-            } catch (Exception e) {
-                if (peer.isActivo()) {
-                    System.err.println("Error durante connect(): " + e.getMessage());
-                }
             } finally {
                 connecting = false;
             }

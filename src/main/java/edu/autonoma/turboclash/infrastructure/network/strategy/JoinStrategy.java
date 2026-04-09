@@ -7,14 +7,13 @@ import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
 /**
- * Representa la responsabilidad de {@code JoinStrategy} en las estrategias de mensajeria.
+ * Estrategia para agregar jugadores remotos.
  */
 public class JoinStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
     private static final int CAR_HEIGHT = 50;
     private static final double START_X = 80;
-    private static final double[] LANES_Y = {120, 220, 320, 420};
 
     private final Match match;
 
@@ -57,9 +56,10 @@ public class JoinStrategy implements IMessageStrategy {
 
         if (existing != null) {
             if (existing.getCar() != null) {
-                double x = message.getPosX() > 0 ? message.getPosX() : existing.getCar().getX();
-                double y = message.getPosY() > 0 ? message.getPosY() : existing.getCar().getY();
-                existing.getCar().setPosition(x, y);
+                existing.getCar().setPosition(
+                        message.getPosX() > 0 ? message.getPosX() : existing.getCar().getX(),
+                        message.getPosY() > 0 ? message.getPosY() : existing.getCar().getY()
+                );
             }
             existing.setScore(message.getScore());
             return;
@@ -71,7 +71,7 @@ public class JoinStrategy implements IMessageStrategy {
         }
 
         double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
-        double posY = message.getPosY() > 0 ? message.getPosY() : resolveLaneY();
+        double posY = resolveLaneYByPort(message.getPort());
 
         Car car = new Car(
                 messagePlayerId != null ? messagePlayerId : messagePlayerName,
@@ -92,39 +92,17 @@ public class JoinStrategy implements IMessageStrategy {
         match.addPlayer(newPlayer);
 
         System.out.println("Jugador agregado: " + messagePlayerName
-                + " en carril Y=" + posY);
-        System.out.println("Remotos actuales: " + match.getRemotePlayers().size());
+                + " puerto=" + message.getPort()
+                + " carrilY=" + posY);
     }
 
-    private double resolveLaneY() {
-        boolean[] used = new boolean[LANES_Y.length];
-
-        Player local = match.getLocalPlayer();
-        if (local != null && local.getCar() != null) {
-            markUsedLane(local.getCar().getY(), used);
-        }
-
-        for (Player remote : match.getRemotePlayers()) {
-            if (remote != null && remote.getCar() != null) {
-                markUsedLane(remote.getCar().getY(), used);
-            }
-        }
-
-        for (int i = 0; i < LANES_Y.length; i++) {
-            if (!used[i]) {
-                return LANES_Y[i];
-            }
-        }
-
-        return LANES_Y[LANES_Y.length - 1];
-    }
-
-    private void markUsedLane(double y, boolean[] used) {
-        for (int i = 0; i < LANES_Y.length; i++) {
-            if (Math.abs(LANES_Y[i] - y) < 20) {
-                used[i] = true;
-                return;
-            }
-        }
+    private double resolveLaneYByPort(int port) {
+        return switch (port) {
+            case 5001 -> 120;
+            case 5002 -> 220;
+            case 5003 -> 320;
+            case 5004 -> 420;
+            default -> 120;
+        };
     }
 }
