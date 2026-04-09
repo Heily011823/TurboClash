@@ -6,6 +6,9 @@ import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
+/**
+ * Maneja la sincronización de movimiento de jugadores remotos.
+ */
 public class MoveStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
@@ -13,9 +16,9 @@ public class MoveStrategy implements IMessageStrategy {
     private static final double START_X = 80;
 
     /**
-     * Debe coincidir con GameWindow.
+     * Debe coincidir con los carriles base del GameWindow responsive.
      */
-    private static final int[] LANE_Y = {80, 220, 360, 500};
+    private static final int[] LANE_Y = {140, 280, 420, 560};
 
     private final Match match;
 
@@ -37,7 +40,6 @@ public class MoveStrategy implements IMessageStrategy {
         }
 
         Player localPlayer = match.getLocalPlayer();
-
         if (isLocalPlayer(localPlayer, messagePlayerId, messagePlayerName)) {
             return;
         }
@@ -50,7 +52,7 @@ public class MoveStrategy implements IMessageStrategy {
 
             System.out.println("[MOVE] Remoto creado desde movimiento: "
                     + remote.getName()
-                    + " id=" + remote.getId());
+                    + " | id=" + remote.getId());
         }
 
         if (remote.getCar() != null) {
@@ -65,11 +67,12 @@ public class MoveStrategy implements IMessageStrategy {
                     nextLives
             );
 
-            System.out.println("[MOVE] " + remote.getName()
-                    + " x=" + nextX
-                    + " y=" + nextY
-                    + " score=" + message.getScore()
-                    + " lives=" + nextLives);
+            System.out.println("[MOVE] "
+                    + remote.getName()
+                    + " | x=" + nextX
+                    + " | y=" + nextY
+                    + " | score=" + message.getScore()
+                    + " | lives=" + nextLives);
         }
     }
 
@@ -95,6 +98,7 @@ public class MoveStrategy implements IMessageStrategy {
 
         Player remote = new Player(messagePlayerId, messagePlayerName, car);
         remote.setScore(message.getScore());
+
         return remote;
     }
 
@@ -103,32 +107,37 @@ public class MoveStrategy implements IMessageStrategy {
             return false;
         }
 
-        boolean sameLocalById =
+        boolean sameId =
                 localPlayer.getId() != null
                         && !messagePlayerId.isBlank()
                         && localPlayer.getId().equals(messagePlayerId);
 
-        boolean sameLocalByName =
+        boolean sameName =
                 localPlayer.getName() != null
                         && !messagePlayerName.isBlank()
                         && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
 
-        return sameLocalById || sameLocalByName;
+        return sameId || sameName;
     }
 
     private double resolveLaneY(GameMessage message) {
+        int laneIndex = resolveLaneIndex(message);
+        return LANE_Y[laneIndex];
+    }
+
+    private int resolveLaneIndex(GameMessage message) {
         int byPort = resolveLaneIndexByPort(message.getPort());
         if (byPort >= 0) {
-            return LANE_Y[byPort];
+            return byPort;
         }
 
         String playerId = safe(message.getPlayerId());
         int byId = resolveLaneIndexById(playerId);
         if (byId >= 0) {
-            return LANE_Y[byId];
+            return byId;
         }
 
-        return LANE_Y[0];
+        return 0;
     }
 
     private int resolveLaneIndexByPort(int port) {

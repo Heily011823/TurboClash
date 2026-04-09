@@ -36,7 +36,7 @@ public class GameApplication {
         GameContext context = bootstrap.init(puerto, playerName);
         Player localPlayer = context.getLocalPlayer();
 
-        // IMPORTANTE: registrar el local real en la vista
+        // Registrar el local real para que en espera solo se muestre ese carro
         view.setLocalPlayer(localPlayer);
 
         List<PeerConfigEntry> peers = PeerConfigLoader.loadFromResource("/peers.json");
@@ -71,7 +71,7 @@ public class GameApplication {
                 return;
             }
 
-            // Aquí sí empieza visualmente la partida
+            // Aquí sí comienza visualmente la partida
             view.showGameStarted();
             view.updateCars(context.getPlayers());
 
@@ -118,7 +118,7 @@ public class GameApplication {
                     return;
                 }
 
-                // Primero countdown, luego startGame
+                // Primero countdown, luego arranca el juego real
                 view.setOnCountdownFinished(startGame);
                 view.startCountdown();
             });

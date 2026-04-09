@@ -6,6 +6,9 @@ import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
+/**
+ * Maneja la incorporación de jugadores remotos al match.
+ */
 public class JoinStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
@@ -13,9 +16,9 @@ public class JoinStrategy implements IMessageStrategy {
     private static final double START_X = 80;
 
     /**
-     * Debe coincidir con GameWindow.
+     * Debe coincidir con los carriles base del GameWindow responsive.
      */
-    private static final int[] LANE_Y = {80, 220, 360, 500};
+    private static final int[] LANE_Y = {140, 280, 420, 560};
 
     private final Match match;
 
@@ -29,7 +32,6 @@ public class JoinStrategy implements IMessageStrategy {
             return;
         }
 
-        Player localPlayer = match.getLocalPlayer();
         String messagePlayerId = safe(message.getPlayerId());
         String messagePlayerName = safe(message.getPlayerName());
 
@@ -37,6 +39,7 @@ public class JoinStrategy implements IMessageStrategy {
             return;
         }
 
+        Player localPlayer = match.getLocalPlayer();
         if (isLocalPlayer(localPlayer, messagePlayerId, messagePlayerName)) {
             return;
         }
@@ -47,6 +50,21 @@ public class JoinStrategy implements IMessageStrategy {
             updateExistingPlayer(existing, message);
             return;
         }
+
+        Player newPlayer = createRemotePlayer(message);
+        match.addPlayer(newPlayer);
+
+        System.out.println("[JOIN] Remoto agregado: "
+                + newPlayer.getName()
+                + " | id=" + newPlayer.getId()
+                + " | x=" + newPlayer.getCar().getX()
+                + " | y=" + newPlayer.getCar().getY()
+                + " | lives=" + newPlayer.getLives());
+    }
+
+    private Player createRemotePlayer(GameMessage message) {
+        String messagePlayerId = safe(message.getPlayerId());
+        String messagePlayerName = safe(message.getPlayerName());
 
         String image = resolveImage(message);
         double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
@@ -64,18 +82,10 @@ public class JoinStrategy implements IMessageStrategy {
         int lives = message.getLives() > 0 ? message.getLives() : 3;
         car.setLives(lives);
 
-        Player newPlayer = new Player(messagePlayerId, messagePlayerName, car);
-        newPlayer.setScore(message.getScore());
+        Player player = new Player(messagePlayerId, messagePlayerName, car);
+        player.setScore(message.getScore());
 
-        match.addPlayer(newPlayer);
-
-        System.out.println("[JOIN] Remoto agregado: "
-                + newPlayer.getName()
-                + " id=" + newPlayer.getId()
-                + " x=" + posX
-                + " y=" + posY
-                + " lives=" + lives
-                + " skin=" + image);
+        return player;
     }
 
     private void updateExistingPlayer(Player existing, GameMessage message) {
@@ -94,8 +104,9 @@ public class JoinStrategy implements IMessageStrategy {
 
         System.out.println("[JOIN] Remoto actualizado: "
                 + existing.getName()
-                + " x=" + existing.getCar().getX()
-                + " y=" + existing.getCar().getY());
+                + " | x=" + existing.getCar().getX()
+                + " | y=" + existing.getCar().getY()
+                + " | lives=" + existing.getLives());
     }
 
     private boolean isLocalPlayer(Player localPlayer, String messagePlayerId, String messagePlayerName) {
@@ -103,32 +114,37 @@ public class JoinStrategy implements IMessageStrategy {
             return false;
         }
 
-        boolean sameAsLocalById =
+        boolean sameId =
                 localPlayer.getId() != null
                         && !messagePlayerId.isBlank()
                         && localPlayer.getId().equals(messagePlayerId);
 
-        boolean sameAsLocalByName =
+        boolean sameName =
                 localPlayer.getName() != null
                         && !messagePlayerName.isBlank()
                         && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
 
-        return sameAsLocalById || sameAsLocalByName;
+        return sameId || sameName;
     }
 
     private double resolveLaneY(GameMessage message) {
+        int laneIndex = resolveLaneIndex(message);
+        return LANE_Y[laneIndex];
+    }
+
+    private int resolveLaneIndex(GameMessage message) {
         int byPort = resolveLaneIndexByPort(message.getPort());
         if (byPort >= 0) {
-            return LANE_Y[byPort];
+            return byPort;
         }
 
         String playerId = safe(message.getPlayerId());
         int byId = resolveLaneIndexById(playerId);
         if (byId >= 0) {
-            return LANE_Y[byId];
+            return byId;
         }
 
-        return LANE_Y[0];
+        return 0;
     }
 
     private int resolveLaneIndexByPort(int port) {
