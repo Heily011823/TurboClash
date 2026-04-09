@@ -1,7 +1,5 @@
 package edu.autonoma.turboclash.presentation.view;
 
-
-
 import edu.autonoma.turboclash.domain.model.Player;
 
 import javax.swing.*;
@@ -14,6 +12,8 @@ import java.util.List;
  */
 public class FondoAnimadoPanel extends JPanel {
 
+    private static final int DURACION_PARTIDA_SEGUNDOS = 180;
+
     private Image carretera;
     private Image meta;
 
@@ -23,10 +23,11 @@ public class FondoAnimadoPanel extends JPanel {
     private Timer timerMovimiento;
     private Timer timerTiempo;
 
-    private int segundosRestantes = 180;
+    private int segundosRestantes = DURACION_PARTIDA_SEGUNDOS;
     private boolean tiempoTerminado = false;
     private boolean mostrarMeta = false;
     private boolean juegoTerminado = false;
+    private boolean juegoIniciado = false;
 
     private int metaX;
 
@@ -51,17 +52,15 @@ public class FondoAnimadoPanel extends JPanel {
         }
 
         metaX = GameViewport.WIDTH;
-
-        iniciarMovimiento();
-        iniciarTiempo();
+        crearTimers();
     }
 
     /**
-     * Inicia {@code Movimiento}.
+     * Crea los timers pero NO los inicia.
      */
-    private void iniciarMovimiento() {
+    private void crearTimers() {
         timerMovimiento = new Timer(15, e -> {
-            if (juegoTerminado) return;
+            if (juegoTerminado || !juegoIniciado) return;
 
             x1 -= velocidad;
 
@@ -78,15 +77,8 @@ public class FondoAnimadoPanel extends JPanel {
             repaint();
         });
 
-        timerMovimiento.start();
-    }
-
-    /**
-     * Inicia {@code Tiempo}.
-     */
-    private void iniciarTiempo() {
         timerTiempo = new Timer(1000, e -> {
-            if (juegoTerminado) return;
+            if (juegoTerminado || !juegoIniciado) return;
 
             if (!tiempoTerminado) {
                 segundosRestantes--;
@@ -101,8 +93,63 @@ public class FondoAnimadoPanel extends JPanel {
 
             repaint();
         });
+    }
 
-        timerTiempo.start();
+    /**
+     * Inicia el movimiento y el tiempo solo cuando empieza la partida.
+     */
+    public void startGame() {
+        if (juegoTerminado || juegoIniciado) {
+            return;
+        }
+
+        juegoIniciado = true;
+
+        if (timerMovimiento != null && !timerMovimiento.isRunning()) {
+            timerMovimiento.start();
+        }
+
+        if (timerTiempo != null && !timerTiempo.isRunning()) {
+            timerTiempo.start();
+        }
+
+        repaint();
+    }
+
+    public void pauseGame() {
+        if (timerMovimiento != null) {
+            timerMovimiento.stop();
+        }
+        if (timerTiempo != null) {
+            timerTiempo.stop();
+        }
+    }
+
+    public void resumeGame() {
+        if (juegoTerminado || !juegoIniciado) {
+            return;
+        }
+
+        if (timerMovimiento != null && !timerMovimiento.isRunning()) {
+            timerMovimiento.start();
+        }
+        if (timerTiempo != null && !timerTiempo.isRunning()) {
+            timerTiempo.start();
+        }
+    }
+
+    public void resetGame() {
+        pauseGame();
+
+        x1 = 0;
+        segundosRestantes = DURACION_PARTIDA_SEGUNDOS;
+        tiempoTerminado = false;
+        mostrarMeta = false;
+        juegoTerminado = false;
+        juegoIniciado = false;
+        metaX = GameViewport.WIDTH;
+
+        repaint();
     }
 
     /**
@@ -132,6 +179,14 @@ public class FondoAnimadoPanel extends JPanel {
         return juegoTerminado;
     }
 
+    public boolean isJuegoIniciado() {
+        return juegoIniciado;
+    }
+
+    public int getSegundosRestantes() {
+        return segundosRestantes;
+    }
+
     /**
      * Ejecuta la operacion {@code terminarJuego}.
      *
@@ -141,29 +196,75 @@ public class FondoAnimadoPanel extends JPanel {
         if (juegoTerminado) return;
 
         juegoTerminado = true;
+        juegoIniciado = false;
 
-        timerMovimiento.stop();
-        timerTiempo.stop();
+        if (timerMovimiento != null) {
+            timerMovimiento.stop();
+        }
+        if (timerTiempo != null) {
+            timerTiempo.stop();
+        }
 
-        String primero = ranking.size() > 0 ? ranking.get(0).getName() : "";
-        String segundo = ranking.size() > 1 ? ranking.get(1).getName() : "";
-        String tercero = ranking.size() > 2 ? ranking.get(2).getName() : "";
-        String cuarto = ranking.size() > 3 ? ranking.get(3).getName() : "";
+        String ganador = ranking != null && !ranking.isEmpty()
+                ? safeName(ranking.get(0))
+                : "Sin ganador";
+
+        String tiempoTotal = formatear(DURACION_PARTIDA_SEGUNDOS - segundosRestantes);
+
+        String primero = formatRankingLine(1, ranking, 0);
+        String segundo = formatRankingLine(2, ranking, 1);
+        String tercero = formatRankingLine(3, ranking, 2);
+        String cuarto = formatRankingLine(4, ranking, 3);
 
         Window ventana = SwingUtilities.getWindowAncestor(this);
         if (ventana != null) {
             ventana.dispose();
         }
 
-        new EndGameWindowFrame(primero, segundo, tercero, cuarto);
+        new EndGameWindowFrame(ganador, tiempoTotal, primero, segundo, tercero, cuarto);
+    }
+
+    private String formatRankingLine(int posicion, List<Player> ranking, int index) {
+        if (ranking == null || ranking.size() <= index || ranking.get(index) == null) {
+            return posicion + ". ---";
+        }
+
+        Player player = ranking.get(index);
+        String estado = getEstado(player);
+
+        return posicion + ". "
+                + safeName(player)
+                + " - "
+                + player.getCurrentPoints()
+                + " pts"
+                + " - "
+                + estado;
+    }
+
+    private String getEstado(Player player) {
+        if (player == null) {
+            return "Sin estado";
+        }
+
+        if (player.isFinishReached()) {
+            return "Llegó a la meta";
+        }
+
+        if (player.isAlive()) {
+            return "Sigue activo";
+        }
+
+        return "Eliminado";
+    }
+
+    private String safeName(Player player) {
+        if (player == null || player.getName() == null || player.getName().isBlank()) {
+            return "Jugador";
+        }
+        return player.getName();
     }
 
     @Override
-    /**
-     * Ejecuta la operacion {@code paintComponent}.
-     *
-     * @param g contexto grafico utilizado para el renderizado
-     */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 

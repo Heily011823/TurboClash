@@ -9,10 +9,16 @@ import java.awt.event.ActionListener;
  */
 public class EndGameWindow {
     public JPanel panel1;
+
+    private JLabel tituloLabel;
+    private JLabel ganadorLabel;
+    private JLabel tiempoTotalLabel;
+
     private JLabel PrimerLugar;
     private JLabel SegundoLugar;
     private JLabel TercerLugar;
     private JLabel CuartoLugar;
+
     private JButton btnFin;
     private JButton btnReiniciar;
 
@@ -24,13 +30,17 @@ public class EndGameWindow {
         panel1.setOpaque(false);
         panel1.setPreferredSize(new Dimension(1000, 700));
 
-        PrimerLugar = crearLabel("", 242, 208, 300, 50);
-        SegundoLugar = crearLabel("", 120, 260, 250, 50);
-        TercerLugar = crearLabel("", 400, 260, 250, 50);
-        CuartoLugar = crearLabel("", 240, 440, 300, 50);
+        tituloLabel = crearLabel("RESULTADOS FINALES", 200, 35, 400, 40, 28, new Color(255, 255, 255));
+        ganadorLabel = crearLabel("", 160, 90, 500, 35, 22, new Color(255, 215, 0));
+        tiempoTotalLabel = crearLabel("", 220, 125, 350, 30, 18, new Color(230, 230, 230));
 
-        btnFin = crearBotonImagen("/image/btn_fin.png", 540, 510, 180, 55);
-        btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 70, 510, 180, 55);
+        PrimerLugar = crearLabel("", 170, 190, 460, 40, 20, new Color(255, 215, 0));
+        SegundoLugar = crearLabel("", 120, 245, 320, 40, 18, new Color(230, 230, 230));
+        TercerLugar = crearLabel("", 360, 245, 320, 40, 18, new Color(205, 127, 50));
+        CuartoLugar = crearLabel("", 170, 405, 460, 40, 18, new Color(220, 220, 220));
+
+        btnFin = crearBotonImagen("/image/btn_fin.png", 520, 500, 180, 55);
+        btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 80, 500, 180, 55);
 
         if (btnFin.getIcon() == null) {
             btnFin.setText("FIN");
@@ -42,6 +52,9 @@ public class EndGameWindow {
             btnReiniciar.setContentAreaFilled(true);
         }
 
+        panel1.add(tituloLabel);
+        panel1.add(ganadorLabel);
+        panel1.add(tiempoTotalLabel);
         panel1.add(PrimerLugar);
         panel1.add(SegundoLugar);
         panel1.add(TercerLugar);
@@ -52,33 +65,17 @@ public class EndGameWindow {
 
     /**
      * Ejecuta la operacion {@code crearLabel}.
-     *
-     * @param texto valor del parametro {@code texto}
-     * @param x coordenada horizontal utilizada en la operacion
-     * @param y coordenada vertical utilizada en la operacion
-     * @param w ancho requerido por la operacion
-     * @param h alto requerido por la operacion
-     * @return resultado de la operacion {@code crearLabel}
      */
-    private JLabel crearLabel(String texto, int x, int y, int w, int h) {
+    private JLabel crearLabel(String texto, int x, int y, int w, int h, int fontSize, Color color) {
         JLabel label = new JLabel(texto, SwingConstants.CENTER);
-
         label.setBounds(x, y, w, h);
-
-        label.setForeground(new Color(255, 215, 0));
-        label.setFont(new Font("Arial", Font.BOLD, 20));
+        label.setForeground(color);
+        label.setFont(new Font("Arial", Font.BOLD, fontSize));
         return label;
     }
 
     /**
      * Ejecuta la operacion {@code crearBotonImagen}.
-     *
-     * @param ruta valor del parametro {@code ruta}
-     * @param x coordenada horizontal utilizada en la operacion
-     * @param y coordenada vertical utilizada en la operacion
-     * @param w ancho requerido por la operacion
-     * @param h alto requerido por la operacion
-     * @return resultado de la operacion {@code crearBotonImagen}
      */
     private JButton crearBotonImagen(String ruta, int x, int y, int w, int h) {
         JButton boton = new JButton();
@@ -101,14 +98,18 @@ public class EndGameWindow {
     }
 
     /**
-     * Actualiza el valor de {@code Resultados}.
-     *
-     * @param primero valor del parametro {@code primero}
-     * @param segundo valor del parametro {@code segundo}
-     * @param tercero valor del parametro {@code tercero}
-     * @param cuarto valor del parametro {@code cuarto}
+     * Actualiza los resultados finales.
      */
-    public void setResultados(String primero, String segundo, String tercero, String cuarto) {
+    public void setResultados(String ganador,
+                              String tiempoTotal,
+                              String primero,
+                              String segundo,
+                              String tercero,
+                              String cuarto) {
+
+        ganadorLabel.setText("Ganador: " + ganador);
+        tiempoTotalLabel.setText("Tiempo total de partida: " + tiempoTotal);
+
         PrimerLugar.setText(primero);
         SegundoLugar.setText(segundo);
         TercerLugar.setText(tercero);
@@ -117,8 +118,6 @@ public class EndGameWindow {
 
     /**
      * Ejecuta la operacion {@code addFinListener}.
-     *
-     * @param listener valor del parametro {@code listener}
      */
     public void addFinListener(ActionListener listener) {
         btnFin.addActionListener(listener);
@@ -126,8 +125,6 @@ public class EndGameWindow {
 
     /**
      * Ejecuta la operacion {@code addReiniciarListener}.
-     *
-     * @param listener valor del parametro {@code listener}
      */
     public void addReiniciarListener(ActionListener listener) {
         btnReiniciar.addActionListener(listener);

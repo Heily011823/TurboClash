@@ -8,6 +8,8 @@ import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,15 +30,31 @@ public class GameWindow {
     private final Map<String, JLabel> carLabels = new HashMap<>();
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
-    private final Map<String, JLabel> healthLabels = new HashMap<>();
+    private final Map<String, JLabel> heartLabels = new HashMap<>();
+    private final Map<String, JLabel> nameLabels = new HashMap<>();
 
     private FondoAnimadoPanel fondoAnimadoPanel;
 
-    private static final int CAR_WIDTH = 100;
-    private static final int CAR_HEIGHT = 50;
+    /**
+     * Tamaño base de diseño.
+     */
+    private static final int BASE_WIDTH = 1000;
+    private static final int BASE_HEIGHT = 700;
+
     private static final int START_X = 80;
 
-    private static final int[] START_LANES_Y = {80, 220, 360, 500};
+    /**
+     * Estado visual del juego.
+     * false = esperando jugadores
+     * true = partida iniciada
+     */
+    private boolean gameStarted = false;
+
+    /**
+     * Jugador local real.
+     */
+    private String localPlayerId;
+    private String localPlayerName;
 
     public GameWindow() {
         if (panel1 == null) {
@@ -45,7 +63,7 @@ public class GameWindow {
 
         panel1.setLayout(null);
         panel1.setOpaque(false);
-        panel1.setPreferredSize(new Dimension(1000, 700));
+        panel1.setPreferredSize(new Dimension(BASE_WIDTH, BASE_HEIGHT));
 
         Puntaje = createScoreLabel();
         panel1.add(Puntaje);
@@ -56,20 +74,35 @@ public class GameWindow {
         initializeCountdownUI();
 
         btnClose = new JButton("X");
-        btnClose.setBounds(930, 20, 55, 55);
         btnClose.setFocusPainted(false);
         btnClose.setBorderPainted(false);
         btnClose.setBackground(new Color(150, 0, 0));
         btnClose.setForeground(Color.WHITE);
-        btnClose.setFont(new Font("Arial", Font.BOLD, 18));
         btnClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panel1.add(btnClose);
 
         btnClose.addActionListener(e -> System.exit(0));
+
+        panel1.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateResponsiveLayout();
+                refreshAllSprites();
+            }
+        });
+
+        SwingUtilities.invokeLater(() -> {
+            updateResponsiveLayout();
+            refreshAllSprites();
+        });
     }
 
     public void setBackgroundPanel(FondoAnimadoPanel fondoAnimadoPanel) {
         this.fondoAnimadoPanel = fondoAnimadoPanel;
+    }
+
+    public FondoAnimadoPanel getBackgroundPanel() {
+        return fondoAnimadoPanel;
     }
 
     public JPanel getPanel() {
@@ -84,18 +117,44 @@ public class GameWindow {
         this.onCountdownFinished = action;
     }
 
+    /**
+     * Registra cuál es el jugador local real.
+     */
+    public void setLocalPlayer(Player localPlayer) {
+        if (localPlayer == null) {
+            this.localPlayerId = null;
+            this.localPlayerName = null;
+            return;
+        }
+
+        this.localPlayerId = localPlayer.getId();
+        this.localPlayerName = localPlayer.getName();
+    }
+
     public void showWaitingPlayers() {
-        statusLabel.setText("Esperando 4 jugadores...");
+        gameStarted = false;
+        statusLabel.setText("Esperando jugadores...");
         statusLabel.setVisible(true);
+        panel1.repaint();
+    }
+
+    public void showWaitingPlayers(int connectedPlayers, int expectedPlayers) {
+        gameStarted = false;
+        statusLabel.setText("Esperando jugadores... " + connectedPlayers + "/" + expectedPlayers);
+        statusLabel.setVisible(true);
+        panel1.repaint();
     }
 
     public void showGameStarted() {
+        gameStarted = true;
         statusLabel.setVisible(false);
+        panel1.repaint();
     }
 
     public void updateScore(int points) {
         Puntaje.setText("Puntaje: " + points);
     }
+
 
     public void updateCars(List<Player> players) {
         if (players == null) {
@@ -107,57 +166,91 @@ public class GameWindow {
                 continue;
             }
 
-            updateCarPosition(player.getCar());
+            boolean visible = gameStarted || isLocalPlayer(player);
+            updateCarPosition(player, visible);
         }
 
         panel1.revalidate();
         panel1.repaint();
     }
 
-    public void updateCarPosition(Car car) {
+
+
+    private void updateCarPosition(Player player, boolean visible) {
+        if (player == null) {
+            return;
+        }
+
+        Car car = player.getCar();
         if (car == null || car.getId() == null) {
             return;
         }
 
+        int carWidth = getResponsiveCarWidth();
+        int carHeight = getResponsiveCarHeight();
+
         JLabel lbl = carLabels.computeIfAbsent(car.getId(), id -> {
             String imagePath = normalizeCarImagePath(car.getCarImage());
-            JLabel newLbl = new JLabel(getIcon(imagePath, CAR_WIDTH, CAR_HEIGHT));
+            JLabel newLbl = new JLabel(getIcon(imagePath, carWidth, carHeight));
             newLbl.setOpaque(false);
             panel1.add(newLbl);
             panel1.setComponentZOrder(newLbl, 0);
             return newLbl;
         });
 
-        int drawX = Math.max(0, (int) car.getX());
-        int drawY = Math.max(0, (int) car.getY());
+        String imagePath = normalizeCarImagePath(car.getCarImage());
+        lbl.setIcon(getIcon(imagePath, carWidth, carHeight));
 
-        lbl.setBounds(drawX, drawY, CAR_WIDTH, CAR_HEIGHT);
-        lbl.setVisible(car.isActive());
+        int drawX = Math.max(0, scaleX((int) car.getX()));
+        int drawY = Math.max(0, scaleY((int) car.getY()));
 
-        updateHealthVisual(drawX, drawY, car.getId(), car.isActive(), car.getLives());
+        lbl.setBounds(drawX, drawY, carWidth, carHeight);
+        lbl.setVisible(visible && car.isActive());
+
+        updateHealthVisual(drawX, drawY, car.getId(), visible && car.isActive(), car.getLives());
+        updateNameVisual(drawX, drawY, player.getName(), car.getId(), visible && car.isActive());
     }
 
-    public void updateHealth(Car car, int lives) {
-        if (car == null || car.getId() == null) {
-            return;
-        }
 
-        updateHealthVisual((int) car.getX(), (int) car.getY(), car.getId(), car.isActive(), lives);
-    }
+
 
     private void updateHealthVisual(int x, int y, String carId, boolean active, int lives) {
+        int heartSize = Math.max(14, scale(20));
+        int spacing = Math.max(16, scale(22));
+        int offsetY = Math.max(10, scale(28));
+
         for (int i = 0; i < 3; i++) {
             String heartKey = carId + "_heart_" + i;
 
-            JLabel heart = healthLabels.computeIfAbsent(heartKey, id -> {
-                JLabel lbl = new JLabel(getIcon("/image/Health.png", 25, 25));
+            JLabel heart = heartLabels.computeIfAbsent(heartKey, id -> {
+                JLabel lbl = new JLabel();
                 panel1.add(lbl);
                 return lbl;
             });
 
-            heart.setBounds(x + (i * 28), y - 30, 25, 25);
+            heart.setIcon(getIcon("/image/Health.png", heartSize, heartSize));
+            heart.setBounds(x + (i * spacing), y - offsetY, heartSize, heartSize);
             heart.setVisible(i < lives && active);
         }
+    }
+
+    private void updateNameVisual(int x, int y, String playerName, String carId, boolean active) {
+        int fontSize = Math.max(10, scale(14));
+        int width = Math.max(90, scale(130));
+        int height = Math.max(18, scale(20));
+        int offsetY = Math.max(28, scale(50));
+
+        JLabel nameLabel = nameLabels.computeIfAbsent(carId, id -> {
+            JLabel lbl = new JLabel("", SwingConstants.CENTER);
+            lbl.setForeground(Color.WHITE);
+            panel1.add(lbl);
+            return lbl;
+        });
+
+        nameLabel.setFont(new Font("Arial", Font.BOLD, fontSize));
+        nameLabel.setText(playerName != null && !playerName.isBlank() ? playerName : "Jugador");
+        nameLabel.setBounds(x - scale(10), y - offsetY, width, height);
+        nameLabel.setVisible(active);
     }
 
     public void updateObstacles(List<Obstacle> obstacles) {
@@ -167,6 +260,8 @@ public class GameWindow {
             return;
         }
 
+        int obstacleSize = Math.max(28, scale(45));
+
         for (Obstacle obs : obstacles) {
             JLabel lbl = obstacleLabels.computeIfAbsent(obs.getId(), id -> {
                 String path;
@@ -175,12 +270,20 @@ public class GameWindow {
                     case BARRIER -> path = "/image/Barrier.png";
                     default -> path = "/image/Cone.png";
                 }
-                JLabel newLbl = new JLabel(getIcon(path, 45, 45));
+                JLabel newLbl = new JLabel(getIcon(path, obstacleSize, obstacleSize));
                 panel1.add(newLbl);
                 return newLbl;
             });
 
-            lbl.setBounds((int) obs.getX(), (int) obs.getY(), 45, 45);
+            String path;
+            switch (obs.getType()) {
+                case OIL -> path = "/image/Oil_Spill.png";
+                case BARRIER -> path = "/image/Barrier.png";
+                default -> path = "/image/Cone.png";
+            }
+
+            lbl.setIcon(getIcon(path, obstacleSize, obstacleSize));
+            lbl.setBounds(scaleX((int) obs.getX()), scaleY((int) obs.getY()), obstacleSize, obstacleSize);
             lbl.setVisible(obs.isVisible());
         }
     }
@@ -192,26 +295,30 @@ public class GameWindow {
             return;
         }
 
+        int itemSize = Math.max(20, scale(30));
+
         for (Item item : items) {
             JLabel lbl = itemLabels.computeIfAbsent(item.getId(), id -> {
-                JLabel newLbl = new JLabel(getIcon("/image/Coin.png", 30, 30));
+                JLabel newLbl = new JLabel(getIcon("/image/Coin.png", itemSize, itemSize));
                 panel1.add(newLbl);
                 return newLbl;
             });
 
-            lbl.setBounds((int) item.getX(), (int) item.getY(), 30, 30);
+            lbl.setIcon(getIcon("/image/Coin.png", itemSize, itemSize));
+            lbl.setBounds(scaleX((int) item.getX()), scaleY((int) item.getY()), itemSize, itemSize);
             lbl.setVisible(item.isVisible());
         }
     }
 
     /**
-     * SOLO organiza salida inicial.
-     * No debe pisar posiciones ya sincronizadas por red.
+     * Organiza la salida inicial sin pisar posiciones sincronizadas por red.
      */
     public void prepareRaceStart(List<Player> players) {
         if (players == null || players.isEmpty()) {
             return;
         }
+
+        int[] lanes = getResponsiveLanesYBase();
 
         for (Player player : players) {
             if (player == null || player.getCar() == null) {
@@ -225,21 +332,19 @@ public class GameWindow {
             boolean stillAtStartX = Math.abs(car.getX() - START_X) < 5;
 
             if (uninitializedX) {
-                car.setPosition(START_X, getStartLaneY(player));
+                car.setPosition(START_X, getStartLaneY(player, lanes));
             } else if (uninitializedY) {
-                car.setPosition(car.getX(), getStartLaneY(player));
-            } else if (stillAtStartX && !isValidLane((int) car.getY())) {
-                car.setPosition(START_X, getStartLaneY(player));
+                car.setPosition(car.getX(), getStartLaneY(player, lanes));
+            } else if (stillAtStartX && !isValidLane((int) car.getY(), lanes)) {
+                car.setPosition(START_X, getStartLaneY(player, lanes));
             }
-
-            updateCarPosition(car);
         }
 
         panel1.repaint();
     }
 
-    private boolean isValidLane(int y) {
-        for (int lane : START_LANES_Y) {
+    private boolean isValidLane(int y, int[] lanes) {
+        for (int lane : lanes) {
             if (Math.abs(lane - y) < 20) {
                 return true;
             }
@@ -247,9 +352,22 @@ public class GameWindow {
         return false;
     }
 
-    private int getStartLaneY(Player player) {
+    /**
+     * Carriles en coordenadas base del juego.
+     * Aquí puedes moverlos fino sin romper el responsive.
+     */
+    private int[] getResponsiveLanesYBase() {
+        return new int[] {
+                140,
+                280,
+                420,
+                560
+        };
+    }
+
+    private int getStartLaneY(Player player, int[] lanes) {
         if (player == null || player.getId() == null) {
-            return START_LANES_Y[0];
+            return lanes[0];
         }
 
         String id = player.getId().trim();
@@ -258,26 +376,44 @@ public class GameWindow {
             case "5001":
             case "player1":
             case "jugador1":
-                return START_LANES_Y[0];
+                return lanes[0];
 
             case "5002":
             case "player2":
             case "jugador2":
-                return START_LANES_Y[1];
+                return lanes[1];
 
             case "5003":
             case "player3":
             case "jugador3":
-                return START_LANES_Y[2];
+                return lanes[2];
 
             case "5004":
             case "player4":
             case "jugador4":
-                return START_LANES_Y[3];
+                return lanes[3];
 
             default:
-                return START_LANES_Y[Math.abs(id.hashCode()) % START_LANES_Y.length];
+                return lanes[Math.abs(id.hashCode()) % lanes.length];
         }
+    }
+
+    private boolean isLocalPlayer(Player player) {
+        if (player == null) {
+            return false;
+        }
+
+        boolean sameId =
+                localPlayerId != null
+                        && player.getId() != null
+                        && localPlayerId.equals(player.getId());
+
+        boolean sameName =
+                localPlayerName != null
+                        && player.getName() != null
+                        && localPlayerName.equalsIgnoreCase(player.getName());
+
+        return sameId || sameName;
     }
 
     public void startCountdown() {
@@ -337,10 +473,10 @@ public class GameWindow {
     }
 
     private JLabel createStatusLabel() {
-        JLabel label = new JLabel("Esperando 4 jugadores...");
+        JLabel label = new JLabel("Esperando jugadores...");
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", Font.BOLD, 22));
-        label.setBounds(20, 80, 450, 40);
+        label.setBounds(100, 120, 450, 40);
         label.setVisible(false);
         return label;
     }
@@ -352,6 +488,110 @@ public class GameWindow {
         countdownLabel.setBounds(400, 250, 200, 80);
         countdownLabel.setVisible(false);
         panel1.add(countdownLabel);
+    }
+
+    private void updateResponsiveLayout() {
+        int panelWidth = panel1.getWidth();
+        int panelHeight = panel1.getHeight();
+
+        if (panelWidth <= 0 || panelHeight <= 0) {
+            panelWidth = BASE_WIDTH;
+            panelHeight = BASE_HEIGHT;
+        }
+
+        int btnSize = scale(55);
+        int marginRight = scale(15);
+        int topMargin = scale(20);
+
+        btnClose.setBounds(
+                panelWidth - btnSize - marginRight,
+                topMargin,
+                btnSize,
+                btnSize
+        );
+        btnClose.setFont(new Font("Arial", Font.BOLD, Math.max(12, scale(18))));
+
+        Puntaje.setBounds(
+                scaleX(20),
+                scaleY(40),
+                Math.max(180, scaleX(260)),
+                Math.max(25, scaleY(40))
+        );
+        Puntaje.setFont(new Font("Arial", Font.BOLD, Math.max(14, scale(24))));
+
+        int statusWidth = Math.max(260, scale(500));
+        int statusHeight = Math.max(30, scale(40));
+
+        statusLabel.setBounds(
+                panelWidth / 2 - statusWidth / 2,
+                panelHeight / 2 - statusHeight / 2,
+                statusWidth,
+                statusHeight
+        );
+        statusLabel.setOpaque(true);
+        statusLabel.setBackground(new Color(0, 0, 0, 150));
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusLabel.setFont(new Font("Arial", Font.BOLD, Math.max(14, scale(22))));
+
+        countdownLabel.setBounds(
+                panelWidth / 2 - scale(100),
+                panelHeight / 2 - scale(40),
+                Math.max(120, scale(200)),
+                Math.max(50, scale(80))
+        );
+        countdownLabel.setFont(new Font("Arial", Font.BOLD, Math.max(24, scale(48))));
+    }
+
+    private void refreshAllSprites() {
+        for (Map.Entry<String, JLabel> entry : carLabels.entrySet()) {
+            JLabel lbl = entry.getValue();
+            Rectangle bounds = lbl.getBounds();
+
+            if (bounds.width <= 0 || bounds.height <= 0) {
+                continue;
+            }
+
+            String key = entry.getKey();
+            JLabel name = nameLabels.get(key);
+            if (name != null && name.isVisible()) {
+                name.setFont(new Font("Arial", Font.BOLD, Math.max(10, scale(14))));
+            }
+        }
+
+        panel1.revalidate();
+        panel1.repaint();
+    }
+
+    private int getResponsiveCarWidth() {
+        return Math.max(60, scale(100));
+    }
+
+    private int getResponsiveCarHeight() {
+        return Math.max(30, scale(50));
+    }
+
+    private int scale(int baseValue) {
+        int currentWidth = panel1.getWidth() > 0 ? panel1.getWidth() : BASE_WIDTH;
+        int currentHeight = panel1.getHeight() > 0 ? panel1.getHeight() : BASE_HEIGHT;
+
+        double scaleX = currentWidth / (double) BASE_WIDTH;
+        double scaleY = currentHeight / (double) BASE_HEIGHT;
+        double factor = Math.min(scaleX, scaleY);
+
+        return Math.max(1, (int) Math.round(baseValue * factor));
+    }
+
+    private int scaleX(int baseValue) {
+        int currentWidth = panel1.getWidth() > 0 ? panel1.getWidth() : BASE_WIDTH;
+        double factor = currentWidth / (double) BASE_WIDTH;
+        return (int) Math.round(baseValue * factor);
+    }
+
+    private int scaleY(int baseValue) {
+        int currentHeight = panel1.getHeight() > 0 ? panel1.getHeight() : BASE_HEIGHT;
+        double factor = currentHeight / (double) BASE_HEIGHT;
+        return (int) Math.round(baseValue * factor);
     }
 
     private ImageIcon getIcon(String path, int w, int h) {

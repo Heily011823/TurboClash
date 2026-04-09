@@ -14,8 +14,6 @@ public class GameLoop {
     private final int frameDelay;
     private final NetworkSync networkSync;
 
-    private static final int EXPECTED_REMOTE_PLAYERS = 3;
-
     public GameLoop(int frameDelay) {
         this.frameDelay = frameDelay;
         this.networkSync = new NetworkSync();
@@ -36,21 +34,9 @@ public class GameLoop {
                 context.getResultManager()
         );
 
-        networkSync.join(context, local);
-
-        long timeout = System.currentTimeMillis() + 10000;
-        while (context.getMatch().getRemotePlayers().size() < EXPECTED_REMOTE_PLAYERS
-                && System.currentTimeMillis() < timeout) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-
-        System.out.println("Jugadores remotos conectados: " + context.getMatch().getRemotePlayers().size());
-        System.out.println("ANTES DEL LOOP: " + context.getMatch().isFinished());
+        System.out.println("GameLoop iniciado.");
+        System.out.println("Jugadores remotos conectados al iniciar loop: "
+                + context.getMatch().getRemotePlayers().size());
 
         while (!context.getMatch().isFinished()) {
 
@@ -90,8 +76,6 @@ public class GameLoop {
 
     private void shutdown(GameContext context, Player local) {
         System.out.println("GameLoop finalizado.");
-        // No enviar PLAYER_LEFT ni cerrar peer automáticamente aquí.
-        // Eso solo debe hacerse cuando el usuario cierre realmente el juego.
     }
 
     private void sleep() {

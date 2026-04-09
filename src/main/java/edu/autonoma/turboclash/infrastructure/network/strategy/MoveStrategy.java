@@ -1,92 +1,173 @@
 package edu.autonoma.turboclash.infrastructure.network.strategy;
 
+import edu.autonoma.turboclash.domain.model.Car;
+import edu.autonoma.turboclash.domain.model.CarSkin;
 import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
 /**
- * Representa la responsabilidad de {@code MoveStrategy} en las estrategias de mensajeria.
+ * Maneja la sincronización de movimiento de jugadores remotos.
  */
 public class MoveStrategy implements IMessageStrategy {
 
-    private final Match match;
+    private static final int CAR_WIDTH = 100;
+    private static final int CAR_HEIGHT = 50;
+    private static final double START_X = 80;
 
     /**
-     * Crea una nueva instancia de {@code MoveStrategy}.
-     *
-     * @param match valor del parametro {@code match}
+     * Debe coincidir con los carriles base del GameWindow responsive.
      */
+    private static final int[] LANE_Y = {140, 280, 420, 560};
+
+    private final Match match;
+
     public MoveStrategy(Match match) {
         this.match = match;
     }
 
-    /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param message valor del parametro {@code message}
-     */
     @Override
     public void handle(GameMessage message) {
         if (message == null || match == null) {
             return;
         }
 
-        if ((message.getPlayerId() == null || message.getPlayerId().isBlank())
-                && (message.getPlayerName() == null || message.getPlayerName().isBlank())) {
+        String messagePlayerId = safe(message.getPlayerId());
+        String messagePlayerName = safe(message.getPlayerName());
+
+        if (messagePlayerId.isBlank() && messagePlayerName.isBlank()) {
             return;
         }
 
         Player localPlayer = match.getLocalPlayer();
-
-        if (localPlayer != null) {
-            boolean sameLocalById =
-                    localPlayer.getId() != null
-                            && message.getPlayerId() != null
-                            && localPlayer.getId().equals(message.getPlayerId());
-
-            boolean sameLocalByName =
-                    localPlayer.getName() != null
-                            && message.getPlayerName() != null
-                            && localPlayer.getName().equalsIgnoreCase(message.getPlayerName());
-
-            if (sameLocalById || sameLocalByName) {
-                return;
-            }
+        if (isLocalPlayer(localPlayer, messagePlayerId, messagePlayerName)) {
+            return;
         }
 
-        for (Player p : match.getRemotePlayers()) {
-            if (p == null || p.getCar() == null) {
-                continue;
-            }
+        Player remote = match.findRemotePlayer(messagePlayerId, messagePlayerName);
 
-            boolean sameId =
-                    p.getId() != null
-                            && message.getPlayerId() != null
-                            && p.getId().equals(message.getPlayerId());
+        if (remote == null) {
+            remote = createRemotePlayer(message);
+            match.addPlayer(remote);
 
-            boolean sameName =
-                    p.getName() != null
-                            && message.getPlayerName() != null
-                            && p.getName().equalsIgnoreCase(message.getPlayerName());
-
-            if (sameId || sameName) {
-                p.syncFromNetwork(
-                        message.getPosX(),
-                        message.getPosY(),
-                        message.getScore()
-                );
-
-                System.out.println("Movimiento actualizado de "
-                        + p.getName()
-                        + " -> X: " + message.getPosX()
-                        + ", Y: " + message.getPosY()
-                        + ", Score: " + message.getScore());
-
-                return;
-            }
+            System.out.println("[MOVE] Remoto creado desde movimiento: "
+                    + remote.getName()
+                    + " | id=" + remote.getId());
         }
 
-        System.out.println("No se encontró jugador remoto para MOVEMENT: "
-                + message.getPlayerName() + " / " + message.getPlayerId());
+        if (remote.getCar() != null) {
+            double nextX = message.getPosX() > 0 ? message.getPosX() : START_X;
+            double nextY = resolveLaneY(message);
+            int nextLives = message.getLives() > 0 ? message.getLives() : remote.getLives();
+
+            remote.syncFromNetwork(
+                    nextX,
+                    nextY,
+                    message.getScore(),
+                    nextLives
+            );
+
+            System.out.println("[MOVE] "
+                    + remote.getName()
+                    + " | x=" + nextX
+                    + " | y=" + nextY
+                    + " | score=" + message.getScore()
+                    + " | lives=" + nextLives);
+        }
+    }
+
+    private Player createRemotePlayer(GameMessage message) {
+        String messagePlayerId = safe(message.getPlayerId());
+        String messagePlayerName = safe(message.getPlayerName());
+
+        String image = resolveImage(message);
+        double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
+        double posY = resolveLaneY(message);
+
+        Car car = new Car(
+                !messagePlayerId.isBlank() ? messagePlayerId : messagePlayerName,
+                posX,
+                posY,
+                CAR_WIDTH,
+                CAR_HEIGHT,
+                image
+        );
+
+        int lives = message.getLives() > 0 ? message.getLives() : 3;
+        car.setLives(lives);
+
+        Player remote = new Player(messagePlayerId, messagePlayerName, car);
+        remote.setScore(message.getScore());
+
+        return remote;
+    }
+
+    private boolean isLocalPlayer(Player localPlayer, String messagePlayerId, String messagePlayerName) {
+        if (localPlayer == null) {
+            return false;
+        }
+
+        boolean sameId =
+                localPlayer.getId() != null
+                        && !messagePlayerId.isBlank()
+                        && localPlayer.getId().equals(messagePlayerId);
+
+        boolean sameName =
+                localPlayer.getName() != null
+                        && !messagePlayerName.isBlank()
+                        && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
+
+        return sameId || sameName;
+    }
+
+    private double resolveLaneY(GameMessage message) {
+        int laneIndex = resolveLaneIndex(message);
+        return LANE_Y[laneIndex];
+    }
+
+    private int resolveLaneIndex(GameMessage message) {
+        int byPort = resolveLaneIndexByPort(message.getPort());
+        if (byPort >= 0) {
+            return byPort;
+        }
+
+        String playerId = safe(message.getPlayerId());
+        int byId = resolveLaneIndexById(playerId);
+        if (byId >= 0) {
+            return byId;
+        }
+
+        return 0;
+    }
+
+    private int resolveLaneIndexByPort(int port) {
+        return switch (port) {
+            case 5001 -> 0;
+            case 5002 -> 1;
+            case 5003 -> 2;
+            case 5004 -> 3;
+            default -> -1;
+        };
+    }
+
+    private int resolveLaneIndexById(String id) {
+        return switch (id) {
+            case "5001", "player1", "jugador1" -> 0;
+            case "5002", "player2", "jugador2" -> 1;
+            case "5003", "player3", "jugador3" -> 2;
+            case "5004", "player4", "jugador4" -> 3;
+            default -> -1;
+        };
+    }
+
+    private String resolveImage(GameMessage message) {
+        if (message.getCarSkin() != null) {
+            return message.getCarSkin().getFileName();
+        }
+        return CarSkin.BLUE.getFileName();
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim();
     }
 }

@@ -7,87 +7,71 @@ import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
 /**
- * Representa la responsabilidad de {@code JoinStrategy} en las estrategias de mensajeria.
+ * Maneja la incorporación de jugadores remotos al match.
  */
 public class JoinStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
     private static final int CAR_HEIGHT = 50;
-
     private static final double START_X = 80;
 
-    // 4 carriles verticales fijos
-    private static final double[] LANES_Y = {120, 220, 320, 420};
+    /**
+     * Debe coincidir con los carriles base del GameWindow responsive.
+     */
+    private static final int[] LANE_Y = {140, 280, 420, 560};
 
     private final Match match;
 
-    /**
-     * Crea una nueva instancia de {@code JoinStrategy}.
-     *
-     * @param match valor del parametro {@code match}
-     */
     public JoinStrategy(Match match) {
         this.match = match;
     }
 
-    /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param message valor del parametro {@code message}
-     */
     @Override
     public void handle(GameMessage message) {
         if (message == null || match == null) {
             return;
         }
 
-        Player localPlayer = match.getLocalPlayer();
-        String messagePlayerId = message.getPlayerId();
-        String messagePlayerName = message.getPlayerName();
+        String messagePlayerId = safe(message.getPlayerId());
+        String messagePlayerName = safe(message.getPlayerName());
 
-        if ((messagePlayerId == null || messagePlayerId.isBlank())
-                && (messagePlayerName == null || messagePlayerName.isBlank())) {
+        if (messagePlayerId.isBlank() && messagePlayerName.isBlank()) {
             return;
         }
 
-        if (localPlayer != null) {
-            boolean sameAsLocalById =
-                    localPlayer.getId() != null
-                            && messagePlayerId != null
-                            && localPlayer.getId().equals(messagePlayerId);
-
-            boolean sameAsLocalByName =
-                    localPlayer.getName() != null
-                            && messagePlayerName != null
-                            && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
-
-            if (sameAsLocalById || sameAsLocalByName) {
-                return;
-            }
+        Player localPlayer = match.getLocalPlayer();
+        if (isLocalPlayer(localPlayer, messagePlayerId, messagePlayerName)) {
+            return;
         }
 
         Player existing = match.findRemotePlayer(messagePlayerId, messagePlayerName);
 
         if (existing != null) {
-            if (existing.getCar() != null) {
-                double x = message.getPosX() > 0 ? message.getPosX() : existing.getCar().getX();
-                double y = message.getPosY() > 0 ? message.getPosY() : existing.getCar().getY();
-                existing.getCar().setPosition(x, y);
-            }
-            existing.setScore(message.getScore());
+            updateExistingPlayer(existing, message);
             return;
         }
 
-        String image = CarSkin.BLUE.getFileName();
-        if (message.getCarSkin() != null) {
-            image = message.getCarSkin().getFileName();
-        }
+        Player newPlayer = createRemotePlayer(message);
+        match.addPlayer(newPlayer);
 
+        System.out.println("[JOIN] Remoto agregado: "
+                + newPlayer.getName()
+                + " | id=" + newPlayer.getId()
+                + " | x=" + newPlayer.getCar().getX()
+                + " | y=" + newPlayer.getCar().getY()
+                + " | lives=" + newPlayer.getLives());
+    }
+
+    private Player createRemotePlayer(GameMessage message) {
+        String messagePlayerId = safe(message.getPlayerId());
+        String messagePlayerName = safe(message.getPlayerName());
+
+        String image = resolveImage(message);
         double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
-        double posY = resolveLaneY();
+        double posY = resolveLaneY(message);
 
         Car car = new Car(
-                messagePlayerId != null ? messagePlayerId : messagePlayerName,
+                !messagePlayerId.isBlank() ? messagePlayerId : messagePlayerName,
                 posX,
                 posY,
                 CAR_WIDTH,
@@ -95,49 +79,102 @@ public class JoinStrategy implements IMessageStrategy {
                 image
         );
 
-        Player newPlayer = new Player(
-                messagePlayerId,
-                messagePlayerName,
-                car
-        );
+        int lives = message.getLives() > 0 ? message.getLives() : 3;
+        car.setLives(lives);
 
-        newPlayer.setScore(message.getScore());
-        match.addPlayer(newPlayer);
+        Player player = new Player(messagePlayerId, messagePlayerName, car);
+        player.setScore(message.getScore());
 
-        System.out.println("Jugador agregado: " + messagePlayerName
-                + " en carril Y=" + posY);
-        System.out.println("Remotos actuales: " + match.getRemotePlayers().size());
+        return player;
     }
 
-    private double resolveLaneY() {
-        boolean[] used = new boolean[LANES_Y.length];
+    private void updateExistingPlayer(Player existing, GameMessage message) {
+        if (existing.getCar() != null) {
+            double nextX = message.getPosX() > 0 ? message.getPosX() : existing.getCar().getX();
+            double nextY = resolveLaneY(message);
 
-        Player local = match.getLocalPlayer();
-        if (local != null && local.getCar() != null) {
-            markUsedLane(local.getCar().getY(), used);
-        }
+            existing.getCar().setPosition(nextX, nextY);
 
-        for (Player remote : match.getRemotePlayers()) {
-            if (remote != null && remote.getCar() != null) {
-                markUsedLane(remote.getCar().getY(), used);
+            if (message.getLives() > 0) {
+                existing.getCar().setLives(message.getLives());
             }
         }
 
-        for (int i = 0; i < LANES_Y.length; i++) {
-            if (!used[i]) {
-                return LANES_Y[i];
-            }
-        }
+        existing.setScore(message.getScore());
 
-        return LANES_Y[LANES_Y.length - 1];
+        System.out.println("[JOIN] Remoto actualizado: "
+                + existing.getName()
+                + " | x=" + existing.getCar().getX()
+                + " | y=" + existing.getCar().getY()
+                + " | lives=" + existing.getLives());
     }
 
-    private void markUsedLane(double y, boolean[] used) {
-        for (int i = 0; i < LANES_Y.length; i++) {
-            if (Math.abs(LANES_Y[i] - y) < 20) {
-                used[i] = true;
-                return;
-            }
+    private boolean isLocalPlayer(Player localPlayer, String messagePlayerId, String messagePlayerName) {
+        if (localPlayer == null) {
+            return false;
         }
+
+        boolean sameId =
+                localPlayer.getId() != null
+                        && !messagePlayerId.isBlank()
+                        && localPlayer.getId().equals(messagePlayerId);
+
+        boolean sameName =
+                localPlayer.getName() != null
+                        && !messagePlayerName.isBlank()
+                        && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
+
+        return sameId || sameName;
+    }
+
+    private double resolveLaneY(GameMessage message) {
+        int laneIndex = resolveLaneIndex(message);
+        return LANE_Y[laneIndex];
+    }
+
+    private int resolveLaneIndex(GameMessage message) {
+        int byPort = resolveLaneIndexByPort(message.getPort());
+        if (byPort >= 0) {
+            return byPort;
+        }
+
+        String playerId = safe(message.getPlayerId());
+        int byId = resolveLaneIndexById(playerId);
+        if (byId >= 0) {
+            return byId;
+        }
+
+        return 0;
+    }
+
+    private int resolveLaneIndexByPort(int port) {
+        return switch (port) {
+            case 5001 -> 0;
+            case 5002 -> 1;
+            case 5003 -> 2;
+            case 5004 -> 3;
+            default -> -1;
+        };
+    }
+
+    private int resolveLaneIndexById(String id) {
+        return switch (id) {
+            case "5001", "player1", "jugador1" -> 0;
+            case "5002", "player2", "jugador2" -> 1;
+            case "5003", "player3", "jugador3" -> 2;
+            case "5004", "player4", "jugador4" -> 3;
+            default -> -1;
+        };
+    }
+
+    private String resolveImage(GameMessage message) {
+        if (message.getCarSkin() != null) {
+            return message.getCarSkin().getFileName();
+        }
+        return CarSkin.BLUE.getFileName();
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim();
     }
 }

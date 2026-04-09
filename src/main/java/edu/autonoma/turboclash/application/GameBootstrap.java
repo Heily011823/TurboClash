@@ -2,16 +2,29 @@ package edu.autonoma.turboclash.application;
 
 import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.domain.events.CollisionListener;
-import edu.autonoma.turboclash.domain.model.*;
-import edu.autonoma.turboclash.domain.services.*;
-import edu.autonoma.turboclash.infrastructure.*;
-import edu.autonoma.turboclash.infrastructure.network.core.*;
+import edu.autonoma.turboclash.domain.model.Item;
+import edu.autonoma.turboclash.domain.model.Match;
+import edu.autonoma.turboclash.domain.model.Obstacle;
+import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.domain.services.CollisionManager;
+import edu.autonoma.turboclash.domain.services.CompositeCollisionListener;
+import edu.autonoma.turboclash.domain.services.GameCollisionHandler;
+import edu.autonoma.turboclash.domain.services.GameEngine;
+import edu.autonoma.turboclash.domain.services.GameResultManager;
+import edu.autonoma.turboclash.domain.services.GameRulesManager;
+import edu.autonoma.turboclash.domain.services.GameSpawner;
+import edu.autonoma.turboclash.infrastructure.GameFactory;
+import edu.autonoma.turboclash.infrastructure.NetworkFactory;
+import edu.autonoma.turboclash.infrastructure.WorldFactory;
+import edu.autonoma.turboclash.infrastructure.network.core.GameNetworkService;
+import edu.autonoma.turboclash.infrastructure.network.core.NetworkConfig;
+import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
 import edu.autonoma.turboclash.infrastructure.network.factory.GameMessageFactory;
 import edu.autonoma.turboclash.infrastructure.network.handler.GameMessageHandler;
 import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
 import edu.autonoma.turboclash.infrastructure.sound.SoundCollisionListener;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -69,10 +82,14 @@ public class GameBootstrap {
         List<Item> items = new CopyOnWriteArrayList<>(worldFactory.createItems());
         List<Obstacle> obstacles = new CopyOnWriteArrayList<>(worldFactory.createObstacles());
 
-        CollisionListener listener = new SoundCollisionListener();
+        GameRulesManager rulesManager = new GameRulesManager(100);
 
-        CollisionManager collisionManager =
-                new CollisionManager(listener);
+        CollisionListener listener = new CompositeCollisionListener(
+                new GameCollisionHandler(rulesManager),
+                new SoundCollisionListener()
+        );
+
+        CollisionManager collisionManager = new CollisionManager(listener);
 
         GameEngine engine = new GameEngine(
                 match,
@@ -84,8 +101,7 @@ public class GameBootstrap {
         GameSpawner spawner = new GameSpawner(items, obstacles);
         spawner.start();
 
-        GameMessageHandler messageHandler =
-                new GameMessageHandler(match);
+        GameMessageHandler messageHandler = new GameMessageHandler(match);
 
         GameMessageFactory messageFactory = new GameMessageFactory();
 
@@ -99,6 +115,7 @@ public class GameBootstrap {
 
         messageHandler.setPeer(peer);
         messageHandler.setMessageFactory(messageFactory);
+
         peer.iniciar();
 
         NetworkConfig networkConfig = new NetworkConfig(config);
@@ -113,7 +130,7 @@ public class GameBootstrap {
                 obstacles,
                 items,
                 peer,
-                new GameRulesManager(100),
+                rulesManager,
                 new GameResultManager()
         );
 

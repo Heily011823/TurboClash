@@ -1,11 +1,12 @@
 package edu.autonoma.turboclash.infrastructure.network.core;
 
-import java.net.DatagramSocket;
-import java.util.List;
-
-import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.domain.rules.PortValidator;
 import edu.autonoma.turboclash.exception.InvalidPortException;
+import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
+
+import java.net.DatagramSocket;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Representa la responsabilidad de {@code UdpPeer} en la infraestructura de red.
@@ -13,21 +14,13 @@ import edu.autonoma.turboclash.exception.InvalidPortException;
 public class UdpPeer {
 
     private final DatagramSocket socket;
-    private final List<PeerInfo> peers = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private final List<PeerInfo> peers = new CopyOnWriteArrayList<>();
 
     private final IMessageSender sender;
     private final IMessageReceiver receiver;
     private volatile boolean activo;
-
     private Thread receiverThread;
 
-    /**
-     * Crea una nueva instancia de {@code UdpPeer}.
-     *
-     * @param socket valor del parametro {@code socket}
-     * @param sender valor del parametro {@code sender}
-     * @param receiver valor del parametro {@code receiver}
-     */
     public UdpPeer(DatagramSocket socket, IMessageSender sender, IMessageReceiver receiver) {
 
         if (socket == null) {
@@ -42,17 +35,26 @@ public class UdpPeer {
         System.out.println("UDP Peer iniciado en puerto: " + socket.getLocalPort());
     }
 
-    /**
-     * Agrega {@code Peer}.
-     *
-     * @param ip direccion IP asociada a la operacion
-     * @param puerto valor del parametro {@code puerto}
-     */
+    public synchronized void iniciar() {
+        if (!activo || socket.isClosed()) {
+            return;
+        }
+
+        if (receiverThread != null && receiverThread.isAlive()) {
+            System.out.println("Receiver ya iniciado en puerto: " + socket.getLocalPort());
+            return;
+        }
+
+        receiverThread = new Thread(receiver::escuchar);
+        receiverThread.setName("UdpReceiver-" + socket.getLocalPort());
+        receiverThread.setDaemon(true);
+        receiverThread.start();
+    }
+
     public void agregarPeer(String ip, int puerto) {
         try {
             PortValidator.validate(puerto);
 
-            // Evita agregarse a sí mismo
             if (puerto == socket.getLocalPort()) {
                 return;
             }
@@ -69,23 +71,6 @@ public class UdpPeer {
         }
     }
 
-    /**
-     * Inicia la operacion principal del metodo.
-     */
-    public void iniciar() {
-        if (!activo || socket.isClosed()) {
-            return;
-        }
-
-        receiverThread = new Thread(receiver::escuchar);
-        receiverThread.start();
-    }
-
-    /**
-     * Envia {@code ATodos}.
-     *
-     * @param mensaje valor del parametro {@code mensaje}
-     */
     public void enviarATodos(GameMessage mensaje) {
         if (!isActivo()) {
             return;
@@ -110,9 +95,6 @@ public class UdpPeer {
         }
     }
 
-    /**
-     * Cierra la operacion principal del metodo.
-     */
     public void cerrar() {
         activo = false;
         receiver.detener();
@@ -126,22 +108,12 @@ public class UdpPeer {
         }
     }
 
-    /**
-     * Obtiene el valor de {@code Receiver}.
-     *
-     * @return valor de {@code Receiver}
-     */
-    public IMessageReceiver getReceiver() {
-        return receiver;
-    }
-
-    /**
-     * Obtiene el valor de {@code Sender}.
-     *
-     * @return valor de {@code Sender}
-     */
     public IMessageSender getSender() {
         return sender;
+    }
+
+    public IMessageReceiver getReceiver() {
+        return receiver;
     }
 
     public boolean isActivo() {
@@ -150,5 +122,9 @@ public class UdpPeer {
 
     public int getPeerCount() {
         return peers.size();
+    }
+
+    public int getLocalPort() {
+        return socket.getLocalPort();
     }
 }

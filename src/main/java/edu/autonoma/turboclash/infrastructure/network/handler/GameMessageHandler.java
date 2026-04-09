@@ -13,12 +13,12 @@ import edu.autonoma.turboclash.infrastructure.network.strategy.MoveStrategy;
 import edu.autonoma.turboclash.infrastructure.network.strategy.ScoreStrategy;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Representa la responsabilidad de {@code GameMessageHandler} en el procesamiento de mensajes de red.
+ * Procesa mensajes de red del juego.
  */
 public class GameMessageHandler {
 
@@ -27,7 +27,7 @@ public class GameMessageHandler {
     private UdpPeer peer;
     private GameMessageFactory messageFactory;
 
-    private final Set<String> processedJoins = new HashSet<>();
+    private final Set<String> processedJoins = ConcurrentHashMap.newKeySet();
 
     public GameMessageHandler(Match match) {
         this.match = match;
@@ -46,15 +46,7 @@ public class GameMessageHandler {
 
         Player localPlayer = match.getLocalPlayer();
 
-        if (msg.getType() == MessageType.DISCOVERY) {
-            if (peer != null) {
-                peer.agregarPeer(ip, port);
-            }
-
-            if (peer != null && messageFactory != null && localPlayer != null) {
-                GameMessage response = messageFactory.create(localPlayer, MessageType.HANDSHAKE);
-                peer.getSender().enviarMensaje(response, ip, port);
-            }
+        if (peer != null && msg.getPort() == peer.getLocalPort()) {
             return;
         }
 
@@ -74,38 +66,56 @@ public class GameMessageHandler {
             }
         }
 
-        if (msg.getType() == MessageType.HANDSHAKE || msg.getType() == MessageType.PLAYER_JOINED) {
-            String joinKey = buildJoinKey(msg, ip, port);
-
-            if (processedJoins.contains(joinKey)) {
-                return;
+        if (msg.getType() == MessageType.DISCOVERY) {
+            if (peer != null) {
+                peer.agregarPeer(ip, port);
             }
 
-            processedJoins.add(joinKey);
+            if (peer != null && messageFactory != null && localPlayer != null) {
+                GameMessage handshake = messageFactory.create(localPlayer, MessageType.HANDSHAKE, peer.getLocalPort());
+                peer.getSender().enviarMensaje(handshake, ip, port);
+
+                GameMessage join = messageFactory.create(localPlayer, MessageType.PLAYER_JOINED, peer.getLocalPort());
+                peer.getSender().enviarMensaje(join, ip, port);
+            }
+            return;
+        }
+
+        if (msg.getType() == MessageType.HANDSHAKE || msg.getType() == MessageType.PLAYER_JOINED) {
+            String joinKey = buildJoinKey(msg);
+
+            if (!processedJoins.add(joinKey)) {
+                return;
+            }
 
             if (peer != null) {
                 peer.agregarPeer(ip, port);
             }
+
+            if (msg.getType() == MessageType.HANDSHAKE
+                    && peer != null
+                    && messageFactory != null
+                    && localPlayer != null) {
+                GameMessage joinResponse = messageFactory.create(localPlayer, MessageType.PLAYER_JOINED, peer.getLocalPort());
+                peer.getSender().enviarMensaje(joinResponse, ip, port);
+            }
         }
 
         IMessageStrategy strategy = strategies.get(msg.getType());
-        if (strategy == null) {
-            return;
+        if (strategy != null) {
+            strategy.handle(msg);
         }
-
-        strategy.handle(msg);
 
         System.out.println("Procesado: " + msg.getType()
                 + " de " + msg.getPlayerName()
+                + " puerto=" + msg.getPort()
                 + " | remotos: " + match.getRemotePlayers().size());
-
-
     }
 
-    private String buildJoinKey(GameMessage msg, String ip, int port) {
+    private String buildJoinKey(GameMessage msg) {
         String playerId = msg.getPlayerId() != null ? msg.getPlayerId() : "";
         String playerName = msg.getPlayerName() != null ? msg.getPlayerName() : "";
-        return msg.getType() + "|" + playerId + "|" + playerName + "|" + ip + "|" + port;
+        return msg.getType() + "|" + playerId + "|" + playerName + "|" + msg.getPort();
     }
 
     public void setPeer(UdpPeer peer) {
