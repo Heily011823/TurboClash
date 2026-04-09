@@ -1,8 +1,5 @@
 package edu.autonoma.turboclash.domain.model;
 
-/**
- * Representa la responsabilidad de {@code Player} dentro del dominio del juego.
- */
 public class Player {
 
     private final String id;
@@ -16,13 +13,6 @@ public class Player {
     private int eliminationOrder;
     private boolean hasScored;
 
-    /**
-     * Crea una nueva instancia de {@code Player}.
-     *
-     * @param id identificador asociado a la operacion
-     * @param name valor del parametro {@code name}
-     * @param car valor del parametro {@code car}
-     */
     public Player(String id, String name, Car car) {
         this.id = id;
         this.name = name;
@@ -35,39 +25,31 @@ public class Player {
         this.eliminationOrder = Integer.MAX_VALUE;
     }
 
-    /**
-     * Desplaza la operacion principal del metodo.
-     *
-     * @param dx desplazamiento horizontal aplicado en la operacion
-     * @param dy desplazamiento vertical aplicado en la operacion
-     */
     public void move(double dx, double dy) {
         if (car != null) {
             car.move(dx, dy);
         }
     }
 
-    /**
-     * Sincroniza {@code FromNetwork}.
-     *
-     * @param x coordenada horizontal utilizada en la operacion
-     * @param y coordenada vertical utilizada en la operacion
-     * @param score valor del parametro {@code score}
-     */
-    public void syncFromNetwork(double x, double y, int score) {
+    public void syncFromNetwork(double x, double y, int score, int lives) {
         if (car != null) {
             car.setPosition(x, y);
+            car.setLives(lives);
         }
+
         this.score.setPoints(score);
 
         if (score > 0) {
             this.hasScored = true;
         }
+
+        if (lives <= 0) {
+            this.eliminated = true;
+        }
     }
 
     public void updateScore(int amount) {
         score.update(amount);
-
         if (score.getPoints() > 0) {
             hasScored = true;
         }
@@ -79,7 +61,6 @@ public class Player {
 
     public void setScore(int points) {
         this.score.setPoints(points);
-
         if (points > 0) {
             hasScored = true;
         }
@@ -100,7 +81,6 @@ public class Player {
     public void loseLife() {
         if (car != null) {
             car.reduceLife();
-
             if (car.getLives() <= 0) {
                 eliminated = true;
             }
@@ -114,7 +94,6 @@ public class Player {
     public void setLives(int lives) {
         if (car != null) {
             car.setLives(lives);
-
             if (car.getLives() <= 0) {
                 eliminated = true;
             }

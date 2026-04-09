@@ -1,13 +1,11 @@
 package edu.autonoma.turboclash.infrastructure.network.factory;
 
 import edu.autonoma.turboclash.domain.model.Car;
+import edu.autonoma.turboclash.domain.model.CarSkin;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
 
-/**
- * Fabrica de mensajes del juego.
- */
 public class GameMessageFactory {
 
     public GameMessageFactory() {
@@ -22,10 +20,14 @@ public class GameMessageFactory {
 
         double posX = 0;
         double posY = 0;
+        int lives = 0;
+        CarSkin skin = null;
 
         if (car != null) {
             posX = car.getX();
             posY = car.getY();
+            lives = car.getLives();
+            skin = resolveSkin(car.getCarImage());
         }
 
         return new GameMessage(
@@ -35,9 +37,10 @@ public class GameMessageFactory {
                 posX,
                 posY,
                 player.getCurrentPoints(),
+                lives,
                 System.currentTimeMillis(),
                 null,
-                null,
+                skin,
                 port
         );
     }
@@ -54,5 +57,16 @@ public class GameMessageFactory {
         GameMessage msg = create(player, type, port);
         msg.setEvent(event);
         return msg;
+    }
+
+    private CarSkin resolveSkin(String carImage) {
+        if (carImage == null) return CarSkin.BLUE;
+
+        String value = carImage.trim().toLowerCase();
+
+        if (value.contains("red")) return CarSkin.RED;
+        if (value.contains("yellow")) return CarSkin.YELLOW;
+        if (value.contains("brown")) return CarSkin.BROWN;
+        return CarSkin.BLUE;
     }
 }

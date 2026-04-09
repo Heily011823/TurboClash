@@ -6,6 +6,7 @@ import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
 import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigEntry;
 import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigLoader;
+import edu.autonoma.turboclash.presentation.view.FondoAnimadoPanel;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 import edu.autonoma.turboclash.presentation.view.GameWindowFrame;
 
@@ -13,15 +14,7 @@ import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Aplicación principal del juego.
- */
 public class GameApplication {
-
-    /**
-     * Si juegan 4 en total, cada cliente debe ver 3 remotos.
-     */
-    private static final int EXPECTED_REMOTE_PLAYERS = 3;
 
     private final GameBootstrap bootstrap;
     private final GameConfig config;
@@ -43,7 +36,6 @@ public class GameApplication {
         GameContext context = bootstrap.init(puerto, playerName);
         Player localPlayer = context.getLocalPlayer();
 
-
         List<PeerConfigEntry> peers = PeerConfigLoader.loadFromResource("/peers.json");
 
         for (PeerConfigEntry peerInfo : peers) {
@@ -52,11 +44,15 @@ public class GameApplication {
             }
         }
 
+        int expectedRemotePlayers = (int) peers.stream()
+                .filter(p -> p.getPuerto() != puerto)
+                .count();
+
         System.out.println("Conectando a peers...");
         context.getNetwork().connect(context, localPlayer);
 
         view.updateCars(context.getPlayers());
-        view.showWaitingPlayers();
+        view.showWaitingPlayers(1 + context.getMatch().getRemotePlayers().size(), 1 + expectedRemotePlayers);
         view.requestGameFocus();
 
         GameLoop loop = new GameLoop(config.getFrameDelay());
@@ -65,6 +61,11 @@ public class GameApplication {
         Runnable startGame = () -> {
             if (!gameStarted.compareAndSet(false, true)) {
                 return;
+            }
+
+            FondoAnimadoPanel fondo = view.getBackgroundPanel();
+            if (fondo != null) {
+                fondo.startGame();
             }
 
             Thread gameThread = new Thread(() -> loop.run(context, view, keyboard, mouse, puerto));
@@ -76,7 +77,7 @@ public class GameApplication {
         new Thread(() -> {
             long timeout = System.currentTimeMillis() + 15000;
 
-            while (context.getMatch().getRemotePlayers().size() < EXPECTED_REMOTE_PLAYERS
+            while (context.getMatch().getRemotePlayers().size() < expectedRemotePlayers
                     && System.currentTimeMillis() < timeout) {
                 try {
                     Thread.sleep(200);
@@ -84,24 +85,27 @@ public class GameApplication {
                     Thread.currentThread().interrupt();
                     return;
                 }
+
+                int connected = 1 + context.getMatch().getRemotePlayers().size();
+                int expected = 1 + expectedRemotePlayers;
+
+                SwingUtilities.invokeLater(() ->
+                        view.showWaitingPlayers(connected, expected)
+                );
             }
 
             SwingUtilities.invokeLater(() -> {
                 int connectedPlayers = context.getMatch().getRemotePlayers().size();
 
-                if (connectedPlayers < EXPECTED_REMOTE_PLAYERS) {
-                    view.showWaitingPlayers();
+                if (connectedPlayers < expectedRemotePlayers) {
                     JOptionPane.showMessageDialog(
                             null,
                             "Solo se conectaron " + connectedPlayers + " de "
-                                    + EXPECTED_REMOTE_PLAYERS + " jugadores remotos.\n"
-                                    + "Verifica que todos estén conectados, usando puertos distintos\n"
-                                    + "y que la red P2P esté activa en todos los equipos."
+                                    + expectedRemotePlayers + " jugadores remotos."
                     );
                     return;
                 }
 
-                System.out.println("Todos los jugadores remotos conectados.");
                 view.showGameStarted();
                 view.setOnCountdownFinished(startGame);
                 view.startCountdown();

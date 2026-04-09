@@ -28,7 +28,8 @@ public class GameWindow {
     private final Map<String, JLabel> carLabels = new HashMap<>();
     private final Map<String, JLabel> obstacleLabels = new HashMap<>();
     private final Map<String, JLabel> itemLabels = new HashMap<>();
-    private final Map<String, JLabel> healthLabels = new HashMap<>();
+    private final Map<String, JLabel> heartLabels = new HashMap<>();
+    private final Map<String, JLabel> nameLabels = new HashMap<>();
 
     private FondoAnimadoPanel fondoAnimadoPanel;
 
@@ -36,6 +37,9 @@ public class GameWindow {
     private static final int CAR_HEIGHT = 50;
     private static final int START_X = 80;
 
+    /**
+     * Mantener estos carriles fijos y consistentes con la vista.
+     */
     private static final int[] START_LANES_Y = {80, 220, 360, 500};
 
     public GameWindow() {
@@ -85,7 +89,12 @@ public class GameWindow {
     }
 
     public void showWaitingPlayers() {
-        statusLabel.setText("Esperando 4 jugadores...");
+        statusLabel.setText("Esperando jugadores...");
+        statusLabel.setVisible(true);
+    }
+
+    public void showWaitingPlayers(int connectedPlayers, int expectedPlayers) {
+        statusLabel.setText("Esperando jugadores... " + connectedPlayers + "/" + expectedPlayers);
         statusLabel.setVisible(true);
     }
 
@@ -107,14 +116,19 @@ public class GameWindow {
                 continue;
             }
 
-            updateCarPosition(player.getCar());
+            updateCarPosition(player);
         }
 
         panel1.revalidate();
         panel1.repaint();
     }
 
-    public void updateCarPosition(Car car) {
+    public void updateCarPosition(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        Car car = player.getCar();
         if (car == null || car.getId() == null) {
             return;
         }
@@ -128,6 +142,9 @@ public class GameWindow {
             return newLbl;
         });
 
+        String imagePath = normalizeCarImagePath(car.getCarImage());
+        lbl.setIcon(getIcon(imagePath, CAR_WIDTH, CAR_HEIGHT));
+
         int drawX = Math.max(0, (int) car.getX());
         int drawY = Math.max(0, (int) car.getY());
 
@@ -135,6 +152,19 @@ public class GameWindow {
         lbl.setVisible(car.isActive());
 
         updateHealthVisual(drawX, drawY, car.getId(), car.isActive(), car.getLives());
+        updateNameVisual(drawX, drawY, player.getName(), car.getId(), car.isActive());
+    }
+
+    /**
+     * Compatibilidad por si en otra parte del proyecto se sigue llamando con Car.
+     */
+    public void updateCarPosition(Car car) {
+        if (car == null) {
+            return;
+        }
+
+        Player tempPlayer = new Player(car.getId(), car.getId(), car);
+        updateCarPosition(tempPlayer);
     }
 
     public void updateHealth(Car car, int lives) {
@@ -149,15 +179,29 @@ public class GameWindow {
         for (int i = 0; i < 3; i++) {
             String heartKey = carId + "_heart_" + i;
 
-            JLabel heart = healthLabels.computeIfAbsent(heartKey, id -> {
-                JLabel lbl = new JLabel(getIcon("/image/Health.png", 25, 25));
+            JLabel heart = heartLabels.computeIfAbsent(heartKey, id -> {
+                JLabel lbl = new JLabel(getIcon("/image/Health.png", 20, 20));
                 panel1.add(lbl);
                 return lbl;
             });
 
-            heart.setBounds(x + (i * 28), y - 30, 25, 25);
+            heart.setBounds(x + (i * 22), y - 28, 20, 20);
             heart.setVisible(i < lives && active);
         }
+    }
+
+    private void updateNameVisual(int x, int y, String playerName, String carId, boolean active) {
+        JLabel nameLabel = nameLabels.computeIfAbsent(carId, id -> {
+            JLabel lbl = new JLabel("", SwingConstants.CENTER);
+            lbl.setForeground(Color.WHITE);
+            lbl.setFont(new Font("Arial", Font.BOLD, 14));
+            panel1.add(lbl);
+            return lbl;
+        });
+
+        nameLabel.setText(playerName != null && !playerName.isBlank() ? playerName : "Jugador");
+        nameLabel.setBounds(x - 10, y - 50, 130, 20);
+        nameLabel.setVisible(active);
     }
 
     public void updateObstacles(List<Obstacle> obstacles) {
@@ -205,7 +249,7 @@ public class GameWindow {
     }
 
     /**
-     * SOLO organiza salida inicial.
+     * Solo organiza salida inicial.
      * No debe pisar posiciones ya sincronizadas por red.
      */
     public void prepareRaceStart(List<Player> players) {
@@ -232,7 +276,7 @@ public class GameWindow {
                 car.setPosition(START_X, getStartLaneY(player));
             }
 
-            updateCarPosition(car);
+            updateCarPosition(player);
         }
 
         panel1.repaint();
@@ -248,11 +292,12 @@ public class GameWindow {
     }
 
     private int getStartLaneY(Player player) {
-        if (player == null || player.getId() == null) {
+        if (player == null) {
             return START_LANES_Y[0];
         }
 
-        String id = player.getId().trim();
+        String id = player.getId() != null ? player.getId().trim() : "";
+        String name = player.getName() != null ? player.getName().trim().toLowerCase() : "";
 
         switch (id) {
             case "5001":
@@ -276,7 +321,11 @@ public class GameWindow {
                 return START_LANES_Y[3];
 
             default:
-                return START_LANES_Y[Math.abs(id.hashCode()) % START_LANES_Y.length];
+                if (name.contains("1")) return START_LANES_Y[0];
+                if (name.contains("2")) return START_LANES_Y[1];
+                if (name.contains("3")) return START_LANES_Y[2];
+                if (name.contains("4")) return START_LANES_Y[3];
+                return START_LANES_Y[Math.abs((id + name).hashCode()) % START_LANES_Y.length];
         }
     }
 
@@ -337,7 +386,7 @@ public class GameWindow {
     }
 
     private JLabel createStatusLabel() {
-        JLabel label = new JLabel("Esperando 4 jugadores...");
+        JLabel label = new JLabel("Esperando jugadores...");
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", Font.BOLD, 22));
         label.setBounds(20, 80, 450, 40);
@@ -381,5 +430,13 @@ public class GameWindow {
         }
 
         return "/image/" + value;
+    }
+    public FondoAnimadoPanel getBackgroundPanel() {
+        return fondoAnimadoPanel;
+    }
+    public void startBackgroundGame() {
+        if (fondoAnimadoPanel != null) {
+            fondoAnimadoPanel.startGame();
+        }
     }
 }

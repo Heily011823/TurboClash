@@ -6,14 +6,16 @@ import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
-/**
- * Estrategia para agregar jugadores remotos.
- */
 public class JoinStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
     private static final int CAR_HEIGHT = 50;
     private static final double START_X = 80;
+
+    /**
+     * Debe coincidir con GameWindow.
+     */
+    private static final int[] LANE_Y = {80, 220, 360, 500};
 
     private final Match match;
 
@@ -28,53 +30,30 @@ public class JoinStrategy implements IMessageStrategy {
         }
 
         Player localPlayer = match.getLocalPlayer();
-        String messagePlayerId = message.getPlayerId();
-        String messagePlayerName = message.getPlayerName();
+        String messagePlayerId = safe(message.getPlayerId());
+        String messagePlayerName = safe(message.getPlayerName());
 
-        if ((messagePlayerId == null || messagePlayerId.isBlank())
-                && (messagePlayerName == null || messagePlayerName.isBlank())) {
+        if (messagePlayerId.isBlank() && messagePlayerName.isBlank()) {
             return;
         }
 
-        if (localPlayer != null) {
-            boolean sameAsLocalById =
-                    localPlayer.getId() != null
-                            && messagePlayerId != null
-                            && localPlayer.getId().equals(messagePlayerId);
-
-            boolean sameAsLocalByName =
-                    localPlayer.getName() != null
-                            && messagePlayerName != null
-                            && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
-
-            if (sameAsLocalById || sameAsLocalByName) {
-                return;
-            }
+        if (isLocalPlayer(localPlayer, messagePlayerId, messagePlayerName)) {
+            return;
         }
 
         Player existing = match.findRemotePlayer(messagePlayerId, messagePlayerName);
 
         if (existing != null) {
-            if (existing.getCar() != null) {
-                existing.getCar().setPosition(
-                        message.getPosX() > 0 ? message.getPosX() : existing.getCar().getX(),
-                        message.getPosY() > 0 ? message.getPosY() : existing.getCar().getY()
-                );
-            }
-            existing.setScore(message.getScore());
+            updateExistingPlayer(existing, message);
             return;
         }
 
-        String image = CarSkin.BLUE.getFileName();
-        if (message.getCarSkin() != null) {
-            image = message.getCarSkin().getFileName();
-        }
-
+        String image = resolveImage(message);
         double posX = message.getPosX() > 0 ? message.getPosX() : START_X;
-        double posY = resolveLaneYByPort(message.getPort());
+        double posY = resolveLaneY(message);
 
         Car car = new Car(
-                messagePlayerId != null ? messagePlayerId : messagePlayerName,
+                !messagePlayerId.isBlank() ? messagePlayerId : messagePlayerName,
                 posX,
                 posY,
                 CAR_WIDTH,
@@ -82,27 +61,104 @@ public class JoinStrategy implements IMessageStrategy {
                 image
         );
 
-        Player newPlayer = new Player(
-                messagePlayerId,
-                messagePlayerName,
-                car
-        );
+        int lives = message.getLives() > 0 ? message.getLives() : 3;
+        car.setLives(lives);
 
+        Player newPlayer = new Player(messagePlayerId, messagePlayerName, car);
         newPlayer.setScore(message.getScore());
+
         match.addPlayer(newPlayer);
 
-        System.out.println("Jugador agregado: " + messagePlayerName
-                + " puerto=" + message.getPort()
-                + " carrilY=" + posY);
+        System.out.println("[JOIN] Remoto agregado: "
+                + newPlayer.getName()
+                + " id=" + newPlayer.getId()
+                + " x=" + posX
+                + " y=" + posY
+                + " lives=" + lives
+                + " skin=" + image);
     }
 
-    private double resolveLaneYByPort(int port) {
+    private void updateExistingPlayer(Player existing, GameMessage message) {
+        if (existing.getCar() != null) {
+            double nextX = message.getPosX() > 0 ? message.getPosX() : existing.getCar().getX();
+            double nextY = resolveLaneY(message);
+
+            existing.getCar().setPosition(nextX, nextY);
+
+            if (message.getLives() > 0) {
+                existing.getCar().setLives(message.getLives());
+            }
+        }
+
+        existing.setScore(message.getScore());
+
+        System.out.println("[JOIN] Remoto actualizado: "
+                + existing.getName()
+                + " x=" + existing.getCar().getX()
+                + " y=" + existing.getCar().getY());
+    }
+
+    private boolean isLocalPlayer(Player localPlayer, String messagePlayerId, String messagePlayerName) {
+        if (localPlayer == null) {
+            return false;
+        }
+
+        boolean sameAsLocalById =
+                localPlayer.getId() != null
+                        && !messagePlayerId.isBlank()
+                        && localPlayer.getId().equals(messagePlayerId);
+
+        boolean sameAsLocalByName =
+                localPlayer.getName() != null
+                        && !messagePlayerName.isBlank()
+                        && localPlayer.getName().equalsIgnoreCase(messagePlayerName);
+
+        return sameAsLocalById || sameAsLocalByName;
+    }
+
+    private double resolveLaneY(GameMessage message) {
+        int byPort = resolveLaneIndexByPort(message.getPort());
+        if (byPort >= 0) {
+            return LANE_Y[byPort];
+        }
+
+        String playerId = safe(message.getPlayerId());
+        int byId = resolveLaneIndexById(playerId);
+        if (byId >= 0) {
+            return LANE_Y[byId];
+        }
+
+        return LANE_Y[0];
+    }
+
+    private int resolveLaneIndexByPort(int port) {
         return switch (port) {
-            case 5001 -> 120;
-            case 5002 -> 220;
-            case 5003 -> 320;
-            case 5004 -> 420;
-            default -> 120;
+            case 5001 -> 0;
+            case 5002 -> 1;
+            case 5003 -> 2;
+            case 5004 -> 3;
+            default -> -1;
         };
+    }
+
+    private int resolveLaneIndexById(String id) {
+        return switch (id) {
+            case "5001", "player1", "jugador1" -> 0;
+            case "5002", "player2", "jugador2" -> 1;
+            case "5003", "player3", "jugador3" -> 2;
+            case "5004", "player4", "jugador4" -> 3;
+            default -> -1;
+        };
+    }
+
+    private String resolveImage(GameMessage message) {
+        if (message.getCarSkin() != null) {
+            return message.getCarSkin().getFileName();
+        }
+        return CarSkin.BLUE.getFileName();
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim();
     }
 }
