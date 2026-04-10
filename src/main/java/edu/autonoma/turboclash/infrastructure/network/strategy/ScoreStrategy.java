@@ -36,9 +36,7 @@ public class ScoreStrategy implements IMessageStrategy {
                             p.getName().equalsIgnoreCase(message.getPlayerName());
 
             if (sameId || sameName) {
-
                 p.setScore(message.getScore());
-                System.out.println("Score actualizado para: " + p.getName());
                 break;
             }
         }

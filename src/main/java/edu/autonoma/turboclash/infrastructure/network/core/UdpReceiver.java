@@ -16,7 +16,6 @@ public class UdpReceiver implements IMessageReceiver {
     private final DatagramSocket socket;
     private volatile boolean activo;
     private IMessageListener listener;
-    private boolean waitingLogged;
 
     /**
      * Crea una nueva instancia de {@code UdpReceiver}.
@@ -65,12 +64,6 @@ public class UdpReceiver implements IMessageReceiver {
                         String ip = ipAddress.getHostAddress();
                         int puerto = packet.getPort();
 
-                        if (message.getType() != null) {
-                            System.out.println("Recibido: " + message.getType() + " de " + message.getPlayerName());
-                        }
-
-                        waitingLogged = false;
-
                         if (listener != null) {
                             listener.onMessage(message, ip, puerto);
                         }
@@ -79,10 +72,7 @@ public class UdpReceiver implements IMessageReceiver {
                         System.err.println("Mensaje inválido: " + data);
                     }
                 } catch (SocketTimeoutException e) {
-                    if (!waitingLogged) {
-                        System.out.println("Esperando mensajes UDP...");
-                        waitingLogged = true;
-                    }
+                    // ciclo de escucha sin ruido de logs
                 }
             }
         } catch (Exception e) {

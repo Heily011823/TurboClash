@@ -6,6 +6,8 @@ public class Player {
     private final String name;
     private final Car car;
     private final Score score;
+    private int networkPort;
+    private long lastProcessedSequence;
 
     private boolean finishReached;
     private boolean eliminated;
@@ -32,12 +34,28 @@ public class Player {
     }
 
     public void syncFromNetwork(double x, double y, int score, int lives) {
+        syncFromNetwork(x, y, score, lives, finishReached, eliminated, finishOrder, eliminationOrder);
+    }
+
+    public void syncFromNetwork(double x,
+                                double y,
+                                int score,
+                                int lives,
+                                boolean finishReached,
+                                boolean eliminated,
+                                int finishOrder,
+                                int eliminationOrder) {
         if (car != null) {
             car.setPosition(x, y);
             car.setLives(lives);
+            car.setFinishReached(finishReached);
         }
 
         this.score.setPoints(score);
+        this.finishReached = finishReached;
+        this.finishOrder = finishOrder;
+        this.eliminationOrder = eliminationOrder;
+        this.eliminated = eliminated || lives <= 0;
 
         if (score > 0) {
             this.hasScored = true;
@@ -101,7 +119,7 @@ public class Player {
     }
 
     public boolean isAlive() {
-        return getLives() > 0;
+        return getLives() > 0 && !eliminated;
     }
 
     public boolean isFinishReached() {
@@ -138,6 +156,22 @@ public class Player {
 
     public Car getCar() {
         return car;
+    }
+
+    public int getNetworkPort() {
+        return networkPort;
+    }
+
+    public void setNetworkPort(int networkPort) {
+        this.networkPort = networkPort;
+    }
+
+    public long getLastProcessedSequence() {
+        return lastProcessedSequence;
+    }
+
+    public void setLastProcessedSequence(long lastProcessedSequence) {
+        this.lastProcessedSequence = lastProcessedSequence;
     }
 
     public String getId() {

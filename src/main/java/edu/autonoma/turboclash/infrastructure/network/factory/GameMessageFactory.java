@@ -11,7 +11,7 @@ public class GameMessageFactory {
     public GameMessageFactory() {
     }
 
-    public GameMessage create(Player player, MessageType type, int port) {
+    public GameMessage create(Player player, MessageType type, int port, long sequence, boolean authority) {
         if (player == null) {
             throw new IllegalArgumentException("El jugador no puede ser nulo");
         }
@@ -39,22 +39,34 @@ public class GameMessageFactory {
                 player.getCurrentPoints(),
                 lives,
                 System.currentTimeMillis(),
+                sequence,
                 null,
                 skin,
-                port
+                port,
+                player.isFinishReached(),
+                player.isEliminated(),
+                player.getFinishOrder(),
+                player.getEliminationOrder(),
+                car != null && car.isActive(),
+                authority
         );
+    }
+
+    public GameMessage create(Player player, MessageType type, int port) {
+        return create(player, type, port, System.currentTimeMillis(), false);
     }
 
     public GameMessage createDiscovery(int port) {
         GameMessage msg = new GameMessage();
         msg.setType(MessageType.DISCOVERY);
         msg.setTime(System.currentTimeMillis());
+        msg.setSequence(System.currentTimeMillis());
         msg.setPort(port);
         return msg;
     }
 
-    public GameMessage createEvent(Player player, MessageType type, String event, int port) {
-        GameMessage msg = create(player, type, port);
+    public GameMessage createEvent(Player player, MessageType type, String event, int port, long sequence, boolean authority) {
+        GameMessage msg = create(player, type, port, sequence, authority);
         msg.setEvent(event);
         return msg;
     }

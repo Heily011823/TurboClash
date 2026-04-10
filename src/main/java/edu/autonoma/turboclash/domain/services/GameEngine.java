@@ -16,7 +16,6 @@ public class GameEngine {
     private final List<Obstacle> obstacles;
 
     private static final double WORLD_SPEED = 6.0;
-    private static final double DEAD_ZONE_X = 0;
 
     /**
      * Crea una nueva instancia de {@code GameEngine}.
@@ -46,9 +45,6 @@ public class GameEngine {
         updatePlayers();
         updateWorld();
         processCollisions();
-        checkPlayerOut();
-
-        match.check();
     }
 
     /**
@@ -83,19 +79,6 @@ public class GameEngine {
      */
     private void processCollisions() {
         collisionManager.process(match, items, obstacles);
-    }
-
-    /**
-     * Ejecuta la operacion {@code checkPlayerOut}.
-     */
-    private void checkPlayerOut() {
-        Player local = match.getLocalPlayer();
-
-        if (local == null || local.getCar() == null) return;
-
-        if (local.getCar().getX() <= DEAD_ZONE_X) {
-            match.setFinished(null);
-        }
     }
 
     /**

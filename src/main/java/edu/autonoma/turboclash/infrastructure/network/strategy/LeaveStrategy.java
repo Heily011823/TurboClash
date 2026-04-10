@@ -57,6 +57,8 @@ public class LeaveStrategy implements IMessageStrategy {
             }
         }
 
+        match.markPlayerRemoved(messagePlayerId, messagePlayerName);
+
         match.getRemotePlayers().removeIf(player -> {
             if (player == null) {
                 return false;
@@ -74,12 +76,5 @@ public class LeaveStrategy implements IMessageStrategy {
 
             return sameId || sameName;
         });
-
-        System.out.println("Jugador eliminado: "
-                + (messagePlayerName != null && !messagePlayerName.isBlank()
-                ? messagePlayerName
-                : messagePlayerId));
-
-        System.out.println("Remotos actuales: " + match.getRemotePlayers().size());
     }
 }
