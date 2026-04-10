@@ -67,6 +67,9 @@ public class UdpReceiver implements IMessageReceiver {
                     }
 
                     try {
+                        System.out.println("[DEBUG][UdpReceiver] Datagram recibido desde "
+                                + packet.getAddress().getHostAddress() + ":" + packet.getPort()
+                                + " bytes=" + packet.getLength());
                         GameMessage message = GameMessage.deserialize(data);
 
                         InetAddress ipAddress = packet.getAddress();

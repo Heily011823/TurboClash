@@ -298,7 +298,7 @@ public class GameMessage {
      * @return resultado de la operacion documentada
      */
     public String serialize() {
-        return getType() + "|" +
+        String serialized = getType() + "|" +
                 safe(playerId) + "|" +
                 safe(playerName) + "|" +
                 posX + "|" +
@@ -316,6 +316,11 @@ public class GameMessage {
                 eliminationOrder + "|" +
                 active + "|" +
                 authority;
+        System.out.println("[DEBUG][GameMessage] Serializando mensaje type=" + getType()
+                + " playerId=" + playerId
+                + " sequence=" + sequence
+                + " authority=" + authority);
+        return serialized;
     }
 
     /**
@@ -364,6 +369,10 @@ public class GameMessage {
             throw new IllegalArgumentException("Error al parsear mensaje UDP: " + data, e);
         }
 
+        System.out.println("[DEBUG][GameMessage] Deserializando mensaje type=" + msg.getType()
+                + " playerId=" + msg.getPlayerId()
+                + " sequence=" + msg.getSequence()
+                + " authority=" + msg.isAuthority());
         return msg;
     }
 

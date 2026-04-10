@@ -54,8 +54,30 @@ public class IntroductionWindow {
         this.listener = listener;
         this.audioService = audioService;
 
+        ensureComponentsInitialized();
         setupUI();
         setupEvents();
+    }
+
+    private void ensureComponentsInitialized() {
+        if (panel1 == null) {
+            panel1 = new JPanel();
+        }
+        if (btnStart == null) {
+            btnStart = new JButton();
+        }
+        if (txtName == null) {
+            txtName = new JTextField();
+        }
+        if (lblName == null) {
+            lblName = new JLabel();
+        }
+        if (infoIcon == null) {
+            infoIcon = new JLabel();
+        }
+        if (btnClose == null) {
+            btnClose = new JButton();
+        }
     }
 
     private void setupUI() {
