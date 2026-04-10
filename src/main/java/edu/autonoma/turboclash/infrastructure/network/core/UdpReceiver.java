@@ -9,7 +9,10 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Representa la responsabilidad de {@code UdpReceiver} en la infraestructura de red.
+ * Representa la clase `UdpReceiver` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class UdpReceiver implements IMessageReceiver {
 
@@ -18,9 +21,8 @@ public class UdpReceiver implements IMessageReceiver {
     private IMessageListener listener;
 
     /**
-     * Crea una nueva instancia de {@code UdpReceiver}.
-     *
-     * @param socket valor del parametro {@code socket}
+     * Crea una nueva instancia de `UdpReceiver`.
+     * @param socket valor del parametro `socket`
      */
     public UdpReceiver(DatagramSocket socket) {
         if (socket == null) {
@@ -37,11 +39,18 @@ public class UdpReceiver implements IMessageReceiver {
     }
 
     @Override
+    /**
+     * Actualiza el valor asociado a `setListener`.
+     * @param listener valor del parametro `listener`
+     */
     public void setListener(IMessageListener listener) {
         this.listener = listener;
     }
 
     @Override
+    /**
+     * Ejecuta la operacion publica `escuchar`.
+     */
     public void escuchar() {
         try {
             while (activo && !socket.isClosed()) {
@@ -69,7 +78,7 @@ public class UdpReceiver implements IMessageReceiver {
                         }
 
                     } catch (Exception e) {
-                        System.err.println("Mensaje inválido: " + data);
+                        System.err.println("Mensaje invÃ¡lido: " + data);
                     }
                 } catch (SocketTimeoutException e) {
                     // ciclo de escucha sin ruido de logs
@@ -77,12 +86,15 @@ public class UdpReceiver implements IMessageReceiver {
             }
         } catch (Exception e) {
             if (activo && !socket.isClosed()) {
-                throw new RuntimeException("Error en recepción UDP", e);
+                throw new RuntimeException("Error en recepciÃ³n UDP", e);
             }
         }
     }
 
     @Override
+    /**
+     * Ejecuta la operacion publica `detener`.
+     */
     public void detener() {
         activo = false;
 

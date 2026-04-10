@@ -7,11 +7,20 @@ import edu.autonoma.turboclash.infrastructure.network.message.MessagePayloadCode
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
 import edu.autonoma.turboclash.infrastructure.network.message.PlayerState;
 
+/**
+ * Representa la clase `MessageCodecTest` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public final class MessageCodecTest {
 
     private MessageCodecTest() {
     }
 
+    /**
+     * Ejecuta la operacion publica `run`.
+     */
     public static void run() {
         GameMessage message = new GameMessage(
                 MessageType.MOVEMENT,

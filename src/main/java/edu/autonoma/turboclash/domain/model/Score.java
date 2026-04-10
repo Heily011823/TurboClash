@@ -1,15 +1,17 @@
 package edu.autonoma.turboclash.domain.model;
 
 /**
- * Representa la responsabilidad de {@code Score} dentro del dominio del juego.
+ * Representa la clase `Score` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class Score {
     private int points = 0;
 
     /**
-     * Actualiza la operacion principal del metodo.
-     *
-     * @param amount valor del parametro {@code amount}
+     * Ejecuta la operacion publica `update`.
+     * @param amount valor del parametro `amount`
      */
     public void update(int amount) {
         points += amount;
@@ -17,17 +19,15 @@ public class Score {
     }
 
     /**
-     * Obtiene el valor de {@code Points}.
-     *
-     * @return valor de {@code Points}
+     * Obtiene el valor asociado a `getPoints`.
+     * @return resultado de la operacion documentada
      */
     public int getPoints() {
         return points;
     }
     /**
-     * Actualiza el valor de {@code Points}.
-     *
-     * @param points valor del parametro {@code points}
+     * Actualiza el valor asociado a `setPoints`.
+     * @param points valor del parametro `points`
      */
     public void setPoints(int points) {
         this.points = points;

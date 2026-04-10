@@ -5,11 +5,20 @@ import edu.autonoma.turboclash.domain.model.Player;
 
 import java.util.ArrayList;
 
+/**
+ * Representa la clase `MatchSequenceTest` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public final class MatchSequenceTest {
 
     private MatchSequenceTest() {
     }
 
+    /**
+     * Ejecuta la operacion publica `run`.
+     */
     public static void run() {
         Player host = GameRulesManagerTest.createPlayer("5001", "Host");
         Match match = new Match(host, new ArrayList<>(), 10);

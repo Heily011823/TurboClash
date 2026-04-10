@@ -7,10 +7,16 @@ import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
 import edu.autonoma.turboclash.presentation.navigation.IstartWindowListener;
 
 /**
- * Representa y organiza la vista {@code StartWindow} en la capa de presentacion.
+ * Representa la clase `StartWindow` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class StartWindow {
 
+    /**
+     * Expone el atributo publico `panel1` para la colaboracion entre componentes del sistema.
+     */
     public JPanel panel1;
     private JButton btnJugar;
     private JButton btnExit;
@@ -19,10 +25,9 @@ public class StartWindow {
     private final IAudioService audioService;
 
     /**
-     * Crea una nueva instancia de {@code StartWindow}.
-     *
-     * @param listener valor del parametro {@code listener}
-     * @param audioService valor del parametro {@code audioService}
+     * Crea una nueva instancia de `StartWindow`.
+     * @param listener valor del parametro `listener`
+     * @param audioService valor del parametro `audioService`
      */
     public StartWindow(IstartWindowListener listener, IAudioService audioService) {
         this.listener = listener;
@@ -34,9 +39,6 @@ public class StartWindow {
         setupEvents();
     }
 
-    /**
-     * Configura {@code UI}.
-     */
     private void setupUI() {
         panel1.setLayout(null);
 
@@ -71,9 +73,6 @@ public class StartWindow {
         panel1.add(btnJugar);
     }
 
-    /**
-     * Configura {@code Events}.
-     */
     private void setupEvents() {
 
         btnExit.addActionListener(e -> System.exit(0));

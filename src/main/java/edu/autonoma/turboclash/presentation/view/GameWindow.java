@@ -4,6 +4,7 @@ import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.domain.model.Item;
 import edu.autonoma.turboclash.domain.model.Obstacle;
 import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.infrastructure.sound.SoundManager;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -27,13 +28,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Representa la clase `GameWindow` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class GameWindow {
 
+    /**
+     * Expone el atributo publico `panel1` para la colaboracion entre componentes del sistema.
+     */
     public JPanel panel1;
+    /**
+     * Expone el atributo publico `Puntaje` para la colaboracion entre componentes del sistema.
+     */
     public JLabel Puntaje;
 
     private JLabel countdownLabel;
     private JLabel statusLabel;
+    private JLabel playerStatusLabel;
     private JButton btnClose;
     private Runnable onCountdownFinished;
 
@@ -46,6 +60,7 @@ public class GameWindow {
 
     private FondoAnimadoPanel fondoAnimadoPanel;
     private Timer synchronizedCountdownTimer;
+    private int lastCountdownSecond = -1;
 
     private static final int BASE_WIDTH = 1000;
     private static final int BASE_HEIGHT = 700;
@@ -55,6 +70,9 @@ public class GameWindow {
     private String localPlayerId;
     private String localPlayerName;
 
+    /**
+     * Crea una nueva instancia de `GameWindow`.
+     */
     public GameWindow() {
         if (panel1 == null) {
             panel1 = new JPanel(null);
@@ -66,6 +84,9 @@ public class GameWindow {
 
         Puntaje = createScoreLabel();
         panel1.add(Puntaje);
+
+        playerStatusLabel = createPlayerStatusLabel();
+        panel1.add(playerStatusLabel);
 
         statusLabel = createStatusLabel();
         panel1.add(statusLabel);
@@ -83,6 +104,10 @@ public class GameWindow {
 
         panel1.addComponentListener(new ComponentAdapter() {
             @Override
+            /**
+             * Ejecuta la operacion publica `componentResized`.
+             * @param e valor del parametro `e`
+             */
             public void componentResized(ComponentEvent e) {
                 updateResponsiveLayout();
                 iconCache.clear();
@@ -92,22 +117,41 @@ public class GameWindow {
         SwingUtilities.invokeLater(this::updateResponsiveLayout);
     }
 
+    /**
+     * Actualiza el valor asociado a `setBackgroundPanel`.
+     * @param fondoAnimadoPanel valor del parametro `fondoAnimadoPanel`
+     */
     public void setBackgroundPanel(FondoAnimadoPanel fondoAnimadoPanel) {
         this.fondoAnimadoPanel = fondoAnimadoPanel;
     }
 
+    /**
+     * Obtiene el valor asociado a `getBackgroundPanel`.
+     * @return resultado de la operacion documentada
+     */
     public FondoAnimadoPanel getBackgroundPanel() {
         return fondoAnimadoPanel;
     }
 
+    /**
+     * Obtiene el valor asociado a `getPanel`.
+     * @return resultado de la operacion documentada
+     */
     public JPanel getPanel() {
         return panel1;
     }
 
+    /**
+     * Ejecuta la operacion publica `requestGameFocus`.
+     */
     public void requestGameFocus() {
         panel1.requestFocusInWindow();
     }
 
+    /**
+     * Actualiza el valor asociado a `setLocalPlayer`.
+     * @param localPlayer valor del parametro `localPlayer`
+     */
     public void setLocalPlayer(Player localPlayer) {
         if (localPlayer == null) {
             this.localPlayerId = null;
@@ -119,6 +163,9 @@ public class GameWindow {
         this.localPlayerName = localPlayer.getName();
     }
 
+    /**
+     * Muestra la informacion necesaria para show waiting players.
+     */
     public void showWaitingPlayers() {
         gameStarted = false;
         statusLabel.setText("Esperando jugadores...");
@@ -126,6 +173,11 @@ public class GameWindow {
         panel1.repaint();
     }
 
+    /**
+     * Muestra la informacion necesaria para show waiting players.
+     * @param connectedPlayers valor del parametro `connectedPlayers`
+     * @param minPlayers valor del parametro `minPlayers`
+     */
     public void showWaitingPlayers(int connectedPlayers, int minPlayers) {
         gameStarted = false;
         statusLabel.setText("Esperando jugadores... " + connectedPlayers + "/" + minPlayers + " minimo");
@@ -133,16 +185,27 @@ public class GameWindow {
         panel1.repaint();
     }
 
+    /**
+     * Muestra la informacion necesaria para show game started.
+     */
     public void showGameStarted() {
         gameStarted = true;
         statusLabel.setVisible(false);
         panel1.repaint();
     }
 
+    /**
+     * Actualiza el valor asociado a `setOnCountdownFinished`.
+     * @param onCountdownFinished valor del parametro `onCountdownFinished`
+     */
     public void setOnCountdownFinished(Runnable onCountdownFinished) {
         this.onCountdownFinished = onCountdownFinished;
     }
 
+    /**
+     * Inicia el flujo asociado a start synchronized countdown.
+     * @param scheduledStartTime valor del parametro `scheduledStartTime`
+     */
     public void startSynchronizedCountdown(long scheduledStartTime) {
         if (synchronizedCountdownTimer != null) {
             synchronizedCountdownTimer.stop();
@@ -155,6 +218,7 @@ public class GameWindow {
             if (remainingMillis <= 0) {
                 countdownLabel.setVisible(false);
                 ((Timer) e.getSource()).stop();
+                lastCountdownSecond = -1;
                 showGameStarted();
                 if (onCountdownFinished != null) {
                     onCountdownFinished.run();
@@ -164,18 +228,66 @@ public class GameWindow {
 
             int seconds = Math.max(1, (int) Math.ceil(remainingMillis / 1000.0));
             countdownLabel.setText(String.valueOf(seconds));
+            if (seconds != lastCountdownSecond) {
+                lastCountdownSecond = seconds;
+                SoundManager.getInstance().playCountdownSound();
+            }
         });
         synchronizedCountdownTimer.start();
     }
 
+    /**
+     * Inicia el flujo asociado a start countdown.
+     */
     public void startCountdown() {
         startSynchronizedCountdown(System.currentTimeMillis() + 3000L);
     }
 
+    /**
+     * Actualiza el estado relacionado con update score.
+     * @param points valor del parametro `points`
+     */
     public void updateScore(int points) {
         Puntaje.setText("Puntaje: " + points);
     }
 
+    /**
+     * Actualiza el estado relacionado con update player status.
+     * @param players valor del parametro `players`
+     */
+    public void updatePlayerStatus(List<Player> players) {
+        if (players == null || players.isEmpty()) {
+            playerStatusLabel.setText("<html><b>Jugadores:</b> sin datos</html>");
+            return;
+        }
+
+        StringBuilder builder = new StringBuilder("<html><b>Jugadores</b><br/>");
+        for (Player player : players) {
+            if (player == null) {
+                continue;
+            }
+
+            String name = player.getName() != null && !player.getName().isBlank() ? player.getName() : "Jugador";
+            String state = player.isFinishReached() ? "Meta"
+                    : player.isEliminated() ? "Eliminado"
+                    : "Activo";
+            builder.append(name)
+                    .append(": ")
+                    .append(player.getCurrentPoints())
+                    .append(" pts | ")
+                    .append(player.getLives())
+                    .append(" vidas | ")
+                    .append(state)
+                    .append("<br/>");
+        }
+        builder.append("</html>");
+        playerStatusLabel.setText(builder.toString());
+    }
+
+    /**
+     * Actualiza el estado relacionado con update cars.
+     * @param players valor del parametro `players`
+     */
     public void updateCars(List<Player> players) {
         if (players == null) {
             return;
@@ -196,6 +308,10 @@ public class GameWindow {
         panel1.repaint();
     }
 
+    /**
+     * Actualiza el estado relacionado con update obstacles.
+     * @param obstacles valor del parametro `obstacles`
+     */
     public void updateObstacles(List<Obstacle> obstacles) {
         obstacleLabels.values().forEach(lbl -> lbl.setVisible(false));
         if (obstacles == null) {
@@ -221,6 +337,10 @@ public class GameWindow {
         }
     }
 
+    /**
+     * Actualiza el estado relacionado con update items.
+     * @param items valor del parametro `items`
+     */
     public void updateItems(List<Item> items) {
         itemLabels.values().forEach(lbl -> lbl.setVisible(false));
         if (items == null) {
@@ -240,6 +360,10 @@ public class GameWindow {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `prepareRaceStart`.
+     * @param players valor del parametro `players`
+     */
     public void prepareRaceStart(List<Player> players) {
         if (players == null || players.isEmpty()) {
             return;
@@ -260,18 +384,34 @@ public class GameWindow {
         }
     }
 
+    /**
+     * Obtiene el valor asociado a `getMetaX`.
+     * @return resultado de la operacion documentada
+     */
     public int getMetaX() {
         return fondoAnimadoPanel == null ? Integer.MAX_VALUE : fondoAnimadoPanel.getMetaX();
     }
 
+    /**
+     * Indica la condicion evaluada por `isMetaVisible`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isMetaVisible() {
         return fondoAnimadoPanel != null && fondoAnimadoPanel.isMetaVisible();
     }
 
+    /**
+     * Indica la condicion evaluada por `isBackgroundFinished`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isBackgroundFinished() {
         return fondoAnimadoPanel != null && fondoAnimadoPanel.isJuegoTerminado();
     }
 
+    /**
+     * Muestra la informacion necesaria para show game result.
+     * @param ranking valor del parametro `ranking`
+     */
     public void showGameResult(List<Player> ranking) {
         if (fondoAnimadoPanel != null) {
             fondoAnimadoPanel.terminarJuego(ranking);
@@ -380,6 +520,16 @@ public class GameWindow {
         return label;
     }
 
+    private JLabel createPlayerStatusLabel() {
+        JLabel label = new JLabel("<html><b>Jugadores:</b> sin datos</html>");
+        label.setForeground(Color.WHITE);
+        label.setVerticalAlignment(SwingConstants.TOP);
+        label.setOpaque(true);
+        label.setBackground(new Color(0, 0, 0, 140));
+        label.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+        return label;
+    }
+
     private void initializeCountdownUI() {
         countdownLabel = new JLabel("", SwingConstants.CENTER);
         countdownLabel.setFont(new Font("Arial", Font.BOLD, 48));
@@ -401,6 +551,8 @@ public class GameWindow {
 
         Puntaje.setBounds(scaleX(20), scaleY(40), Math.max(180, scaleX(260)), Math.max(25, scaleY(40)));
         Puntaje.setFont(new Font("Arial", Font.BOLD, Math.max(14, scale(24))));
+        playerStatusLabel.setBounds(scaleX(20), scaleY(90), Math.max(220, scaleX(320)), Math.max(120, scaleY(180)));
+        playerStatusLabel.setFont(new Font("Arial", Font.PLAIN, Math.max(11, scale(14))));
 
         int statusWidth = Math.max(260, scale(500));
         int statusHeight = Math.max(30, scale(40));

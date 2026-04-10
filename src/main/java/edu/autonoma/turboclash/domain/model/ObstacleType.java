@@ -1,7 +1,10 @@
 package edu.autonoma.turboclash.domain.model;
 
 /**
- * Enumera los valores disponibles de {@code ObstacleType} dentro del dominio del juego.
+ * Enumera las opciones disponibles para `ObstacleType` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public enum ObstacleType {
     OIL("Oil_Spill.png"),
@@ -10,19 +13,13 @@ public enum ObstacleType {
 
     private final String image;
 
-    /**
-     * Crea una nueva instancia de {@code ObstacleType}.
-     *
-     * @param image valor del parametro {@code image}
-     */
     ObstacleType(String image) {
         this.image = image;
     }
 
     /**
-     * Obtiene el valor de {@code Image}.
-     *
-     * @return valor de {@code Image}
+     * Obtiene el valor asociado a `getImage`.
+     * @return resultado de la operacion documentada
      */
     public String getImage() {
         return image;

@@ -10,7 +10,10 @@ import java.util.Random;
 
 
 /**
- * Representa la responsabilidad de {@code GameSpawner} en los servicios de dominio.
+ * Representa la clase `GameSpawner` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameSpawner implements Runnable {
 
@@ -23,10 +26,9 @@ public class GameSpawner implements Runnable {
     private static final int SPAWN_DELAY_MS = 1500;
 
     /**
-     * Crea una nueva instancia de {@code GameSpawner}.
-     *
-     * @param items valor del parametro {@code items}
-     * @param obstacles valor del parametro {@code obstacles}
+     * Crea una nueva instancia de `GameSpawner`.
+     * @param items valor del parametro `items`
+     * @param obstacles valor del parametro `obstacles`
      */
     public GameSpawner(List<Item> items, List<Obstacle> obstacles) {
         this.items = items;
@@ -36,7 +38,7 @@ public class GameSpawner implements Runnable {
     }
 
     /**
-     * Inicia la operacion principal del metodo.
+     * Ejecuta la operacion publica `start`.
      */
     public void start() {
         if (!running) {
@@ -48,7 +50,7 @@ public class GameSpawner implements Runnable {
     }
 
     /**
-     * Detiene la operacion principal del metodo.
+     * Ejecuta la operacion publica `stop`.
      */
     public void stop() {
         running = false;
@@ -56,7 +58,7 @@ public class GameSpawner implements Runnable {
 
     @Override
     /**
-     * Ejecuta la tarea principal de {@code GameSpawner}.
+     * Ejecuta la operacion publica `run`.
      */
     public void run() {
         while (running) {
@@ -78,9 +80,6 @@ public class GameSpawner implements Runnable {
         }
     }
 
-    /**
-     * Ejecuta la operacion {@code spawnItem}.
-     */
     private void spawnItem() {
         double x = GameViewport.ITEM_SPAWN_X;
         double y = GameViewport.randomPlayableY(30, random);
@@ -88,9 +87,6 @@ public class GameSpawner implements Runnable {
         String id = "coin_" + System.currentTimeMillis();
         items.add(new Item(id, x, y, 30, 30));
     }
-    /**
-     * Ejecuta la operacion {@code spawnObstacle}.
-     */
     private void spawnObstacle() {
         double x = GameViewport.OBSTACLE_SPAWN_X;
         double y = GameViewport.randomPlayableY(45, random);

@@ -11,25 +11,26 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Crea y configura instancias relacionadas con {@code WorldFactory} en la infraestructura del sistema.
+ * Representa la clase `WorldFactory` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class WorldFactory {
 
     private final GameConfig config;
 
     /**
-     * Crea una nueva instancia de {@code WorldFactory}.
-     *
-     * @param config valor del parametro {@code config}
+     * Crea una nueva instancia de `WorldFactory`.
+     * @param config valor del parametro `config`
      */
     public WorldFactory(GameConfig config) {
         this.config = config;
     }
 
     /**
-     * Crea {@code Items}.
-     *
-     * @return instancia creada para {@code Items}
+     * Crea el recurso necesario para create items.
+     * @return resultado de la operacion documentada
      */
     public List<Item> createItems() {
         List<Item> items = new ArrayList<>();
@@ -39,9 +40,8 @@ public class WorldFactory {
     }
 
     /**
-     * Crea {@code Obstacles}.
-     *
-     * @return instancia creada para {@code Obstacles}
+     * Crea el recurso necesario para create obstacles.
+     * @return resultado de la operacion documentada
      */
     public List<Obstacle> createObstacles() {
         List<Obstacle> obstacles = new ArrayList<>();

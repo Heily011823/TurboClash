@@ -6,10 +6,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionAdapter;
 
 /**
- * Representa la responsabilidad de {@code GameInputBinder} en la gestion de entrada.
+ * Representa la clase `GameInputBinder` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameInputBinder {
 
+    /**
+     * Enumera las opciones disponibles para `ControlType` dentro del sistema.
+     *
+     * @author 
+     * @version 1.0
+     */
     public enum ControlType {
         KEYBOARD,
         MOUSE,
@@ -21,11 +30,10 @@ public class GameInputBinder {
     private final ControlType controlType;
 
     /**
-     * Crea una nueva instancia de {@code GameInputBinder}.
-     *
-     * @param keyboardInput valor del parametro {@code keyboardInput}
-     * @param mouseInput valor del parametro {@code mouseInput}
-     * @param controlType tipo de control que se va a enlazar
+     * Crea una nueva instancia de `GameInputBinder`.
+     * @param keyboardInput valor del parametro `keyboardInput`
+     * @param mouseInput valor del parametro `mouseInput`
+     * @param controlType valor del parametro `controlType`
      */
     public GameInputBinder(KeyboardInput keyboardInput, MouseInput mouseInput, ControlType controlType) {
         this.keyboardInput = keyboardInput;
@@ -34,9 +42,8 @@ public class GameInputBinder {
     }
 
     /**
-     * Vincula la operacion principal del metodo.
-     *
-     * @param panel valor del parametro {@code panel}
+     * Ejecuta la operacion publica `bind`.
+     * @param panel valor del parametro `panel`
      */
     public void bind(JPanel panel) {
         panel.setFocusable(true);
@@ -53,19 +60,22 @@ public class GameInputBinder {
         }
     }
 
-    /**
-     * Vincula {@code Keyboard}.
-     *
-     * @param panel valor del parametro {@code panel}
-     */
     private void bindKeyboard(JPanel panel) {
         panel.addKeyListener(new KeyAdapter() {
             @Override
+            /**
+             * Ejecuta la operacion publica `keyPressed`.
+             * @param e valor del parametro `e`
+             */
             public void keyPressed(KeyEvent e) {
                 processKey(e.getKeyCode(), true);
             }
 
             @Override
+            /**
+             * Ejecuta la operacion publica `keyReleased`.
+             * @param e valor del parametro `e`
+             */
             public void keyReleased(KeyEvent e) {
                 processKey(e.getKeyCode(), false);
             }
@@ -81,19 +91,22 @@ public class GameInputBinder {
         });
     }
 
-    /**
-     * Vincula {@code Mouse}.
-     *
-     * @param panel valor del parametro {@code panel}
-     */
     private void bindMouse(JPanel panel) {
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
+            /**
+             * Ejecuta la operacion publica `mouseMoved`.
+             * @param e valor del parametro `e`
+             */
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 mouseInput.setTarget(e.getX(), e.getY());
             }
 
             @Override
+            /**
+             * Ejecuta la operacion publica `mouseDragged`.
+             * @param e valor del parametro `e`
+             */
             public void mouseDragged(java.awt.event.MouseEvent e) {
                 mouseInput.setTarget(e.getX(), e.getY());
             }

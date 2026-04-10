@@ -3,7 +3,10 @@ package edu.autonoma.turboclash.domain.services;
 import edu.autonoma.turboclash.domain.model.Player;
 
 /**
- * Administra la responsabilidad principal de {@code GameRulesManager} en los servicios de dominio.
+ * Representa la clase `GameRulesManager` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameRulesManager {
 
@@ -14,9 +17,8 @@ public class GameRulesManager {
     private int currentEliminationOrder = 1;
 
     /**
-     * Crea una nueva instancia de {@code GameRulesManager}.
-     *
-     * @param targetScore valor del parametro {@code targetScore}
+     * Crea una nueva instancia de `GameRulesManager`.
+     * @param targetScore valor del parametro `targetScore`
      */
     public GameRulesManager(int targetScore) {
         this.targetScore = targetScore;
@@ -24,9 +26,8 @@ public class GameRulesManager {
 
 
     /**
-     * Ejecuta la operacion {@code applyCoinReward}.
-     *
-     * @param p valor del parametro {@code p}
+     * Aplica la logica correspondiente a apply coin reward.
+     * @param p valor del parametro `p`
      */
     public void applyCoinReward(Player p) {
         if (p == null) return;
@@ -37,9 +38,8 @@ public class GameRulesManager {
 
 
     /**
-     * Ejecuta la operacion {@code applyObstaclePenalty}.
-     *
-     * @param p valor del parametro {@code p}
+     * Aplica la logica correspondiente a apply obstacle penalty.
+     * @param p valor del parametro `p`
      */
     public void applyObstaclePenalty(Player p) {
         if (p == null) return;
@@ -55,10 +55,9 @@ public class GameRulesManager {
 
 
     /**
-     * Procesa {@code PlayersCollision}.
-     *
-     * @param p1 valor del parametro {@code p1}
-     * @param p2 valor del parametro {@code p2}
+     * Procesa el evento o estado asociado a handle players collision.
+     * @param p1 valor del parametro `p1`
+     * @param p2 valor del parametro `p2`
      */
     public void handlePlayersCollision(Player p1, Player p2) {
 
@@ -76,11 +75,6 @@ public class GameRulesManager {
     }
 
 
-    /**
-     * Ejecuta la operacion {@code checkZeroLifeRule}.
-     *
-     * @param p valor del parametro {@code p}
-     */
     private void checkZeroLifeRule(Player p) {
         if (p.getCurrentPoints() <= 0 && p.hasScored()) {
             p.resetScore();
@@ -89,11 +83,6 @@ public class GameRulesManager {
     }
 
 
-    /**
-     * Ejecuta la operacion {@code checkElimination}.
-     *
-     * @param p valor del parametro {@code p}
-     */
     private void checkElimination(Player p) {
         if (p != null && !p.isAlive()) {
             if (p.getEliminationOrder() == Integer.MAX_VALUE) {
@@ -103,11 +92,6 @@ public class GameRulesManager {
         }
     }
 
-    /**
-     * Ejecuta la operacion {@code applySpeedDebuff}.
-     *
-     * @param p valor del parametro {@code p}
-     */
     private void applySpeedDebuff(Player p) {
         if (p != null && p.getCar() != null) {
             p.getCar().applyDebuff(
@@ -119,9 +103,8 @@ public class GameRulesManager {
 
     // META
     /**
-     * Ejecuta la operacion {@code applyFinishBonus}.
-     *
-     * @param p valor del parametro {@code p}
+     * Aplica la logica correspondiente a apply finish bonus.
+     * @param p valor del parametro `p`
      */
     public void applyFinishBonus(Player p) {
         if (p == null || p.getCar() == null) return;
@@ -136,10 +119,9 @@ public class GameRulesManager {
     }
 
     /**
-     * Indica si {@code Won}.
-     *
-     * @param p valor del parametro {@code p}
-     * @return true si se cumple la condicion evaluada; false en caso contrario
+     * Indica la condicion evaluada por `hasWon`.
+     * @param p valor del parametro `p`
+     * @return resultado de la operacion documentada
      */
     public boolean hasWon(Player p) {
         if (p == null || p.getCar() == null) return false;

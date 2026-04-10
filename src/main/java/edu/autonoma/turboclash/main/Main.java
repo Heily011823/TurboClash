@@ -5,14 +5,16 @@ import edu.autonoma.turboclash.presentation.view.StartWindowFrame;
 import javax.swing.*;
 
 /**
- * Define el punto de entrada principal de la aplicacion.
+ * Representa la clase `Main` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class Main {
 
     /**
-     * Ejecuta la operacion {@code main}.
-     *
-     * @param args valor del parametro {@code args}
+     * Ejecuta la operacion publica `main`.
+     * @param args valor del parametro `args`
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(StartWindowFrame::new);

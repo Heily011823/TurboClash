@@ -6,15 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Administra la responsabilidad principal de {@code GameResultManager} en los servicios de dominio.
+ * Representa la clase `GameResultManager` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameResultManager {
 
     /**
-     * Ejecuta la operacion {@code calculateRanking}.
-     *
-     * @param players valor del parametro {@code players}
-     * @return resultado de la operacion {@code calculateRanking}
+     * Calcula el resultado requerido para calculate ranking.
+     * @param players valor del parametro `players`
+     * @return resultado de la operacion documentada
      */
     public List<Player> calculateRanking(List<Player> players) {
         List<Player> ranking = new ArrayList<>(players);

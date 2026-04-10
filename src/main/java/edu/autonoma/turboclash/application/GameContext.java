@@ -16,7 +16,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Contexto compartido del juego.
+ * Representa la clase `GameContext` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameContext {
 
@@ -32,6 +35,18 @@ public class GameContext {
 
     private Player localPlayer;
 
+    /**
+     * Crea una nueva instancia de `GameContext`.
+     * @param match valor del parametro `match`
+     * @param engine valor del parametro `engine`
+     * @param network valor del parametro `network`
+     * @param obstacles valor del parametro `obstacles`
+     * @param items valor del parametro `items`
+     * @param peer valor del parametro `peer`
+     * @param rulesManager valor del parametro `rulesManager`
+     * @param resultManager valor del parametro `resultManager`
+     * @param coordinator valor del parametro `coordinator`
+     */
     public GameContext(Match match,
                        GameEngine engine,
                        GameNetworkService network,
@@ -53,6 +68,10 @@ public class GameContext {
         this.coordinator = coordinator;
     }
 
+    /**
+     * Obtiene el valor asociado a `getPlayers`.
+     * @return resultado de la operacion documentada
+     */
     public List<Player> getPlayers() {
         if (match == null || match.getPlayers() == null) {
             return Collections.emptyList();
@@ -60,60 +79,112 @@ public class GameContext {
         return match.getPlayers();
     }
 
+    /**
+     * Obtiene el valor asociado a `getCars`.
+     * @return resultado de la operacion documentada
+     */
     public List<Car> getCars() {
         return getPlayers().stream()
                 .map(Player::getCar)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene el valor asociado a `getMatch`.
+     * @return resultado de la operacion documentada
+     */
     public Match getMatch() {
         return match;
     }
 
+    /**
+     * Obtiene el valor asociado a `getEngine`.
+     * @return resultado de la operacion documentada
+     */
     public GameEngine getEngine() {
         return engine;
     }
 
+    /**
+     * Obtiene el valor asociado a `getNetwork`.
+     * @return resultado de la operacion documentada
+     */
     public GameNetworkService getNetwork() {
         return network;
     }
 
+    /**
+     * Obtiene el valor asociado a `getObstacles`.
+     * @return resultado de la operacion documentada
+     */
     public List<Obstacle> getObstacles() {
         return obstacles != null
                 ? Collections.unmodifiableList(obstacles)
                 : Collections.emptyList();
     }
 
+    /**
+     * Obtiene el valor asociado a `getItems`.
+     * @return resultado de la operacion documentada
+     */
     public List<Item> getItems() {
         return items != null
                 ? Collections.unmodifiableList(items)
                 : Collections.emptyList();
     }
 
+    /**
+     * Obtiene el valor asociado a `getPeer`.
+     * @return resultado de la operacion documentada
+     */
     public UdpPeer getPeer() {
         return peer;
     }
 
+    /**
+     * Obtiene el valor asociado a `getRulesManager`.
+     * @return resultado de la operacion documentada
+     */
     public GameRulesManager getRulesManager() {
         return rulesManager;
     }
 
+    /**
+     * Obtiene el valor asociado a `getResultManager`.
+     * @return resultado de la operacion documentada
+     */
     public GameResultManager getResultManager() {
         return resultManager;
     }
 
+    /**
+     * Obtiene el valor asociado a `getCoordinator`.
+     * @return resultado de la operacion documentada
+     */
     public AuthoritativeMatchCoordinator getCoordinator() {
         return coordinator;
     }
 
+    /**
+     * Obtiene el valor asociado a `getLocalPlayer`.
+     * @return resultado de la operacion documentada
+     */
     public Player getLocalPlayer() {
         return localPlayer;
     }
 
+    /**
+     * Actualiza el valor asociado a `setLocalPlayer`.
+     * @param localPlayer valor del parametro `localPlayer`
+     */
     public void setLocalPlayer(Player localPlayer) {
         this.localPlayer = localPlayer;
     }
 
+    /**
+     * Agrega el elemento necesario para add player.
+     * @param player valor del parametro `player`
+     */
     public void addPlayer(Player player) {
         if (match != null && player != null) {
             match.addPlayer(player);

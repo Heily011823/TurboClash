@@ -1,11 +1,14 @@
 package edu.autonoma.turboclash.infrastructure.network.message;
 
 /**
- * Enumera los valores disponibles de {@code MessageType} en el intercambio de mensajes.
+ * Enumera las opciones disponibles para `MessageType` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public enum MessageType {
 
-    // Conexión
+    // ConexiÃ³n
     HANDSHAKE,
     PLAYER_JOINED,
     PLAYER_LEFT,

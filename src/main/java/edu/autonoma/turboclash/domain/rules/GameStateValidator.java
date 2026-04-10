@@ -4,15 +4,17 @@ import edu.autonoma.turboclash.exception.InvalidGameStateException;
 
 
 /**
- * Valida las reglas asociadas a {@code GameStateValidator} en las reglas del dominio.
+ * Representa la clase `GameStateValidator` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameStateValidator {
 
     /**
-     * Valida si la partida puede iniciar.
-     *
-     * @param playersConnected Indica si los jugadores están conectados.
-     * @throws InvalidGameStateException Se lanza la excepción si no hay jugadores conectados.
+     * Valida las condiciones asociadas a validate start.
+     * @param playersConnected valor del parametro `playersConnected`
+     * @throws InvalidGameStateException se propaga si ocurre una condicion excepcional durante la ejecucion
      */
     public static void validateStart(boolean playersConnected) throws InvalidGameStateException {
 

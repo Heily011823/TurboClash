@@ -2,29 +2,30 @@ package edu.autonoma.turboclash.domain.model;
 
 
 /**
- * Representa la responsabilidad de {@code Item} dentro del dominio del juego.
+ * Representa la clase `Item` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class Item extends GameObject {
 
     private final int scoreValue = 20;
 
     /**
-     * Crea una nueva instancia de {@code Item}.
-     *
-     * @param id identificador asociado a la operacion
-     * @param x coordenada horizontal utilizada en la operacion
-     * @param y coordenada vertical utilizada en la operacion
-     * @param width valor del parametro {@code width}
-     * @param height valor del parametro {@code height}
+     * Crea una nueva instancia de `Item`.
+     * @param id valor del parametro `id`
+     * @param x valor del parametro `x`
+     * @param y valor del parametro `y`
+     * @param width valor del parametro `width`
+     * @param height valor del parametro `height`
      */
     public Item(String id, double x, double y, int width, int height) {
         super(id, x, y, width, height);
     }
 
     /**
-     * Obtiene el valor de {@code ScoreValue}.
-     *
-     * @return valor de {@code ScoreValue}
+     * Obtiene el valor asociado a `getScoreValue`.
+     * @return resultado de la operacion documentada
      */
     public int getScoreValue() {
         return scoreValue;

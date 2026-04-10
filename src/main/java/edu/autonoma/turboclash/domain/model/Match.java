@@ -8,7 +8,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Representa la responsabilidad de {@code Match} dentro del dominio del juego.
+ * Representa la clase `Match` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class Match {
 
@@ -30,11 +33,10 @@ public class Match {
     private int maxPlayers = 4;
 
     /**
-     * Crea una nueva instancia de {@code Match}.
-     *
-     * @param localPlayer valor del parametro {@code localPlayer}
-     * @param remotePlayers valor del parametro {@code remotePlayers}
-     * @param targetScore valor del parametro {@code targetScore}
+     * Crea una nueva instancia de `Match`.
+     * @param localPlayer valor del parametro `localPlayer`
+     * @param remotePlayers valor del parametro `remotePlayers`
+     * @param targetScore valor del parametro `targetScore`
      */
     public Match(Player localPlayer, List<Player> remotePlayers, int targetScore) {
         this.localPlayer = localPlayer;
@@ -46,7 +48,7 @@ public class Match {
     }
 
     /**
-     * Ejecuta la operacion {@code check}.
+     * Ejecuta la operacion publica `check`.
      */
     public void check() {
         if (finished || started) {
@@ -55,9 +57,8 @@ public class Match {
     }
 
     /**
-     * Obtiene el valor de {@code Players}.
-     *
-     * @return valor de {@code Players}
+     * Obtiene el valor asociado a `getPlayers`.
+     * @return resultado de la operacion documentada
      */
     public synchronized List<Player> getPlayers() {
         List<Player> all = new ArrayList<>();
@@ -69,15 +70,20 @@ public class Match {
     }
 
     /**
-     * Actualiza el valor de {@code Finished}.
-     *
-     * @param winner valor del parametro {@code winner}
+     * Actualiza el valor asociado a `setFinished`.
+     * @param winner valor del parametro `winner`
      */
     public void setFinished(Player winner) {
         this.finished = true;
         this.winner = winner;
     }
 
+    /**
+     * Ejecuta la operacion publica `finishGame`.
+     * @param winner valor del parametro `winner`
+     * @param ranking valor del parametro `ranking`
+     * @param reason valor del parametro `reason`
+     */
     public synchronized void finishGame(Player winner, List<Player> ranking, String reason) {
         this.finished = true;
         this.winner = winner;
@@ -88,74 +94,137 @@ public class Match {
         }
     }
 
+    /**
+     * Obtiene el valor asociado a `getLocalPlayer`.
+     * @return resultado de la operacion documentada
+     */
     public Player getLocalPlayer() {
         return localPlayer;
     }
 
+    /**
+     * Actualiza el valor asociado a `setLocalPlayer`.
+     * @param localPlayer valor del parametro `localPlayer`
+     */
     public void setLocalPlayer(Player localPlayer) {
         this.localPlayer = localPlayer;
     }
 
+    /**
+     * Obtiene el valor asociado a `getRemotePlayers`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized List<Player> getRemotePlayers() {
         return remotePlayers;
     }
 
+    /**
+     * Indica la condicion evaluada por `isFinished`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isFinished() {
         return finished;
     }
 
+    /**
+     * Obtiene el valor asociado a `getWinner`.
+     * @return resultado de la operacion documentada
+     */
     public Player getWinner() {
         return winner;
     }
 
+    /**
+     * Indica la condicion evaluada por `isStarted`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized boolean isStarted() {
         return started;
     }
 
+    /**
+     * Actualiza el valor asociado a `setStarted`.
+     * @param started valor del parametro `started`
+     */
     public synchronized void setStarted(boolean started) {
         this.started = started;
     }
 
+    /**
+     * Obtiene el valor asociado a `getScheduledStartTime`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized long getScheduledStartTime() {
         return scheduledStartTime;
     }
 
+    /**
+     * Actualiza el valor asociado a `setScheduledStartTime`.
+     * @param scheduledStartTime valor del parametro `scheduledStartTime`
+     */
     public synchronized void setScheduledStartTime(long scheduledStartTime) {
         this.scheduledStartTime = scheduledStartTime;
     }
 
+    /**
+     * Obtiene el valor asociado a `getRemainingMillis`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized long getRemainingMillis() {
         return remainingMillis;
     }
 
+    /**
+     * Actualiza el valor asociado a `setRemainingMillis`.
+     * @param remainingMillis valor del parametro `remainingMillis`
+     */
     public synchronized void setRemainingMillis(long remainingMillis) {
         this.remainingMillis = Math.max(0, remainingMillis);
     }
 
+    /**
+     * Obtiene el valor asociado a `getGameOverReason`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized String getGameOverReason() {
         return gameOverReason;
     }
 
+    /**
+     * Obtiene el valor asociado a `getRanking`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized List<Player> getRanking() {
         return Collections.unmodifiableList(new ArrayList<>(ranking));
     }
 
+    /**
+     * Obtiene el valor asociado a `getMinPlayers`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized int getMinPlayers() {
         return minPlayers;
     }
 
+    /**
+     * Obtiene el valor asociado a `getMaxPlayers`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized int getMaxPlayers() {
         return maxPlayers;
     }
 
+    /**
+     * Obtiene el valor asociado a `getTargetScore`.
+     * @return resultado de la operacion documentada
+     */
     public int getTargetScore() {
         return targetScore;
     }
 
     /**
-     * Agrega o actualiza un jugador remoto.
-     *
-     * @param newPlayer jugador remoto recibido por red
+     * Agrega el elemento necesario para add player.
+     * @param newPlayer valor del parametro `newPlayer`
      */
     public synchronized void addPlayer(Player newPlayer) {
         if (newPlayer == null) {
@@ -184,6 +253,10 @@ public class Match {
         }
     }
 
+    /**
+     * Elimina el elemento asociado a remove player.
+     * @param player valor del parametro `player`
+     */
     public synchronized void removePlayer(Player player) {
         if (player == null) {
             return;
@@ -193,6 +266,10 @@ public class Match {
         remotePlayers.removeIf(existing -> samePlayer(existing, player));
     }
 
+    /**
+     * Elimina el elemento asociado a remove player by name.
+     * @param playerName valor del parametro `playerName`
+     */
     public synchronized void removePlayerByName(String playerName) {
         if (playerName == null || playerName.isBlank()) {
             return;
@@ -205,6 +282,12 @@ public class Match {
                         && player.getName().equalsIgnoreCase(playerName));
     }
 
+    /**
+     * Busca el elemento requerido para find player by id or name.
+     * @param playerId valor del parametro `playerId`
+     * @param playerName valor del parametro `playerName`
+     * @return resultado de la operacion documentada
+     */
     public synchronized Player findPlayerByIdOrName(String playerId, String playerName) {
         if (localPlayer != null) {
             boolean sameLocalById = localPlayer.getId() != null
@@ -223,6 +306,12 @@ public class Match {
         return findRemotePlayer(playerId, playerName);
     }
 
+    /**
+     * Busca el elemento requerido para find remote player.
+     * @param playerId valor del parametro `playerId`
+     * @param playerName valor del parametro `playerName`
+     * @return resultado de la operacion documentada
+     */
     public synchronized Player findRemotePlayer(String playerId, String playerName) {
         for (Player player : remotePlayers) {
             if (player == null) {
@@ -244,6 +333,13 @@ public class Match {
         return null;
     }
 
+    /**
+     * Indica la condicion evaluada por `isPacketFresh`.
+     * @param playerId valor del parametro `playerId`
+     * @param playerName valor del parametro `playerName`
+     * @param sequence valor del parametro `sequence`
+     * @return resultado de la operacion documentada
+     */
     public synchronized boolean isPacketFresh(String playerId, String playerName, long sequence) {
         if (sequence <= 0) {
             return true;
@@ -259,24 +355,47 @@ public class Match {
         return true;
     }
 
+    /**
+     * Ejecuta la operacion publica `markPlayerRemoved`.
+     * @param playerId valor del parametro `playerId`
+     * @param playerName valor del parametro `playerName`
+     */
     public synchronized void markPlayerRemoved(String playerId, String playerName) {
         removedPlayers.add(buildPlayerKey(playerId, playerName));
     }
 
+    /**
+     * Indica la condicion evaluada por `isPlayerRemoved`.
+     * @param playerId valor del parametro `playerId`
+     * @param playerName valor del parametro `playerName`
+     * @return resultado de la operacion documentada
+     */
     public synchronized boolean isPlayerRemoved(String playerId, String playerName) {
         return removedPlayers.contains(buildPlayerKey(playerId, playerName));
     }
 
+    /**
+     * Obtiene el valor asociado a `getConnectedPlayerCount`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized int getConnectedPlayerCount() {
         return getPlayers().size();
     }
 
+    /**
+     * Ejecuta la operacion publica `registerKnownPort`.
+     * @param port valor del parametro `port`
+     */
     public synchronized void registerKnownPort(int port) {
         if (port > 0) {
             knownPorts.add(port);
         }
     }
 
+    /**
+     * Obtiene el valor asociado a `getHostPort`.
+     * @return resultado de la operacion documentada
+     */
     public synchronized int getHostPort() {
         int hostPort = Integer.MAX_VALUE;
 

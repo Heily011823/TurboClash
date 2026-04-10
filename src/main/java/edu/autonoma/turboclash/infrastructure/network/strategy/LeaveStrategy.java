@@ -5,27 +5,28 @@ import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
 /**
- * Representa la responsabilidad de {@code LeaveStrategy} en las estrategias de mensajeria.
+ * Representa la clase `LeaveStrategy` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class LeaveStrategy implements IMessageStrategy {
 
     private final Match match;
 
     /**
-     * Crea una nueva instancia de {@code LeaveStrategy}.
-     *
-     * @param match valor del parametro {@code match}
+     * Crea una nueva instancia de `LeaveStrategy`.
+     * @param match valor del parametro `match`
      */
     public LeaveStrategy(Match match) {
         this.match = match;
     }
 
-    /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param message valor del parametro {@code message}
-     */
     @Override
+    /**
+     * Ejecuta la operacion publica `handle`.
+     * @param message valor del parametro `message`
+     */
     public void handle(GameMessage message) {
         if (message == null || match == null) {
             return;

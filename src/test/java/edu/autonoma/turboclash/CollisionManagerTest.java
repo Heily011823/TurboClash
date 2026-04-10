@@ -9,11 +9,20 @@ import edu.autonoma.turboclash.domain.services.GameRulesManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representa la clase `CollisionManagerTest` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public final class CollisionManagerTest {
 
     private CollisionManagerTest() {
     }
 
+    /**
+     * Ejecuta la operacion publica `run`.
+     */
     public static void run() {
         Player first = GameRulesManagerTest.createPlayer("5001", "One");
         Player second = GameRulesManagerTest.createPlayer("5002", "Two");
@@ -23,14 +32,27 @@ public final class CollisionManagerTest {
         GameRulesManager rules = new GameRulesManager(10);
         CollisionManager manager = new CollisionManager(new CollisionListener() {
             @Override
+            /**
+             * Ejecuta la operacion publica `onItemCollision`.
+             * @param player valor del parametro `player`
+             */
             public void onItemCollision(Player player) {
             }
 
             @Override
+            /**
+             * Ejecuta la operacion publica `onObstacleCollision`.
+             * @param player valor del parametro `player`
+             */
             public void onObstacleCollision(Player player) {
             }
 
             @Override
+            /**
+             * Ejecuta la operacion publica `onPlayersCollision`.
+             * @param p1 valor del parametro `p1`
+             * @param p2 valor del parametro `p2`
+             */
             public void onPlayersCollision(Player p1, Player p2) {
                 rules.handlePlayersCollision(p1, p2);
             }

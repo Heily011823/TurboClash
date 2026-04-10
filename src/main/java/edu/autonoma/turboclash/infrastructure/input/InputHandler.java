@@ -3,13 +3,11 @@ package edu.autonoma.turboclash.infrastructure.input;
 import edu.autonoma.turboclash.domain.model.Car;
 
 /**
- * Define el contrato de {@code InputHandler} en la gestion de entrada.
+ * Define el contrato de `InputHandler` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public interface InputHandler {
-    /**
-     * Actualiza la operacion principal del metodo.
-     *
-     * @param car valor del parametro {@code car}
-     */
     void update(Car car);
 }

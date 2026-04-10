@@ -3,26 +3,27 @@ package edu.autonoma.turboclash.domain.model;
 import edu.autonoma.turboclash.config.GameConfig;
 
 /**
- * Crea y configura instancias relacionadas con {@code CarSkinFactory} dentro del dominio del juego.
+ * Representa la clase `CarSkinFactory` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class CarSkinFactory {
 
     private final GameConfig config;
 
     /**
-     * Crea una nueva instancia de {@code CarSkinFactory}.
-     *
-     * @param config valor del parametro {@code config}
+     * Crea una nueva instancia de `CarSkinFactory`.
+     * @param config valor del parametro `config`
      */
     public CarSkinFactory(GameConfig config) {
         this.config = config;
     }
 
     /**
-     * Ejecuta la operacion {@code fromPort}.
-     *
-     * @param puerto valor del parametro {@code puerto}
-     * @return resultado de la operacion {@code fromPort}
+     * Ejecuta la operacion publica `fromPort`.
+     * @param puerto valor del parametro `puerto`
+     * @return resultado de la operacion documentada
      */
     public CarSkin fromPort(int puerto) {
 

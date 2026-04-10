@@ -28,7 +28,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Coordina la inicializacion de {@code GameBootstrap} en la capa de aplicacion.
+ * Representa la clase `GameBootstrap` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameBootstrap {
 
@@ -39,13 +42,12 @@ public class GameBootstrap {
     private final IAudioService audioService;
 
     /**
-     * Crea una nueva instancia de {@code GameBootstrap}.
-     *
-     * @param gameFactory valor del parametro {@code gameFactory}
-     * @param worldFactory valor del parametro {@code worldFactory}
-     * @param networkFactory valor del parametro {@code networkFactory}
-     * @param config valor del parametro {@code config}
-     * @param audioService valor del parametro {@code audioService}
+     * Crea una nueva instancia de `GameBootstrap`.
+     * @param gameFactory valor del parametro `gameFactory`
+     * @param worldFactory valor del parametro `worldFactory`
+     * @param networkFactory valor del parametro `networkFactory`
+     * @param config valor del parametro `config`
+     * @param audioService valor del parametro `audioService`
      */
     public GameBootstrap(GameFactory gameFactory,
                          WorldFactory worldFactory,
@@ -61,11 +63,10 @@ public class GameBootstrap {
     }
 
     /**
-     * Inicializa la operacion principal del metodo.
-     *
-     * @param puertoLocal valor del parametro {@code puertoLocal}
-     * @param playerName valor del parametro {@code playerName}
-     * @return resultado de la operacion {@code init}
+     * Ejecuta la operacion publica `init`.
+     * @param puertoLocal valor del parametro `puertoLocal`
+     * @param playerName valor del parametro `playerName`
+     * @return resultado de la operacion documentada
      */
     public GameContext init(int puertoLocal, String playerName) {
 

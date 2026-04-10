@@ -21,6 +21,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Representa la clase `AuthoritativeMatchCoordinator` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class AuthoritativeMatchCoordinator {
 
     private static final long START_DELAY_MS = 3000;
@@ -37,6 +43,18 @@ public class AuthoritativeMatchCoordinator {
     private final int localPort;
     private boolean spawnerStarted;
 
+    /**
+     * Crea una nueva instancia de `AuthoritativeMatchCoordinator`.
+     * @param match valor del parametro `match`
+     * @param engine valor del parametro `engine`
+     * @param networkService valor del parametro `networkService`
+     * @param rulesManager valor del parametro `rulesManager`
+     * @param resultManager valor del parametro `resultManager`
+     * @param items valor del parametro `items`
+     * @param obstacles valor del parametro `obstacles`
+     * @param spawner valor del parametro `spawner`
+     * @param localPort valor del parametro `localPort`
+     */
     public AuthoritativeMatchCoordinator(Match match,
                                          GameEngine engine,
                                          GameNetworkService networkService,
@@ -57,10 +75,18 @@ public class AuthoritativeMatchCoordinator {
         this.localPort = localPort;
     }
 
+    /**
+     * Indica la condicion evaluada por `isLocalHost`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isLocalHost() {
         return match.getHostPort() == localPort;
     }
 
+    /**
+     * Actualiza el estado relacionado con update host authority.
+     * @param window valor del parametro `window`
+     */
     public void updateHostAuthority(GameWindow window) {
         if (!isLocalHost() || match.isFinished()) {
             return;
@@ -83,6 +109,9 @@ public class AuthoritativeMatchCoordinator {
         checkGameOver(window);
     }
 
+    /**
+     * Ejecuta la operacion publica `maybeStartMatch`.
+     */
     public void maybeStartMatch() {
         long scheduledStartTime = match.getScheduledStartTime();
         if (match.isStarted() || scheduledStartTime <= 0L) {
@@ -96,6 +125,9 @@ public class AuthoritativeMatchCoordinator {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `maybeScheduleGameStart`.
+     */
     public void maybeScheduleGameStart() {
         if (!isLocalHost() || match.isStarted() || match.getScheduledStartTime() > 0) {
             return;
@@ -111,6 +143,10 @@ public class AuthoritativeMatchCoordinator {
                 match.getConnectedPlayerCount(), match.getMinPlayers(), match.getMaxPlayers());
     }
 
+    /**
+     * Aplica la logica correspondiente a apply game start.
+     * @param payload valor del parametro `payload`
+     */
     public void applyGameStart(GameStartPayload payload) {
         if (payload == null) {
             return;
@@ -120,6 +156,10 @@ public class AuthoritativeMatchCoordinator {
         match.setScheduledStartTime(payload.scheduledStartTime);
     }
 
+    /**
+     * Aplica la logica correspondiente a apply snapshot.
+     * @param snapshot valor del parametro `snapshot`
+     */
     public void applySnapshot(MatchSnapshot snapshot) {
         if (snapshot == null) {
             return;
@@ -162,6 +202,10 @@ public class AuthoritativeMatchCoordinator {
         }
     }
 
+    /**
+     * Aplica la logica correspondiente a apply game over.
+     * @param snapshot valor del parametro `snapshot`
+     */
     public void applyGameOver(MatchSnapshot snapshot) {
         if (snapshot == null) {
             return;
@@ -201,6 +245,10 @@ public class AuthoritativeMatchCoordinator {
         stopSpawner();
     }
 
+    /**
+     * Ejecuta la operacion publica `checkGameOver`.
+     * @param window valor del parametro `window`
+     */
     public void checkGameOver(GameWindow window) {
         long remainingMillis = Math.max(0L, match.getScheduledStartTime() + MATCH_DURATION_MS - System.currentTimeMillis());
         match.setRemainingMillis(remainingMillis);

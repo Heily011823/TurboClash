@@ -4,11 +4,20 @@ import edu.autonoma.turboclash.domain.model.Car;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.domain.services.GameRulesManager;
 
+/**
+ * Representa la clase `GameRulesManagerTest` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public final class GameRulesManagerTest {
 
     private GameRulesManagerTest() {
     }
 
+    /**
+     * Ejecuta la operacion publica `run`.
+     */
     public static void run() {
         GameRulesManager rules = new GameRulesManager(10);
         Player player = createPlayer("1", "Host");

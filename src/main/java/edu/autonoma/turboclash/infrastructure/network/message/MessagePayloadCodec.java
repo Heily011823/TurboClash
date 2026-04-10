@@ -7,11 +7,22 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * Representa la clase `MessagePayloadCodec` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public final class MessagePayloadCodec {
 
     private MessagePayloadCodec() {
     }
 
+    /**
+     * Ejecuta la operacion publica `encodeGameStart`.
+     * @param payload valor del parametro `payload`
+     * @return resultado de la operacion documentada
+     */
     public static String encodeGameStart(GameStartPayload payload) {
         return payload.hostPort + ";" +
                 payload.sequence + ";" +
@@ -21,6 +32,11 @@ public final class MessagePayloadCodec {
                 payload.maxPlayers;
     }
 
+    /**
+     * Ejecuta la operacion publica `decodeGameStart`.
+     * @param data valor del parametro `data`
+     * @return resultado de la operacion documentada
+     */
     public static GameStartPayload decodeGameStart(String data) {
         String[] parts = data.split(";", -1);
         GameStartPayload payload = new GameStartPayload();
@@ -33,6 +49,11 @@ public final class MessagePayloadCodec {
         return payload;
     }
 
+    /**
+     * Ejecuta la operacion publica `encodeSnapshot`.
+     * @param snapshot valor del parametro `snapshot`
+     * @return resultado de la operacion documentada
+     */
     public static String encodeSnapshot(MatchSnapshot snapshot) {
         StringBuilder builder = new StringBuilder();
         builder.append(snapshot.hostPort).append(';')
@@ -86,6 +107,11 @@ public final class MessagePayloadCodec {
         return builder.toString();
     }
 
+    /**
+     * Ejecuta la operacion publica `decodeSnapshot`.
+     * @param data valor del parametro `data`
+     * @return resultado de la operacion documentada
+     */
     public static MatchSnapshot decodeSnapshot(String data) {
         String[] lines = data.split("\\R");
         String[] header = lines[0].split(";", -1);
@@ -117,6 +143,11 @@ public final class MessagePayloadCodec {
         return snapshot;
     }
 
+    /**
+     * Ejecuta la operacion publica `decodePeers`.
+     * @param json valor del parametro `json`
+     * @return resultado de la operacion documentada
+     */
     public static List<PeerConfigEntry> decodePeers(String json) {
         List<PeerConfigEntry> entries = new ArrayList<>();
         if (json == null) {

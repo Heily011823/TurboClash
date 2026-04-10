@@ -7,6 +7,12 @@ import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.presentation.view.GameViewport;
 
+/**
+ * Representa la clase `JoinStrategy` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class JoinStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
@@ -14,11 +20,19 @@ public class JoinStrategy implements IMessageStrategy {
     private static final double START_X = GameViewport.CAR_START_X;
     private final Match match;
 
+    /**
+     * Crea una nueva instancia de `JoinStrategy`.
+     * @param match valor del parametro `match`
+     */
     public JoinStrategy(Match match) {
         this.match = match;
     }
 
     @Override
+    /**
+     * Ejecuta la operacion publica `handle`.
+     * @param message valor del parametro `message`
+     */
     public void handle(GameMessage message) {
         if (message == null || match == null) {
             return;

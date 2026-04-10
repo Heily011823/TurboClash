@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Representa la responsabilidad de {@code GameConfig} en la configuracion del juego.
+ * Representa la clase `GameConfig` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameConfig {
 
@@ -24,7 +27,7 @@ public class GameConfig {
     private final List<SpawnPoint> obstacleSpawnPoints;
 
     /**
-     * Crea una nueva instancia de {@code GameConfig}.
+     * Crea una nueva instancia de `GameConfig`.
      */
     public GameConfig() {
         this.minPort = 5001;
@@ -49,19 +52,38 @@ public class GameConfig {
         this.obstacleSpawnPoints.add(new SpawnPoint(1400, 100, ObstacleType.BARRIER));
     }
 
+    /**
+     * Obtiene el valor asociado a `getMinPort`.
+     * @return resultado de la operacion documentada
+     */
     public int getMinPort() { return minPort; }
+    /**
+     * Obtiene el valor asociado a `getMaxPort`.
+     * @return resultado de la operacion documentada
+     */
     public int getMaxPort() { return maxPort; }
+    /**
+     * Obtiene el valor asociado a `getFrameDelay`.
+     * @return resultado de la operacion documentada
+     */
     public int getFrameDelay() { return frameDelay; }
 
+    /**
+     * Obtiene el valor asociado a `getTargetScore`.
+     * @return resultado de la operacion documentada
+     */
     public int getTargetScore() { return targetScore; }
+    /**
+     * Obtiene el valor asociado a `getCollisionCooldown`.
+     * @return resultado de la operacion documentada
+     */
     public long getCollisionCooldown() { return collisionCooldown; }
 
 
     /**
-     * Indica si {@code ValidPort}.
-     *
-     * @param puerto valor del parametro {@code puerto}
-     * @return true si se cumple la condicion evaluada; false en caso contrario
+     * Indica la condicion evaluada por `isValidPort`.
+     * @param puerto valor del parametro `puerto`
+     * @return resultado de la operacion documentada
      */
     public boolean isValidPort(int puerto) {
         return puerto >= minPort && puerto <= maxPort;

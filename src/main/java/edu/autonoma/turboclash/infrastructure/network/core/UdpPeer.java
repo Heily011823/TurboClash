@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Representa la responsabilidad de {@code UdpPeer} en la infraestructura de red.
+ * Representa la clase `UdpPeer` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class UdpPeer {
 
@@ -21,6 +24,12 @@ public class UdpPeer {
     private volatile boolean activo;
     private Thread receiverThread;
 
+    /**
+     * Crea una nueva instancia de `UdpPeer`.
+     * @param socket valor del parametro `socket`
+     * @param sender valor del parametro `sender`
+     * @param receiver valor del parametro `receiver`
+     */
     public UdpPeer(DatagramSocket socket, IMessageSender sender, IMessageReceiver receiver) {
 
         if (socket == null) {
@@ -34,6 +43,9 @@ public class UdpPeer {
 
     }
 
+    /**
+     * Ejecuta la operacion publica `iniciar`.
+     */
     public synchronized void iniciar() {
         if (!activo || socket.isClosed()) {
             return;
@@ -49,6 +61,11 @@ public class UdpPeer {
         receiverThread.start();
     }
 
+    /**
+     * Ejecuta la operacion publica `agregarPeer`.
+     * @param ip valor del parametro `ip`
+     * @param puerto valor del parametro `puerto`
+     */
     public void agregarPeer(String ip, int puerto) {
         try {
             PortValidator.validate(puerto);
@@ -64,10 +81,14 @@ public class UdpPeer {
                 peers.add(new PeerInfo(ip, puerto));
             }
         } catch (InvalidPortException e) {
-            System.err.println("Puerto inválido: " + e.getMessage());
+            System.err.println("Puerto invÃ¡lido: " + e.getMessage());
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `enviarATodos`.
+     * @param mensaje valor del parametro `mensaje`
+     */
     public void enviarATodos(GameMessage mensaje) {
         if (!isActivo()) {
             return;
@@ -78,6 +99,12 @@ public class UdpPeer {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `enviarATodosExcepto`.
+     * @param mensaje valor del parametro `mensaje`
+     * @param ip valor del parametro `ip`
+     * @param puerto valor del parametro `puerto`
+     */
     public void enviarATodosExcepto(GameMessage mensaje, String ip, int puerto) {
         if (!isActivo()) {
             return;
@@ -92,6 +119,9 @@ public class UdpPeer {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `cerrar`.
+     */
     public void cerrar() {
         activo = false;
         receiver.detener();
@@ -105,22 +135,42 @@ public class UdpPeer {
         }
     }
 
+    /**
+     * Obtiene el valor asociado a `getSender`.
+     * @return resultado de la operacion documentada
+     */
     public IMessageSender getSender() {
         return sender;
     }
 
+    /**
+     * Obtiene el valor asociado a `getReceiver`.
+     * @return resultado de la operacion documentada
+     */
     public IMessageReceiver getReceiver() {
         return receiver;
     }
 
+    /**
+     * Indica la condicion evaluada por `isActivo`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isActivo() {
         return activo && !socket.isClosed();
     }
 
+    /**
+     * Obtiene el valor asociado a `getPeerCount`.
+     * @return resultado de la operacion documentada
+     */
     public int getPeerCount() {
         return peers.size();
     }
 
+    /**
+     * Obtiene el valor asociado a `getLocalPort`.
+     * @return resultado de la operacion documentada
+     */
     public int getLocalPort() {
         return socket.getLocalPort();
     }

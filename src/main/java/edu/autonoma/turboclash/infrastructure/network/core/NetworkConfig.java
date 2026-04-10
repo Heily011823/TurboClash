@@ -6,16 +6,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Representa la responsabilidad de {@code NetworkConfig} en la infraestructura de red.
+ * Representa la clase `NetworkConfig` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class NetworkConfig {
 
     private final GameConfig config;
 
     /**
-     * Crea una nueva instancia de {@code NetworkConfig}.
-     *
-     * @param config valor del parametro {@code config}
+     * Crea una nueva instancia de `NetworkConfig`.
+     * @param config valor del parametro `config`
      */
     public NetworkConfig(GameConfig config) {
         this.config = config;
@@ -23,9 +25,8 @@ public class NetworkConfig {
 
 
     /**
-     * Obtiene el valor de {@code Ports}.
-     *
-     * @return valor de {@code Ports}
+     * Obtiene el valor asociado a `getPorts`.
+     * @return resultado de la operacion documentada
      */
     public int[] getPorts() {
         int size = config.getMaxPort() - config.getMinPort() + 1;

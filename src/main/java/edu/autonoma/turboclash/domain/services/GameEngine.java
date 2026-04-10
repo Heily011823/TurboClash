@@ -5,7 +5,10 @@ import edu.autonoma.turboclash.domain.model.*;
 import java.util.List;
 
 /**
- * Representa la responsabilidad de {@code GameEngine} en los servicios de dominio.
+ * Representa la clase `GameEngine` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameEngine {
 
@@ -18,12 +21,11 @@ public class GameEngine {
     private static final double WORLD_SPEED = 6.0;
 
     /**
-     * Crea una nueva instancia de {@code GameEngine}.
-     *
-     * @param match valor del parametro {@code match}
-     * @param collisionManager valor del parametro {@code collisionManager}
-     * @param items valor del parametro {@code items}
-     * @param obstacles valor del parametro {@code obstacles}
+     * Crea una nueva instancia de `GameEngine`.
+     * @param match valor del parametro `match`
+     * @param collisionManager valor del parametro `collisionManager`
+     * @param items valor del parametro `items`
+     * @param obstacles valor del parametro `obstacles`
      */
     public GameEngine(Match match,
                       CollisionManager collisionManager,
@@ -37,7 +39,7 @@ public class GameEngine {
     }
 
     /**
-     * Actualiza la operacion principal del metodo.
+     * Ejecuta la operacion publica `update`.
      */
     public void update() {
         if (match.isFinished()) return;
@@ -47,9 +49,6 @@ public class GameEngine {
         processCollisions();
     }
 
-    /**
-     * Actualiza {@code Players}.
-     */
     private void updatePlayers() {
         for (Player p : match.getPlayers()) {
             if (p.getCar() != null) {
@@ -58,9 +57,6 @@ public class GameEngine {
         }
     }
 
-    /**
-     * Actualiza {@code World}.
-     */
     private void updateWorld() {
         for (Item item : items) {
             item.setPosition(item.getX() - WORLD_SPEED, item.getY());
@@ -74,26 +70,21 @@ public class GameEngine {
         obstacles.removeIf(obs -> obs.getX() < -100);
     }
 
-    /**
-     * Ejecuta la operacion {@code processCollisions}.
-     */
     private void processCollisions() {
         collisionManager.process(match, items, obstacles);
     }
 
     /**
-     * Obtiene el valor de {@code Items}.
-     *
-     * @return valor de {@code Items}
+     * Obtiene el valor asociado a `getItems`.
+     * @return resultado de la operacion documentada
      */
     public List<Item> getItems() {
         return items;
     }
 
     /**
-     * Obtiene el valor de {@code Obstacles}.
-     *
-     * @return valor de {@code Obstacles}
+     * Obtiene el valor asociado a `getObstacles`.
+     * @return resultado de la operacion documentada
      */
     public List<Obstacle> getObstacles() {
         return obstacles;
