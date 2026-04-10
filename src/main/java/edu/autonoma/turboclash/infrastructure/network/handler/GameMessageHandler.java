@@ -58,6 +58,11 @@ public class GameMessageHandler {
             return;
         }
 
+        System.out.println("[DEBUG][GameMessageHandler] Mensaje UDP recibido type=" + msg.getType()
+                + " from=" + ip + ":" + port
+                + " playerId=" + msg.getPlayerId()
+                + " sequence=" + msg.getSequence());
+
         match.registerKnownPort(msg.getPort());
 
         if (peer != null && msg.getPort() == peer.getLocalPort()) {
@@ -94,6 +99,8 @@ public class GameMessageHandler {
         }
 
         IMessageStrategy strategy = strategies.get(msg.getType());
+        System.out.println("[DEBUG][GameMessageHandler] Decision MessageType=" + msg.getType()
+                + " strategy=" + (strategy != null ? strategy.getClass().getSimpleName() : "sin estrategia"));
         if (strategy != null) {
             strategy.handle(msg);
         }

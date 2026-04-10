@@ -24,12 +24,18 @@ public final class MessagePayloadCodec {
      * @return resultado de la operacion documentada
      */
     public static String encodeGameStart(GameStartPayload payload) {
-        return payload.hostPort + ";" +
+        String encoded = payload.hostPort + ";" +
                 payload.sequence + ";" +
                 payload.scheduledStartTime + ";" +
                 payload.connectedPlayers + ";" +
                 payload.minPlayers + ";" +
                 payload.maxPlayers;
+        System.out.println("[DEBUG][MessagePayloadCodec] Codificando GAME_START hostPort=" + payload.hostPort
+                + " sequence=" + payload.sequence
+                + " connectedPlayers=" + payload.connectedPlayers
+                + " minPlayers=" + payload.minPlayers
+                + " maxPlayers=" + payload.maxPlayers);
+        return encoded;
     }
 
     /**
@@ -46,6 +52,11 @@ public final class MessagePayloadCodec {
         payload.connectedPlayers = parseInt(parts, 3);
         payload.minPlayers = parseInt(parts, 4);
         payload.maxPlayers = parseInt(parts, 5);
+        System.out.println("[DEBUG][MessagePayloadCodec] Decodificando GAME_START hostPort=" + payload.hostPort
+                + " sequence=" + payload.sequence
+                + " connectedPlayers=" + payload.connectedPlayers
+                + " minPlayers=" + payload.minPlayers
+                + " maxPlayers=" + payload.maxPlayers);
         return payload;
     }
 
@@ -104,6 +115,13 @@ public final class MessagePayloadCodec {
                     .append(encode(obstacle.type));
         }
 
+        System.out.println("[DEBUG][MessagePayloadCodec] Codificando snapshot hostPort=" + snapshot.hostPort
+                + " sequence=" + snapshot.sequence
+                + " started=" + snapshot.started
+                + " finished=" + snapshot.finished
+                + " players=" + snapshot.players.size()
+                + " items=" + snapshot.items.size()
+                + " obstacles=" + snapshot.obstacles.size());
         return builder.toString();
     }
 
@@ -140,6 +158,13 @@ public final class MessagePayloadCodec {
             }
         }
 
+        System.out.println("[DEBUG][MessagePayloadCodec] Decodificando snapshot hostPort=" + snapshot.hostPort
+                + " sequence=" + snapshot.sequence
+                + " started=" + snapshot.started
+                + " finished=" + snapshot.finished
+                + " players=" + snapshot.players.size()
+                + " items=" + snapshot.items.size()
+                + " obstacles=" + snapshot.obstacles.size());
         return snapshot;
     }
 

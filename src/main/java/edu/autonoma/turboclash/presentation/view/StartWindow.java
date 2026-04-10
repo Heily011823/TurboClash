@@ -34,9 +34,22 @@ public class StartWindow {
         this.audioService = audioService;
 
         audioService.playMenuMusic();
+        ensureComponentsInitialized();
 
         setupUI();
         setupEvents();
+    }
+
+    private void ensureComponentsInitialized() {
+        if (panel1 == null) {
+            panel1 = new JPanel();
+        }
+        if (btnJugar == null) {
+            btnJugar = new JButton();
+        }
+        if (btnExit == null) {
+            btnExit = new JButton();
+        }
     }
 
     private void setupUI() {
