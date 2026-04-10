@@ -82,7 +82,7 @@ public class GameBootstrap {
         List<Item> items = new CopyOnWriteArrayList<>(worldFactory.createItems());
         List<Obstacle> obstacles = new CopyOnWriteArrayList<>(worldFactory.createObstacles());
 
-        GameRulesManager rulesManager = new GameRulesManager(100);
+        GameRulesManager rulesManager = new GameRulesManager(config.getTargetScore());
 
         CollisionListener listener = new CompositeCollisionListener(
                 new GameCollisionHandler(rulesManager),
@@ -99,11 +99,9 @@ public class GameBootstrap {
         );
 
         GameSpawner spawner = new GameSpawner(items, obstacles);
-        spawner.start();
-
-        GameMessageHandler messageHandler = new GameMessageHandler(match);
 
         GameMessageFactory messageFactory = new GameMessageFactory();
+        GameMessageHandler messageHandler = new GameMessageHandler(match, null);
 
         UdpPeer peer = networkFactory.createPeer(
                 puertoLocal,
@@ -113,15 +111,26 @@ public class GameBootstrap {
                 messageFactory
         );
 
+        NetworkConfig networkConfig = new NetworkConfig(config);
+        GameNetworkService network = new GameNetworkService(peer, messageFactory, networkConfig);
+        GameResultManager resultManager = new GameResultManager();
+        AuthoritativeMatchCoordinator coordinator = new AuthoritativeMatchCoordinator(
+                match,
+                engine,
+                network,
+                rulesManager,
+                resultManager,
+                items,
+                obstacles,
+                spawner,
+                puertoLocal
+        );
+
+        messageHandler.setCoordinator(coordinator);
         messageHandler.setPeer(peer);
         messageHandler.setMessageFactory(messageFactory);
 
         peer.iniciar();
-
-        NetworkConfig networkConfig = new NetworkConfig(config);
-
-        GameNetworkService network =
-                new GameNetworkService(peer, messageFactory, networkConfig);
 
         GameContext context = new GameContext(
                 match,
@@ -131,7 +140,8 @@ public class GameBootstrap {
                 items,
                 peer,
                 rulesManager,
-                new GameResultManager()
+                resultManager,
+                coordinator
         );
 
         context.setLocalPlayer(localPlayer);

@@ -28,6 +28,7 @@ public class GameContext {
     private final UdpPeer peer;
     private final GameRulesManager rulesManager;
     private final GameResultManager resultManager;
+    private final AuthoritativeMatchCoordinator coordinator;
 
     private Player localPlayer;
 
@@ -38,7 +39,8 @@ public class GameContext {
                        List<Item> items,
                        UdpPeer peer,
                        GameRulesManager rulesManager,
-                       GameResultManager resultManager) {
+                       GameResultManager resultManager,
+                       AuthoritativeMatchCoordinator coordinator) {
 
         this.match = match;
         this.engine = engine;
@@ -48,6 +50,7 @@ public class GameContext {
         this.peer = peer;
         this.rulesManager = rulesManager;
         this.resultManager = resultManager;
+        this.coordinator = coordinator;
     }
 
     public List<Player> getPlayers() {
@@ -97,6 +100,10 @@ public class GameContext {
 
     public GameResultManager getResultManager() {
         return resultManager;
+    }
+
+    public AuthoritativeMatchCoordinator getCoordinator() {
+        return coordinator;
     }
 
     public Player getLocalPlayer() {

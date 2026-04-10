@@ -3,7 +3,6 @@ package edu.autonoma.turboclash.application;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
-import edu.autonoma.turboclash.presentation.presenter.GamePresenter;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 import edu.autonoma.turboclash.presentation.view.ViewSynchronizer;
 
@@ -27,55 +26,68 @@ public class GameLoop {
 
         ViewSynchronizer viewSync = new ViewSynchronizer();
         Player local = context.getLocalPlayer();
-
-        GamePresenter presenter = new GamePresenter(
-                window,
-                context.getRulesManager(),
-                context.getResultManager()
-        );
-
-        System.out.println("GameLoop iniciado.");
-        System.out.println("Jugadores remotos conectados al iniciar loop: "
-                + context.getMatch().getRemotePlayers().size());
+        long lastCountdownStart = -1L;
+        boolean resultShown = false;
+        boolean backgroundStarted = false;
 
         while (!context.getMatch().isFinished()) {
+            context.getCoordinator().updateHostAuthority(window);
+            context.getCoordinator().maybeStartMatch();
 
-            context.getEngine().update();
+            if (context.getMatch().getScheduledStartTime() > 0
+                    && context.getMatch().getScheduledStartTime() != lastCountdownStart) {
+                long scheduledStart = context.getMatch().getScheduledStartTime();
+                lastCountdownStart = scheduledStart;
+                SwingUtilities.invokeLater(() -> window.startSynchronizedCountdown(scheduledStart));
+            }
 
-            presenter.update(
-                    local != null ? local.getCar() : null,
-                    context.getMatch().getPlayers()
-            );
+            boolean movementEnabled = context.getMatch().isStarted()
+                    && local != null
+                    && local.getCar() != null
+                    && local.getCar().isActive()
+                    && !local.isEliminated();
 
-            if (local != null && local.getCar() != null && presenter.isMovementEnabled()) {
+            if (movementEnabled) {
                 local.getCar().updateDebuff();
 
-                if (puertoLocal == 5001 || puertoLocal == 5002) {
-                    keyboard.update(local.getCar());
-                } else if (puertoLocal == 5003 || puertoLocal == 5004) {
+                if (puertoLocal == 5003 || puertoLocal == 5004) {
                     mouse.update(local.getCar());
                 } else {
                     keyboard.update(local.getCar());
                 }
             }
 
+            if (context.getMatch().isStarted() && !backgroundStarted) {
+                backgroundStarted = true;
+                SwingUtilities.invokeLater(() -> {
+                    window.showGameStarted();
+                    if (window.getBackgroundPanel() != null) {
+                        window.getBackgroundPanel().startGame();
+                    }
+                });
+            }
+
             SwingUtilities.invokeLater(() -> viewSync.sync(
                     window,
                     context.getMatch(),
-                    context.getObstacles(),
+                    context.getEngine().getObstacles(),
                     context.getEngine().getItems()
             ));
 
             networkSync.sync(context, local);
-
             sleep();
+        }
+
+        if (!resultShown) {
+            resultShown = true;
+            SwingUtilities.invokeLater(() -> window.showGameResult(context.getMatch().getRanking()));
         }
 
         shutdown(context, local);
     }
 
     private void shutdown(GameContext context, Player local) {
-        System.out.println("GameLoop finalizado.");
+        context.getNetwork().sendLeave(local);
     }
 
     private void sleep() {

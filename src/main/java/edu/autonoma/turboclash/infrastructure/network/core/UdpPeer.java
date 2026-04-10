@@ -32,7 +32,6 @@ public class UdpPeer {
         this.receiver = receiver;
         this.activo = true;
 
-        System.out.println("UDP Peer iniciado en puerto: " + socket.getLocalPort());
     }
 
     public synchronized void iniciar() {
@@ -41,7 +40,6 @@ public class UdpPeer {
         }
 
         if (receiverThread != null && receiverThread.isAlive()) {
-            System.out.println("Receiver ya iniciado en puerto: " + socket.getLocalPort());
             return;
         }
 
@@ -64,7 +62,6 @@ public class UdpPeer {
 
             if (!exists) {
                 peers.add(new PeerInfo(ip, puerto));
-                System.out.println("Peer agregado: " + ip + ":" + puerto);
             }
         } catch (InvalidPortException e) {
             System.err.println("Puerto inválido: " + e.getMessage());

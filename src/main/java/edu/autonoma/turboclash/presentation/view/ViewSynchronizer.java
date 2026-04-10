@@ -16,13 +16,8 @@ public class ViewSynchronizer {
         if (localPlayer == null) return;
 
         window.updateScore(localPlayer.getCurrentPoints());
-        window.prepareRaceStart(match.getPlayers());
         window.updateCars(match.getPlayers());
         window.updateObstacles(obstacles);
         window.updateItems(items);
-
-        if (window.getPanel() != null) {
-            window.getPanel().repaint();
-        }
     }
 }

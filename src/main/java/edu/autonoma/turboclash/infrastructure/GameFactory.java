@@ -2,6 +2,7 @@ package edu.autonoma.turboclash.infrastructure;
 
 import edu.autonoma.turboclash.config.GameConfig;
 import edu.autonoma.turboclash.domain.model.*;
+import edu.autonoma.turboclash.presentation.view.GameViewport;
 
 import java.util.ArrayList;
 
@@ -49,13 +50,25 @@ public class GameFactory {
 
         Car car = new Car(
                 playerId,
-                0,
-                0,
+                GameViewport.CAR_START_X,
+                resolveLaneY(puerto),
                 80,
                 40,
                 skin.getFileName()
         );
 
-        return new Player(playerId, playerName, car);
+        Player player = new Player(playerId, playerName, car);
+        player.setNetworkPort(puerto);
+        return player;
+    }
+
+    private int resolveLaneY(int puerto) {
+        return switch (puerto) {
+            case 5001 -> GameViewport.laneY(0);
+            case 5002 -> GameViewport.laneY(1);
+            case 5003 -> GameViewport.laneY(2);
+            case 5004 -> GameViewport.laneY(3);
+            default -> GameViewport.laneY(0);
+        };
     }
 }
