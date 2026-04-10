@@ -62,7 +62,7 @@ Documentacion ampliada:
 - `docs/CLASSES.md`
 - `docs/RUBRICA.md`
 
-## Red UDP / P2P
+## Red UDP / Red UDP con modelo híbrido (P2P con host autoritativo)
 
 Mensajes principales:
 
