@@ -11,9 +11,9 @@ import java.util.Random;
 
 /**
  * Representa la clase `GameSpawner` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ * @author Elizabeth Meneses Muñoz </elizabeth.menesesm@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public class GameSpawner implements Runnable {
 

@@ -2,9 +2,9 @@ package edu.autonoma.turboclash.domain.model;
 
 /**
  * Enumera las opciones disponibles para `CarSkin` dentro del sistema.
- *
- * @author 
+ * @author Heily Rios Ayala </heily.riosa@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public enum CarSkin {
 

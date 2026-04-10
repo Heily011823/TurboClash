@@ -7,9 +7,9 @@ import java.util.Map;
 
 /**
  * Representa la clase `NetworkConfig` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ * @author Heily Rios Ayala </heily.riosa@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public class NetworkConfig {
 

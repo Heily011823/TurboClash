@@ -7,9 +7,9 @@ import java.awt.*;
 
 /**
  * Representa la clase `EndGameWindowFrame` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ *@author Valerie Moreno Castaño</valerie.morenoc@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public class EndGameWindowFrame extends JFrame {
 

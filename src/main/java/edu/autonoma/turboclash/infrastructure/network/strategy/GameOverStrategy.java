@@ -6,9 +6,9 @@ import edu.autonoma.turboclash.infrastructure.network.message.MessagePayloadCode
 
 /**
  * Representa la clase `GameOverStrategy` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ *@author Valerie Moreno Castaño</valerie.morenoc@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public class GameOverStrategy implements IMessageStrategy {
 

@@ -10,9 +10,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Representa la clase `UdpPeer` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ * @author Heily Rios Ayala </heily.riosa@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public class UdpPeer {
 

@@ -7,9 +7,9 @@ import java.awt.event.MouseMotionAdapter;
 
 /**
  * Representa la clase `GameInputBinder` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ *@author Valerie Moreno Castaño</valerie.morenoc@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-090
  */
 public class GameInputBinder {
 

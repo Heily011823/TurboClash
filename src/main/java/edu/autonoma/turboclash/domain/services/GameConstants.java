@@ -4,9 +4,9 @@ package edu.autonoma.turboclash.domain.services;
 
 /**
  * Representa la clase `GameConstants` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ * @author Elizabeth Meneses Muñoz </elizabeth.menesesm@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public class GameConstants {
 

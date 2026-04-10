@@ -5,9 +5,9 @@ import java.awt.Rectangle;
 
 /**
  * Representa la clase `GameObject` y define su responsabilidad dentro del sistema.
- *
- * @author 
+ * @author Elizabeth Meneses Muñoz </elizabeth.menesesm@autonoma.edu.co>
  * @version 1.0
+ * @since 2025-04-09
  */
 public abstract class GameObject {
 
