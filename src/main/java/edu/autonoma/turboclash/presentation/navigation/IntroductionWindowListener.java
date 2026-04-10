@@ -1,14 +1,12 @@
 package edu.autonoma.turboclash.presentation.navigation;
 
 /**
- * Define el contrato de escucha y coordinacion para {@code IntroductionWindowListener} para la navegacion de la interfaz.
+ * Define el contrato de `IntroductionWindowListener` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public interface IntroductionWindowListener {
 
-    /**
-     * Atiende {@code ContinuePressed}.
-     *
-     * @param playerName valor del parametro {@code playerName}
-     */
     void onContinuePressed(String playerName);
 }

@@ -8,16 +8,34 @@ import edu.autonoma.turboclash.presentation.view.ViewSynchronizer;
 
 import javax.swing.SwingUtilities;
 
+/**
+ * Representa la clase `GameLoop` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class GameLoop {
 
     private final int frameDelay;
     private final NetworkSync networkSync;
 
+    /**
+     * Crea una nueva instancia de `GameLoop`.
+     * @param frameDelay valor del parametro `frameDelay`
+     */
     public GameLoop(int frameDelay) {
         this.frameDelay = frameDelay;
         this.networkSync = new NetworkSync();
     }
 
+    /**
+     * Ejecuta la operacion publica `run`.
+     * @param context valor del parametro `context`
+     * @param window valor del parametro `window`
+     * @param keyboard valor del parametro `keyboard`
+     * @param mouse valor del parametro `mouse`
+     * @param puertoLocal valor del parametro `puertoLocal`
+     */
     public void run(GameContext context,
                     GameWindow window,
                     KeyboardInput keyboard,

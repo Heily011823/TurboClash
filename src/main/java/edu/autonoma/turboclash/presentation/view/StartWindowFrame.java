@@ -8,12 +8,15 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Representa y organiza la vista {@code StartWindowFrame} en la capa de presentacion.
+ * Representa la clase `StartWindowFrame` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class StartWindowFrame extends JFrame implements IstartWindowListener, IntroductionWindowListener {
 
     /**
-     * Crea una nueva instancia de {@code StartWindowFrame}.
+     * Crea una nueva instancia de `StartWindowFrame`.
      */
     public StartWindowFrame() {
 
@@ -35,7 +38,7 @@ public class StartWindowFrame extends JFrame implements IstartWindowListener, In
 
     @Override
     /**
-     * Atiende {@code PlayPressed}.
+     * Ejecuta la operacion publica `onPlayPressed`.
      */
     public void onPlayPressed() {
         dispose();
@@ -44,9 +47,8 @@ public class StartWindowFrame extends JFrame implements IstartWindowListener, In
 
     @Override
     /**
-     * Atiende {@code ContinuePressed}.
-     *
-     * @param playerName valor del parametro {@code playerName}
+     * Ejecuta la operacion publica `onContinuePressed`.
+     * @param playerName valor del parametro `playerName`
      */
     public void onContinuePressed(String playerName) {
         dispose();

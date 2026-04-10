@@ -4,7 +4,10 @@ import edu.autonoma.turboclash.domain.model.GameObject;
 import edu.autonoma.turboclash.domain.model.Player;
 
 /**
- * Define el contrato de escucha y coordinacion para {@code CollisionListener} para la gestion de eventos del dominio.
+ * Define el contrato de `CollisionListener` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public interface CollisionListener {
 

@@ -6,7 +6,10 @@ import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
 
 /**
- * Representa la responsabilidad de {@code InputCoordinator} en la capa de aplicacion.
+ * Representa la clase `InputCoordinator` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class InputCoordinator {
 
@@ -15,11 +18,10 @@ public class InputCoordinator {
     private final int puertoLocal;
 
     /**
-     * Crea una nueva instancia de {@code InputCoordinator}.
-     *
-     * @param keyboardInput valor del parametro {@code keyboardInput}
-     * @param mouseInput valor del parametro {@code mouseInput}
-     * @param puertoLocal valor del parametro {@code puertoLocal}
+     * Crea una nueva instancia de `InputCoordinator`.
+     * @param keyboardInput valor del parametro `keyboardInput`
+     * @param mouseInput valor del parametro `mouseInput`
+     * @param puertoLocal valor del parametro `puertoLocal`
      */
     public InputCoordinator(KeyboardInput keyboardInput, MouseInput mouseInput, int puertoLocal) {
         this.keyboardInput = keyboardInput;
@@ -28,9 +30,8 @@ public class InputCoordinator {
     }
 
     /**
-     * Procesa la operacion principal del metodo.
-     *
-     * @param player valor del parametro {@code player}
+     * Ejecuta la operacion publica `handle`.
+     * @param player valor del parametro `player`
      */
     public void handle(Player player) {
         if (player == null || player.getCar() == null) return;
@@ -39,11 +40,6 @@ public class InputCoordinator {
         input.update(player.getCar());
     }
 
-    /**
-     * Ejecuta la operacion {@code selectInput}.
-     *
-     * @return resultado de la operacion {@code selectInput}
-     */
     private InputHandler selectInput() {
         return switch (puertoLocal) {
             case 5000,5002 -> keyboardInput;

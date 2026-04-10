@@ -1,14 +1,16 @@
 package edu.autonoma.turboclash.exception;
 
 /**
- * Representa la responsabilidad de {@code InvalidGameStateException} en el manejo de errores.
+ * Representa la clase `InvalidGameStateException` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class InvalidGameStateException extends Exception {
 
     /**
-     * Crea una nueva instancia de {@code InvalidGameStateException}.
-     *
-     * @param message valor del parametro {@code message}
+     * Crea una nueva instancia de `InvalidGameStateException`.
+     * @param message valor del parametro `message`
      */
     public InvalidGameStateException(String message) {
 

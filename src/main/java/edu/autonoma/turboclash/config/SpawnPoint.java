@@ -3,7 +3,10 @@ package edu.autonoma.turboclash.config;
 import edu.autonoma.turboclash.domain.model.ObstacleType;
 
 /**
- * Representa la responsabilidad de {@code SpawnPoint} en la configuracion del juego.
+ * Representa la clase `SpawnPoint` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class SpawnPoint {
 
@@ -12,11 +15,10 @@ public class SpawnPoint {
     private final ObstacleType type;
 
     /**
-     * Crea una nueva instancia de {@code SpawnPoint}.
-     *
-     * @param x coordenada horizontal utilizada en la operacion
-     * @param y coordenada vertical utilizada en la operacion
-     * @param type valor del parametro {@code type}
+     * Crea una nueva instancia de `SpawnPoint`.
+     * @param x valor del parametro `x`
+     * @param y valor del parametro `y`
+     * @param type valor del parametro `type`
      */
     public SpawnPoint(int x, int y, ObstacleType type) {
         this.x = x;
@@ -25,27 +27,24 @@ public class SpawnPoint {
     }
 
     /**
-     * Obtiene el valor de {@code X}.
-     *
-     * @return valor de {@code X}
+     * Obtiene el valor asociado a `getX`.
+     * @return resultado de la operacion documentada
      */
     public int getX() {
         return x;
     }
 
     /**
-     * Obtiene el valor de {@code Y}.
-     *
-     * @return valor de {@code Y}
+     * Obtiene el valor asociado a `getY`.
+     * @return resultado de la operacion documentada
      */
     public int getY() {
         return y;
     }
 
     /**
-     * Obtiene el valor de {@code Type}.
-     *
-     * @return valor de {@code Type}
+     * Obtiene el valor asociado a `getType`.
+     * @return resultado de la operacion documentada
      */
     public ObstacleType getType() {
         return type;

@@ -4,7 +4,10 @@ import java.awt.Rectangle;
 
 
 /**
- * Representa la responsabilidad de {@code GameObject} dentro del dominio del juego.
+ * Representa la clase `GameObject` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public abstract class GameObject {
 
@@ -16,13 +19,12 @@ public abstract class GameObject {
     protected boolean visible = true;
 
     /**
-     * Crea una nueva instancia de {@code GameObject}.
-     *
-     * @param id identificador asociado a la operacion
-     * @param posX valor del parametro {@code posX}
-     * @param posY valor del parametro {@code posY}
-     * @param width valor del parametro {@code width}
-     * @param height valor del parametro {@code height}
+     * Crea una nueva instancia de `GameObject`.
+     * @param id valor del parametro `id`
+     * @param posX valor del parametro `posX`
+     * @param posY valor del parametro `posY`
+     * @param width valor del parametro `width`
+     * @param height valor del parametro `height`
      */
     public GameObject(String id, double posX, double posY, int width, int height) {
         this.id = id;
@@ -34,9 +36,8 @@ public abstract class GameObject {
 
 
     /**
-     * Obtiene el valor de {@code Bounds}.
-     *
-     * @return valor de {@code Bounds}
+     * Obtiene el valor asociado a `getBounds`.
+     * @return resultado de la operacion documentada
      */
     public Rectangle getBounds() {
         return new Rectangle(
@@ -49,10 +50,9 @@ public abstract class GameObject {
 
 
     /**
-     * Ejecuta la operacion {@code collidesWith}.
-     *
-     * @param other valor del parametro {@code other}
-     * @return true si se cumple la condicion evaluada; false en caso contrario
+     * Ejecuta la operacion publica `collidesWith`.
+     * @param other valor del parametro `other`
+     * @return resultado de la operacion documentada
      */
     public boolean collidesWith(GameObject other) {
         if (other == null || !this.visible || !other.visible) return false;
@@ -61,21 +61,48 @@ public abstract class GameObject {
 
 
     /**
-     * Actualiza el valor de {@code Position}.
-     *
-     * @param x coordenada horizontal utilizada en la operacion
-     * @param y coordenada vertical utilizada en la operacion
+     * Actualiza el valor asociado a `setPosition`.
+     * @param x valor del parametro `x`
+     * @param y valor del parametro `y`
      */
     public void setPosition(double x, double y) {
         this.posX = x;
         this.posY = y;
     }
 
+    /**
+     * Obtiene el valor asociado a `getX`.
+     * @return resultado de la operacion documentada
+     */
     public double getX() { return posX; }
+    /**
+     * Obtiene el valor asociado a `getY`.
+     * @return resultado de la operacion documentada
+     */
     public double getY() { return posY; }
+    /**
+     * Obtiene el valor asociado a `getWidth`.
+     * @return resultado de la operacion documentada
+     */
     public int getWidth() { return width; }
+    /**
+     * Obtiene el valor asociado a `getHeight`.
+     * @return resultado de la operacion documentada
+     */
     public int getHeight() { return height; }
+    /**
+     * Obtiene el valor asociado a `getId`.
+     * @return resultado de la operacion documentada
+     */
     public String getId() { return id; }
+    /**
+     * Indica la condicion evaluada por `isVisible`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isVisible() { return visible; }
+    /**
+     * Actualiza el valor asociado a `setVisible`.
+     * @param visible valor del parametro `visible`
+     */
     public void setVisible(boolean visible) { this.visible = visible; }
 }

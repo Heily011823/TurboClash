@@ -10,7 +10,10 @@ import javax.swing.*;
 import java.util.List;
 
 /**
- * Orquesta la comunicación y actualización de GamePresenter en la capa de presentación.
+ * Representa la clase `GamePresenter` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GamePresenter {
 
@@ -26,6 +29,12 @@ public class GamePresenter {
     private Timer gameTimer;
     private int remainingSeconds = 180; // 3 minutos
 
+    /**
+     * Crea una nueva instancia de `GamePresenter`.
+     * @param view valor del parametro `view`
+     * @param rulesManager valor del parametro `rulesManager`
+     * @param resultManager valor del parametro `resultManager`
+     */
     public GamePresenter(GameWindow view,
                          GameRulesManager rulesManager,
                          GameResultManager resultManager) {
@@ -40,6 +49,11 @@ public class GamePresenter {
         });
     }
 
+    /**
+     * Ejecuta la operacion publica `update`.
+     * @param localCar valor del parametro `localCar`
+     * @param players valor del parametro `players`
+     */
     public void update(Car localCar, List<Player> players) {
         if (players == null || players.isEmpty()) {
             return;
@@ -149,9 +163,25 @@ public class GamePresenter {
         view.showGameResult(ranking);
     }
 
-    // Getters para sincronización con la vista o red
+    // Getters para sincronizaciÃ³n con la vista o red
+    /**
+     * Indica la condicion evaluada por `isMovementEnabled`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isMovementEnabled() { return movementEnabled; }
+    /**
+     * Indica la condicion evaluada por `isGameStarted`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isGameStarted() { return gameStarted; }
+    /**
+     * Indica la condicion evaluada por `isGameFinished`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isGameFinished() { return gameFinished; }
+    /**
+     * Obtiene el valor asociado a `getRemainingSeconds`.
+     * @return resultado de la operacion documentada
+     */
     public int getRemainingSeconds() { return remainingSeconds; }
 }

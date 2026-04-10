@@ -1,16 +1,32 @@
 package edu.autonoma.turboclash.presentation.view;
 
-import edu.autonoma.turboclash.presentation.navigation.IntroductionWindowListener;
 import edu.autonoma.turboclash.infrastructure.sound.IAudioService;
+import edu.autonoma.turboclash.presentation.navigation.IntroductionWindowListener;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Image;
 
 /**
- * Representa y organiza la vista {@code IntroductionWindow} en la capa de presentacion.
+ * Representa la clase `IntroductionWindow` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class IntroductionWindow {
 
+    /**
+     * Expone el atributo publico `panel1` para la colaboracion entre componentes del sistema.
+     */
     public JPanel panel1;
     private JButton btnStart;
     private JTextField txtName;
@@ -21,10 +37,19 @@ public class IntroductionWindow {
     private final IntroductionWindowListener listener;
     private final IAudioService audioService;
 
+    /**
+     * Crea una nueva instancia de `IntroductionWindow`.
+     * @param listener valor del parametro `listener`
+     */
     public IntroductionWindow(IntroductionWindowListener listener) {
         this(listener, null);
     }
 
+    /**
+     * Crea una nueva instancia de `IntroductionWindow`.
+     * @param listener valor del parametro `listener`
+     * @param audioService valor del parametro `audioService`
+     */
     public IntroductionWindow(IntroductionWindowListener listener, IAudioService audioService) {
         this.listener = listener;
         this.audioService = audioService;
@@ -59,6 +84,10 @@ public class IntroductionWindow {
 
         panel1.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
+            /**
+             * Ejecuta la operacion publica `componentResized`.
+             * @param e valor del parametro `e`
+             */
             public void componentResized(java.awt.event.ComponentEvent e) {
                 centerComponents();
             }
@@ -124,10 +153,19 @@ public class IntroductionWindow {
 
         btnStart.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
+            /**
+             * Ejecuta la operacion publica `mouseEntered`.
+             * @param e valor del parametro `e`
+             */
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btnStart.setBounds(btnStart.getX() - 8, btnStart.getY() - 4, btnStart.getWidth() + 16, btnStart.getHeight() + 8);
             }
+
             @Override
+            /**
+             * Ejecuta la operacion publica `mouseExited`.
+             * @param e valor del parametro `e`
+             */
             public void mouseExited(java.awt.event.MouseEvent e) {
                 centerComponents();
             }
@@ -135,14 +173,28 @@ public class IntroductionWindow {
 
         infoIcon.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
+            /**
+             * Ejecuta la operacion publica `mouseEntered`.
+             * @param e valor del parametro `e`
+             */
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 infoIcon.setBounds(18, 18, 55, 55);
             }
+
             @Override
+            /**
+             * Ejecuta la operacion publica `mouseExited`.
+             * @param e valor del parametro `e`
+             */
             public void mouseExited(java.awt.event.MouseEvent e) {
                 infoIcon.setBounds(20, 20, 50, 50);
             }
+
             @Override
+            /**
+             * Ejecuta la operacion publica `mouseClicked`.
+             * @param e valor del parametro `e`
+             */
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 showRules();
             }
@@ -161,17 +213,16 @@ public class IntroductionWindow {
         });
     }
 
-    /**
-     * Muestra las reglas detalladas cuando se hace clic en el infoIcon.
-     */
     private void showRules() {
         String rules =
                 "--- REGLAS DE TURBOCLASH ---\n\n" +
-                        "- Regla 1: Recoger monedas suma +20 puntos.\n" +
-                        "- Regla 2: Chocar con obstáculos resta -10 puntos.\n" +
-                        "- Regla 3: Chocar contra otro carro resta 1 vida.\n" +
-                        "- Regla 4: Si el puntaje llega a cero por colisiones, se resta 1 vida.\n" +
-                        "- Regla 5: El primero en llegar a la meta, recibe +50 puntos.";
+                        "- Regla 1: La partida requiere entre 2 y 4 jugadores conectados.\n" +
+                        "- Regla 2: Recoger monedas suma +20 puntos.\n" +
+                        "- Regla 3: Chocar con obstaculos resta -10 puntos y aplica una penalizacion temporal.\n" +
+                        "- Regla 4: Chocar contra otro carro resta 1 vida a ambos jugadores.\n" +
+                        "- Regla 5: Si el puntaje llega a cero despues de haber puntuado, se pierde 1 vida.\n" +
+                        "- Regla 6: El primero en llegar a la meta recibe +50 puntos y prioridad en el ranking.\n" +
+                        "- Regla 7: Un jugador con 0 vidas queda eliminado del match.";
 
         JOptionPane.showMessageDialog(
                 null,

@@ -4,20 +4,22 @@ import edu.autonoma.turboclash.exception.InvalidPortException;
 
 
 /**
- * Valida las reglas asociadas a {@code PortValidator} en las reglas del dominio.
+ * Representa la clase `PortValidator` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class PortValidator {
 
     /**
-     * Valida un número de puerto.
-     *
-     * @param port Es el número de puerto a validar.
-     * @throws InvalidPortException Se lanza la excepción si el puerto está fuera del rango permitido.
+     * Ejecuta la operacion publica `validate`.
+     * @param port valor del parametro `port`
+     * @throws InvalidPortException se propaga si ocurre una condicion excepcional durante la ejecucion
      */
     public static void validate(int port) throws InvalidPortException {
 
         if (port < 1024 || port > 65535) {
-            throw new InvalidPortException("El puerto está fuera de rango");
+            throw new InvalidPortException("El puerto estÃ¡ fuera de rango");
         }
     }
 }

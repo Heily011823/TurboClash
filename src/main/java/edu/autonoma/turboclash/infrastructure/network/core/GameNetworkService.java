@@ -17,6 +17,12 @@ import edu.autonoma.turboclash.infrastructure.network.message.WorldObjectState;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Representa la clase `GameNetworkService` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class GameNetworkService {
 
     private final UdpPeer peer;
@@ -25,6 +31,12 @@ public class GameNetworkService {
     private final AtomicLong sequenceGenerator = new AtomicLong(1L);
     private volatile boolean connecting = false;
 
+    /**
+     * Crea una nueva instancia de `GameNetworkService`.
+     * @param peer valor del parametro `peer`
+     * @param messageFactory valor del parametro `messageFactory`
+     * @param networkConfig valor del parametro `networkConfig`
+     */
     public GameNetworkService(UdpPeer peer,
                               GameMessageFactory messageFactory,
                               NetworkConfig networkConfig) {
@@ -33,10 +45,18 @@ public class GameNetworkService {
         this.networkConfig = networkConfig;
     }
 
+    /**
+     * Obtiene el valor asociado a `getPeer`.
+     * @return resultado de la operacion documentada
+     */
     public UdpPeer getPeer() {
         return peer;
     }
 
+    /**
+     * Envia la informacion asociada a send join.
+     * @param player valor del parametro `player`
+     */
     public void sendJoin(Player player) {
         if (!canSend(player)) {
             return;
@@ -47,6 +67,10 @@ public class GameNetworkService {
         peer.enviarATodos(msg);
     }
 
+    /**
+     * Envia la informacion asociada a send handshake.
+     * @param player valor del parametro `player`
+     */
     public void sendHandshake(Player player) {
         if (!canSend(player)) {
             return;
@@ -57,6 +81,10 @@ public class GameNetworkService {
         peer.enviarATodos(msg);
     }
 
+    /**
+     * Envia la informacion asociada a send movement.
+     * @param player valor del parametro `player`
+     */
     public void sendMovement(Player player) {
         if (!canSend(player)) {
             return;
@@ -67,6 +95,10 @@ public class GameNetworkService {
         peer.enviarATodos(msg);
     }
 
+    /**
+     * Envia la informacion asociada a send leave.
+     * @param player valor del parametro `player`
+     */
     public void sendLeave(Player player) {
         if (!canSend(player)) {
             return;
@@ -77,6 +109,15 @@ public class GameNetworkService {
         peer.enviarATodos(msg);
     }
 
+    /**
+     * Envia la informacion asociada a send game start.
+     * @param player valor del parametro `player`
+     * @param hostPort valor del parametro `hostPort`
+     * @param scheduledStartTime valor del parametro `scheduledStartTime`
+     * @param connectedPlayers valor del parametro `connectedPlayers`
+     * @param minPlayers valor del parametro `minPlayers`
+     * @param maxPlayers valor del parametro `maxPlayers`
+     */
     public void sendGameStart(Player player,
                               int hostPort,
                               long scheduledStartTime,
@@ -108,6 +149,13 @@ public class GameNetworkService {
         peer.enviarATodos(message);
     }
 
+    /**
+     * Envia la informacion asociada a send snapshot.
+     * @param match valor del parametro `match`
+     * @param items valor del parametro `items`
+     * @param obstacles valor del parametro `obstacles`
+     * @param hostPort valor del parametro `hostPort`
+     */
     public void sendSnapshot(Match match, List<Item> items, List<Obstacle> obstacles, int hostPort) {
         if (match == null || match.getLocalPlayer() == null || !peer.isActivo()) {
             return;
@@ -127,6 +175,15 @@ public class GameNetworkService {
         peer.enviarATodos(message);
     }
 
+    /**
+     * Envia la informacion asociada a send game over.
+     * @param match valor del parametro `match`
+     * @param items valor del parametro `items`
+     * @param obstacles valor del parametro `obstacles`
+     * @param ranking valor del parametro `ranking`
+     * @param reason valor del parametro `reason`
+     * @param hostPort valor del parametro `hostPort`
+     */
     public void sendGameOver(Match match,
                              List<Item> items,
                              List<Obstacle> obstacles,
@@ -161,6 +218,9 @@ public class GameNetworkService {
         peer.enviarATodos(message);
     }
 
+    /**
+     * Ejecuta la operacion publica `discover`.
+     */
     public void discover() {
         if (!peer.isActivo()) {
             return;
@@ -180,6 +240,11 @@ public class GameNetworkService {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `join`.
+     * @param context valor del parametro `context`
+     * @param player valor del parametro `player`
+     */
     public void join(GameContext context, Player player) {
         if (context == null || player == null || !peer.isActivo()) {
             return;
@@ -188,6 +253,11 @@ public class GameNetworkService {
         sendJoin(player);
     }
 
+    /**
+     * Ejecuta la operacion publica `connect`.
+     * @param context valor del parametro `context`
+     * @param player valor del parametro `player`
+     */
     public void connect(GameContext context, Player player) {
         if (context == null || player == null || !peer.isActivo() || connecting) {
             return;

@@ -6,6 +6,12 @@ import edu.autonoma.turboclash.domain.model.Match;
 import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 
+/**
+ * Representa la clase `MoveStrategy` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class MoveStrategy implements IMessageStrategy {
 
     private static final int CAR_WIDTH = 100;
@@ -15,11 +21,19 @@ public class MoveStrategy implements IMessageStrategy {
 
     private final Match match;
 
+    /**
+     * Crea una nueva instancia de `MoveStrategy`.
+     * @param match valor del parametro `match`
+     */
     public MoveStrategy(Match match) {
         this.match = match;
     }
 
     @Override
+    /**
+     * Ejecuta la operacion publica `handle`.
+     * @param message valor del parametro `message`
+     */
     public void handle(GameMessage message) {
         if (message == null || match == null) {
             return;

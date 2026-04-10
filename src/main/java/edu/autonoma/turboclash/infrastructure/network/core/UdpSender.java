@@ -8,16 +8,18 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 /**
- * Representa la responsabilidad de {@code UdpSender} en la infraestructura de red.
+ * Representa la clase `UdpSender` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class UdpSender implements IMessageSender {
 
     private final DatagramSocket socket;
 
     /**
-     * Crea una nueva instancia de {@code UdpSender}.
-     *
-     * @param socket valor del parametro {@code socket}
+     * Crea una nueva instancia de `UdpSender`.
+     * @param socket valor del parametro `socket`
      */
     public UdpSender(DatagramSocket socket) {
         if (socket == null) {
@@ -28,11 +30,10 @@ public class UdpSender implements IMessageSender {
 
     @Override
     /**
-     * Envia {@code Mensaje}.
-     *
-     * @param message valor del parametro {@code message}
-     * @param ipDestino valor del parametro {@code ipDestino}
-     * @param puertoDestino valor del parametro {@code puertoDestino}
+     * Ejecuta la operacion publica `enviarMensaje`.
+     * @param message valor del parametro `message`
+     * @param ipDestino valor del parametro `ipDestino`
+     * @param puertoDestino valor del parametro `puertoDestino`
      */
     public void enviarMensaje(GameMessage message, String ipDestino, int puertoDestino) {
 
@@ -41,7 +42,7 @@ public class UdpSender implements IMessageSender {
         }
 
         if (ipDestino == null || ipDestino.isEmpty()) {
-            throw new IllegalArgumentException("IP destino invÃ¡lida");
+            throw new IllegalArgumentException("IP destino invÃƒÂ¡lida");
         }
 
         if (socket.isClosed()) {
@@ -71,12 +72,6 @@ public class UdpSender implements IMessageSender {
         }
     }
 
-    /**
-     * Ejecuta la operacion {@code serialize}.
-     *
-     * @param message valor del parametro {@code message}
-     * @return resultado de la operacion {@code serialize}
-     */
     private byte[] serialize(GameMessage message) {
         return message.serialize().getBytes();
     }

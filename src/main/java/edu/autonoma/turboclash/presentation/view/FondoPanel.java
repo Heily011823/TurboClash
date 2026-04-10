@@ -5,16 +5,18 @@ import java.awt.*;
 import java.net.URL;
 
 /**
- * Representa y organiza la vista {@code FondoPanel} en la capa de presentacion.
+ * Representa la clase `FondoPanel` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class FondoPanel extends JPanel {
 
     private Image imagen;
 
     /**
-     * Crea una nueva instancia de {@code FondoPanel}.
-     *
-     * @param rutaImagen valor del parametro {@code rutaImagen}
+     * Crea una nueva instancia de `FondoPanel`.
+     * @param rutaImagen valor del parametro `rutaImagen`
      */
     public FondoPanel(String rutaImagen) {
         URL location = getClass().getResource(rutaImagen);
@@ -22,17 +24,12 @@ public class FondoPanel extends JPanel {
         if (location != null) {
             imagen = new ImageIcon(location).getImage();
         } else {
-            System.out.println("No se encontró la imagen: " + rutaImagen);
+            System.out.println("No se encontrÃ³ la imagen: " + rutaImagen);
             imagen = null;
         }
     }
 
     @Override
-    /**
-     * Ejecuta la operacion {@code paintComponent}.
-     *
-     * @param g contexto grafico utilizado para el renderizado
-     */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 

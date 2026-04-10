@@ -18,23 +18,23 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Representa y organiza la vista {@code IntroductionWindowFrame} en la capa de presentacion.
+ * Representa la clase `IntroductionWindowFrame` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class IntroductionWindowFrame extends JFrame implements IntroductionWindowListener {
 
     private IntroductionWindow view;
 
     /**
-     * Crea una nueva instancia de {@code IntroductionWindowFrame}.
+     * Crea una nueva instancia de `IntroductionWindowFrame`.
      */
     public IntroductionWindowFrame() {
         this.view = new IntroductionWindow(this, SoundManager.getInstance());
         setupFrame();
     }
 
-    /**
-     * Configura {@code Frame}.
-     */
     private void setupFrame() {
 
         view.panel1.setOpaque(false);
@@ -57,6 +57,10 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
 
         fondo.getActionMap().put("exit", new AbstractAction() {
             @Override
+            /**
+             * Ejecuta la operacion publica `actionPerformed`.
+             * @param e valor del parametro `e`
+             */
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 System.exit(0);
             }
@@ -67,9 +71,8 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
 
     @Override
     /**
-     * Atiende {@code ContinuePressed}.
-     *
-     * @param playerName valor del parametro {@code playerName}
+     * Ejecuta la operacion publica `onContinuePressed`.
+     * @param playerName valor del parametro `playerName`
      */
     public void onContinuePressed(String playerName) {
         try {
@@ -84,11 +87,6 @@ public class IntroductionWindowFrame extends JFrame implements IntroductionWindo
         }
     }
 
-    /**
-     * Inicia {@code Game}.
-     *
-     * @param playerName valor del parametro {@code playerName}
-     */
     private void startGame(String playerName) {
         GameConfig config = new GameConfig();
 

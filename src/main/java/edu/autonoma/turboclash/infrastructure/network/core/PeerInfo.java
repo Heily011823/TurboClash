@@ -1,7 +1,10 @@
 package edu.autonoma.turboclash.infrastructure.network.core;
 
 /**
- * Representa la responsabilidad de {@code PeerInfo} en la infraestructura de red.
+ * Representa la clase `PeerInfo` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class PeerInfo {
 
@@ -9,10 +12,9 @@ public class PeerInfo {
     private final int puerto;
 
     /**
-     * Crea una nueva instancia de {@code PeerInfo}.
-     *
-     * @param ip direccion IP asociada a la operacion
-     * @param puerto valor del parametro {@code puerto}
+     * Crea una nueva instancia de `PeerInfo`.
+     * @param ip valor del parametro `ip`
+     * @param puerto valor del parametro `puerto`
      */
     public PeerInfo(String ip, int puerto) {
         this.ip = ip;
@@ -20,18 +22,16 @@ public class PeerInfo {
     }
 
     /**
-     * Obtiene el valor de {@code Ip}.
-     *
-     * @return valor de {@code Ip}
+     * Obtiene el valor asociado a `getIp`.
+     * @return resultado de la operacion documentada
      */
     public String getIp() {
         return ip;
     }
 
     /**
-     * Obtiene el valor de {@code Puerto}.
-     *
-     * @return valor de {@code Puerto}
+     * Obtiene el valor asociado a `getPuerto`.
+     * @return resultado de la operacion documentada
      */
     public int getPuerto() {
         return puerto;

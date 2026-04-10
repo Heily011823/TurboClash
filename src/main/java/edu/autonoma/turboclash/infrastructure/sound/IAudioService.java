@@ -1,28 +1,19 @@
 package edu.autonoma.turboclash.infrastructure.sound;
 
 /**
- * Define el contrato de servicio para {@code IAudioService} en la infraestructura de audio.
+ * Define el contrato de `IAudioService` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public interface IAudioService {
 
-    /**
-     * Reproduce {@code MenuMusic}.
-     */
     void playMenuMusic();
 
-    /**
-     * Reproduce {@code CoinSound}.
-     */
     void playCoinSound();
 
-    /**
-     * Reproduce {@code BrakeSound}.
-     */
     void playBrakeSound();
 
-    /**
-     * Detiene {@code Music}.
-     */
     void playCountdownSound();
 
     void playWinSound();

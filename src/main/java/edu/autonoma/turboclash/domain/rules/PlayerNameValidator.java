@@ -4,16 +4,17 @@ import edu.autonoma.turboclash.exception.InvalidNameException;
 
 
 /**
- * Valida las reglas asociadas a {@code PlayerNameValidator} en las reglas del dominio.
+ * Representa la clase `PlayerNameValidator` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class PlayerNameValidator {
 
     /**
-     * Valida el nombre de un jugador.
-     *
-     * @param name Es el nombre del jugador a validar.
-     * @throws InvalidNameException Se lanza la excepción si el nombre no cumple con las reglas establecidas.
-
+     * Ejecuta la operacion publica `validate`.
+     * @param name valor del parametro `name`
+     * @throws InvalidNameException se propaga si ocurre una condicion excepcional durante la ejecucion
      */
     public static void validate(String name) throws InvalidNameException {
         if (name == null || name.trim().isEmpty()) {

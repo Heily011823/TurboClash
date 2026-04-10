@@ -6,11 +6,29 @@ import edu.autonoma.turboclash.domain.model.Player;
 import edu.autonoma.turboclash.infrastructure.network.message.GameMessage;
 import edu.autonoma.turboclash.infrastructure.network.message.MessageType;
 
+/**
+ * Representa la clase `GameMessageFactory` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class GameMessageFactory {
 
+    /**
+     * Crea una nueva instancia de `GameMessageFactory`.
+     */
     public GameMessageFactory() {
     }
 
+    /**
+     * Ejecuta la operacion publica `create`.
+     * @param player valor del parametro `player`
+     * @param type valor del parametro `type`
+     * @param port valor del parametro `port`
+     * @param sequence valor del parametro `sequence`
+     * @param authority valor del parametro `authority`
+     * @return resultado de la operacion documentada
+     */
     public GameMessage create(Player player, MessageType type, int port, long sequence, boolean authority) {
         if (player == null) {
             throw new IllegalArgumentException("El jugador no puede ser nulo");
@@ -52,10 +70,22 @@ public class GameMessageFactory {
         );
     }
 
+    /**
+     * Ejecuta la operacion publica `create`.
+     * @param player valor del parametro `player`
+     * @param type valor del parametro `type`
+     * @param port valor del parametro `port`
+     * @return resultado de la operacion documentada
+     */
     public GameMessage create(Player player, MessageType type, int port) {
         return create(player, type, port, System.currentTimeMillis(), false);
     }
 
+    /**
+     * Crea el recurso necesario para create discovery.
+     * @param port valor del parametro `port`
+     * @return resultado de la operacion documentada
+     */
     public GameMessage createDiscovery(int port) {
         GameMessage msg = new GameMessage();
         msg.setType(MessageType.DISCOVERY);
@@ -65,6 +95,16 @@ public class GameMessageFactory {
         return msg;
     }
 
+    /**
+     * Crea el recurso necesario para create event.
+     * @param player valor del parametro `player`
+     * @param type valor del parametro `type`
+     * @param event valor del parametro `event`
+     * @param port valor del parametro `port`
+     * @param sequence valor del parametro `sequence`
+     * @param authority valor del parametro `authority`
+     * @return resultado de la operacion documentada
+     */
     public GameMessage createEvent(Player player, MessageType type, String event, int port, long sequence, boolean authority) {
         GameMessage msg = create(player, type, port, sequence, authority);
         msg.setEvent(event);

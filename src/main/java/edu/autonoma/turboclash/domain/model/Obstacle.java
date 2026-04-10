@@ -1,7 +1,10 @@
 package edu.autonoma.turboclash.domain.model;
 
 /**
- * Representa la responsabilidad de {@code Obstacle} dentro del dominio del juego.
+ * Representa la clase `Obstacle` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class Obstacle extends GameObject {
 
@@ -11,14 +14,13 @@ public class Obstacle extends GameObject {
     private boolean processed = false;
 
     /**
-     * Crea una nueva instancia de {@code Obstacle}.
-     *
-     * @param id identificador asociado a la operacion
-     * @param x coordenada horizontal utilizada en la operacion
-     * @param y coordenada vertical utilizada en la operacion
-     * @param width valor del parametro {@code width}
-     * @param height valor del parametro {@code height}
-     * @param type valor del parametro {@code type}
+     * Crea una nueva instancia de `Obstacle`.
+     * @param id valor del parametro `id`
+     * @param x valor del parametro `x`
+     * @param y valor del parametro `y`
+     * @param width valor del parametro `width`
+     * @param height valor del parametro `height`
+     * @param type valor del parametro `type`
      */
     public Obstacle(String id, double x, double y, int width, int height, ObstacleType type) {
         super(id, x, y, width, height);
@@ -26,36 +28,32 @@ public class Obstacle extends GameObject {
     }
 
     /**
-     * Obtiene el valor de {@code Type}.
-     *
-     * @return valor de {@code Type}
+     * Obtiene el valor asociado a `getType`.
+     * @return resultado de la operacion documentada
      */
     public ObstacleType getType() {
         return type;
     }
 
     /**
-     * Indica si {@code Processed}.
-     *
-     * @return true si se cumple la condicion evaluada; false en caso contrario
+     * Indica la condicion evaluada por `isProcessed`.
+     * @return resultado de la operacion documentada
      */
     public boolean isProcessed() {
         return processed;
     }
 
     /**
-     * Actualiza el valor de {@code Processed}.
-     *
-     * @param processed valor del parametro {@code processed}
+     * Actualiza el valor asociado a `setProcessed`.
+     * @param processed valor del parametro `processed`
      */
     public void setProcessed(boolean processed) {
         this.processed = processed;
     }
 
     /**
-     * Obtiene el valor de {@code Image}.
-     *
-     * @return valor de {@code Image}
+     * Obtiene el valor asociado a `getImage`.
+     * @return resultado de la operacion documentada
      */
     public String getImage() {
         return type.getImage();

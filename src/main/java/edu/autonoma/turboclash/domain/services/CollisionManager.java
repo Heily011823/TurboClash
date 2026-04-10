@@ -11,7 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Administra la responsabilidad principal de {@code CollisionManager} en los servicios de dominio.
+ * Representa la clase `CollisionManager` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class CollisionManager {
 
@@ -20,16 +23,18 @@ public class CollisionManager {
     private final Map<String, Long> playerCollisionCooldowns = new HashMap<>();
 
     /**
-     * Crea una nueva instancia de {@code CollisionManager}.
-     *
-     * @param listener valor del parametro {@code listener}
+     * Crea una nueva instancia de `CollisionManager`.
+     * @param listener valor del parametro `listener`
      */
     public CollisionManager(CollisionListener listener) {
         this.listener = listener;
     }
 
     /**
-     * Procesa solo las colisiones del jugador local.
+     * Ejecuta la operacion publica `process`.
+     * @param match valor del parametro `match`
+     * @param items valor del parametro `items`
+     * @param obstacles valor del parametro `obstacles`
      */
     public void process(Match match,
                         List<Item> items,
@@ -48,9 +53,6 @@ public class CollisionManager {
         checkPlayerCollisions(match.getPlayers());
     }
 
-    /**
-     * Colisiones contra obstáculos.
-     */
     private void checkCarCollisions(Player player, List<Obstacle> obstacles) {
         if (player == null || player.getCar() == null || obstacles == null) return;
 
@@ -64,9 +66,6 @@ public class CollisionManager {
         }
     }
 
-    /**
-     * Colisiones con items.
-     */
     private void checkItemCollisions(Player player, List<Item> items) {
         if (player == null || player.getCar() == null || items == null) return;
 

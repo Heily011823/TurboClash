@@ -1,12 +1,12 @@
 package edu.autonoma.turboclash.presentation.navigation;
 
 /**
- * Define el contrato de escucha y coordinacion para {@code IstartWindowListener} para la navegacion de la interfaz.
+ * Define el contrato de `IstartWindowListener` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public interface IstartWindowListener {
 
-    /**
-     * Atiende {@code PlayPressed}.
-     */
     void onPlayPressed();
 }

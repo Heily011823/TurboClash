@@ -8,7 +8,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Representa y organiza la vista {@code GameWindowFrame} en la capa de presentacion.
+ * Representa la clase `GameWindowFrame` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameWindowFrame extends JFrame {
 
@@ -16,10 +19,9 @@ public class GameWindowFrame extends JFrame {
     private Runnable countdownAction;
 
     /**
-     * Crea una nueva instancia de {@code GameWindowFrame}.
-     *
-     * @param keyboardInput valor del parametro {@code keyboardInput}
-     * @param mouseInput valor del parametro {@code mouseInput}
+     * Crea una nueva instancia de `GameWindowFrame`.
+     * @param keyboardInput valor del parametro `keyboardInput`
+     * @param mouseInput valor del parametro `mouseInput`
      */
     public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
         this.view = new GameWindow();
@@ -41,9 +43,6 @@ public class GameWindowFrame extends JFrame {
         });
     }
 
-    /**
-     * Configura {@code FrameProperties}.
-     */
     private void setupFrameProperties() {
         setTitle("TurboClash - Racing Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -52,12 +51,6 @@ public class GameWindowFrame extends JFrame {
         setResizable(false);
     }
 
-    /**
-     * Configura {@code ContentLayout}.
-     *
-     * @param keyboardInput valor del parametro {@code keyboardInput}
-     * @param mouseInput valor del parametro {@code mouseInput}
-     */
     private void setupContentLayout(KeyboardInput keyboardInput, MouseInput mouseInput) {
         JPanel gamePanel = view.getPanel();
         gamePanel.setOpaque(false);
@@ -100,27 +93,24 @@ public class GameWindowFrame extends JFrame {
     }
 
     /**
-     * Actualiza el valor de {@code CountdownAction}.
-     *
-     * @param countdownAction valor del parametro {@code countdownAction}
+     * Actualiza el valor asociado a `setCountdownAction`.
+     * @param countdownAction valor del parametro `countdownAction`
      */
     public void setCountdownAction(Runnable countdownAction) {
         this.countdownAction = countdownAction;
     }
 
     /**
-     * Obtiene el valor de {@code View}.
-     *
-     * @return valor de {@code View}
+     * Obtiene el valor asociado a `getView`.
+     * @return resultado de la operacion documentada
      */
     public GameWindow getView() {
         return view;
     }
 
     /**
-     * Obtiene el valor de {@code GameView}.
-     *
-     * @return valor de {@code GameView}
+     * Obtiene el valor asociado a `getGameView`.
+     * @return resultado de la operacion documentada
      */
     public GameWindow getGameView() {
         return view;

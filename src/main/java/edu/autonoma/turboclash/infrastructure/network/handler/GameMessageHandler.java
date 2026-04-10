@@ -21,6 +21,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Representa la clase `GameMessageHandler` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class GameMessageHandler {
 
     private final Map<MessageType, IMessageStrategy> strategies = new HashMap<>();
@@ -30,12 +36,23 @@ public class GameMessageHandler {
     private AuthoritativeMatchCoordinator coordinator;
     private final Set<String> processedJoins = ConcurrentHashMap.newKeySet();
 
+    /**
+     * Crea una nueva instancia de `GameMessageHandler`.
+     * @param match valor del parametro `match`
+     * @param coordinator valor del parametro `coordinator`
+     */
     public GameMessageHandler(Match match, AuthoritativeMatchCoordinator coordinator) {
         this.match = match;
         this.coordinator = coordinator;
         registerStrategies();
     }
 
+    /**
+     * Ejecuta la operacion publica `handle`.
+     * @param msg valor del parametro `msg`
+     * @param ip valor del parametro `ip`
+     * @param port valor del parametro `port`
+     */
     public void handle(GameMessage msg, String ip, int port) {
         if (msg == null || match == null) {
             return;
@@ -140,14 +157,26 @@ public class GameMessageHandler {
         return msg.getType() + "|" + playerId + "|" + playerName + "|" + msg.getPort();
     }
 
+    /**
+     * Actualiza el valor asociado a `setPeer`.
+     * @param peer valor del parametro `peer`
+     */
     public void setPeer(UdpPeer peer) {
         this.peer = peer;
     }
 
+    /**
+     * Actualiza el valor asociado a `setMessageFactory`.
+     * @param messageFactory valor del parametro `messageFactory`
+     */
     public void setMessageFactory(GameMessageFactory messageFactory) {
         this.messageFactory = messageFactory;
     }
 
+    /**
+     * Actualiza el valor asociado a `setCoordinator`.
+     * @param coordinator valor del parametro `coordinator`
+     */
     public void setCoordinator(AuthoritativeMatchCoordinator coordinator) {
         this.coordinator = coordinator;
         strategies.put(MessageType.GAME_START, new GameStartStrategy(coordinator));

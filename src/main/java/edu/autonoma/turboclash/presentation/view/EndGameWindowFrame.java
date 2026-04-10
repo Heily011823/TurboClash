@@ -6,14 +6,23 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Representa y organiza la vista {@code EndGameWindowFrame} en la capa de presentacion.
+ * Representa la clase `EndGameWindowFrame` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class EndGameWindowFrame extends JFrame {
 
     private final EndGameWindow view;
 
     /**
-     * Crea una nueva instancia de {@code EndGameWindowFrame}.
+     * Crea una nueva instancia de `EndGameWindowFrame`.
+     * @param ganador valor del parametro `ganador`
+     * @param tiempoTotal valor del parametro `tiempoTotal`
+     * @param primero valor del parametro `primero`
+     * @param segundo valor del parametro `segundo`
+     * @param tercero valor del parametro `tercero`
+     * @param cuarto valor del parametro `cuarto`
      */
     public EndGameWindowFrame(String ganador,
                               String tiempoTotal,
@@ -23,7 +32,11 @@ public class EndGameWindowFrame extends JFrame {
                               String cuarto) {
 
         SoundManager.getInstance().stopMusic();
-        SoundManager.getInstance().playWinSound();
+        if (ganador == null || ganador.isBlank() || "Sin ganador".equalsIgnoreCase(ganador)) {
+            SoundManager.getInstance().playEffect(SoundManager.Sound.END);
+        } else {
+            SoundManager.getInstance().playWinSound();
+        }
 
         view = new EndGameWindow();
         view.panel1.setOpaque(false);

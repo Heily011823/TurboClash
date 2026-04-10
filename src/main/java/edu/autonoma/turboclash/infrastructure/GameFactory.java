@@ -8,7 +8,10 @@ import java.util.ArrayList;
 
 
 /**
- * Crea y configura instancias relacionadas con {@code GameFactory} en la infraestructura del sistema.
+ * Representa la clase `GameFactory` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class GameFactory {
 
@@ -16,9 +19,8 @@ public class GameFactory {
     private final CarSkinFactory skinFactory;
 
     /**
-     * Crea una nueva instancia de {@code GameFactory}.
-     *
-     * @param config valor del parametro {@code config}
+     * Crea una nueva instancia de `GameFactory`.
+     * @param config valor del parametro `config`
      */
     public GameFactory(GameConfig config) {
         this.config = config;
@@ -26,10 +28,9 @@ public class GameFactory {
     }
 
     /**
-     * Crea {@code Match}.
-     *
-     * @param localPlayer valor del parametro {@code localPlayer}
-     * @return instancia creada para {@code Match}
+     * Crea el recurso necesario para create match.
+     * @param localPlayer valor del parametro `localPlayer`
+     * @return resultado de la operacion documentada
      */
     public Match createMatch(Player localPlayer) {
         return new Match(localPlayer, new ArrayList<>(), config.getTargetScore());
@@ -37,12 +38,11 @@ public class GameFactory {
 
 
     /**
-     * Crea {@code Player}.
-     *
-     * @param playerId valor del parametro {@code playerId}
-     * @param playerName valor del parametro {@code playerName}
-     * @param puerto valor del parametro {@code puerto}
-     * @return instancia creada para {@code Player}
+     * Crea el recurso necesario para create player.
+     * @param playerId valor del parametro `playerId`
+     * @param playerName valor del parametro `playerName`
+     * @param puerto valor del parametro `puerto`
+     * @return resultado de la operacion documentada
      */
     public Player createPlayer(String playerId, String playerName, int puerto) {
 

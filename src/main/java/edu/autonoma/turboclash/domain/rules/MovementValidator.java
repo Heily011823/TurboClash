@@ -4,24 +4,26 @@ import edu.autonoma.turboclash.exception.InvalidMovementException;
 
 
 /**
- * Valida las reglas asociadas a {@code MovementValidator} en las reglas del dominio.
+ * Representa la clase `MovementValidator` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class MovementValidator {
 
     /**
-     * Valida las coordenadas del movimiento dentro de los límites del mapa.
-     *
-     * @param x Coordenada X
-     * @param y Coordenada Y
-     * @param maxX Límite máximo en X
-     * @param maxY Límite máximo en Y
-     * @throws InvalidMovementException Se lanza la excepción si el movimiento está fuera del mapa
+     * Ejecuta la operacion publica `validate`.
+     * @param x valor del parametro `x`
+     * @param y valor del parametro `y`
+     * @param maxX valor del parametro `maxX`
+     * @param maxY valor del parametro `maxY`
+     * @throws InvalidMovementException se propaga si ocurre una condicion excepcional durante la ejecucion
      */
     public static void validate(double x, double y, double maxX, double maxY)
             throws InvalidMovementException {
 
         if (x < 0 || y < 0 || x > maxX || y > maxY) {
-            throw new InvalidMovementException("El movimiento está fuera del mapa");
+            throw new InvalidMovementException("El movimiento estÃ¡ fuera del mapa");
         }
     }
 }

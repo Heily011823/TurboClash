@@ -13,16 +13,31 @@ import edu.autonoma.turboclash.presentation.view.GameWindowFrame;
 import javax.swing.JOptionPane;
 import java.util.List;
 
+/**
+ * Representa la clase `GameApplication` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class GameApplication {
 
     private final GameBootstrap bootstrap;
     private final GameConfig config;
 
+    /**
+     * Crea una nueva instancia de `GameApplication`.
+     * @param bootstrap valor del parametro `bootstrap`
+     * @param config valor del parametro `config`
+     */
     public GameApplication(GameBootstrap bootstrap, GameConfig config) {
         this.bootstrap = bootstrap;
         this.config = config;
     }
 
+    /**
+     * Ejecuta la operacion publica `start`.
+     * @param playerName valor del parametro `playerName`
+     */
     public void start(String playerName) {
         int puerto = getPuerto();
 

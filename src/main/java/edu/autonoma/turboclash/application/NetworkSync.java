@@ -2,6 +2,12 @@ package edu.autonoma.turboclash.application;
 
 import edu.autonoma.turboclash.domain.model.Player;
 
+/**
+ * Representa la clase `NetworkSync` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
+ */
 public class NetworkSync {
 
     private static final long MOVEMENT_SEND_INTERVAL_MS = 50L;
@@ -17,6 +23,11 @@ public class NetworkSync {
     private long lastMovementSentAt;
     private long lastSnapshotSentAt;
 
+    /**
+     * Ejecuta la operacion publica `sync`.
+     * @param context valor del parametro `context`
+     * @param player valor del parametro `player`
+     */
     public void sync(GameContext context, Player player) {
         if (context == null || player == null || player.getCar() == null) {
             return;
@@ -41,12 +52,22 @@ public class NetworkSync {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `join`.
+     * @param context valor del parametro `context`
+     * @param player valor del parametro `player`
+     */
     public void join(GameContext context, Player player) {
         if (context != null) {
             context.getNetwork().sendJoin(player);
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `leave`.
+     * @param context valor del parametro `context`
+     * @param player valor del parametro `player`
+     */
     public void leave(GameContext context, Player player) {
         if (context != null) {
             context.getNetwork().sendLeave(player);

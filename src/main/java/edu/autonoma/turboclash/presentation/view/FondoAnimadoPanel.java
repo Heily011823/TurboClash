@@ -8,7 +8,10 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Representa y organiza la vista {@code FondoAnimadoPanel} en la capa de presentacion.
+ * Representa la clase `FondoAnimadoPanel` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class FondoAnimadoPanel extends JPanel {
 
@@ -32,32 +35,28 @@ public class FondoAnimadoPanel extends JPanel {
     private int metaX;
 
     /**
-     * Crea una nueva instancia de {@code FondoAnimadoPanel}.
-     *
-     * @param ruta valor del parametro {@code ruta}
+     * Crea una nueva instancia de `FondoAnimadoPanel`.
+     * @param ruta valor del parametro `ruta`
      */
     public FondoAnimadoPanel(String ruta) {
         URL rutaCarretera = getClass().getResource(ruta);
         if (rutaCarretera != null) {
             carretera = new ImageIcon(rutaCarretera).getImage();
         } else {
-            System.out.println("No se encontró la imagen: " + ruta);
+            System.out.println("No se encontrÃ³ la imagen: " + ruta);
         }
 
         URL rutaMeta = getClass().getResource("/image/Finish.png");
         if (rutaMeta != null) {
             meta = new ImageIcon(rutaMeta).getImage();
         } else {
-            System.out.println("No se encontró la imagen: /image/Finish.png");
+            System.out.println("No se encontrÃ³ la imagen: /image/Finish.png");
         }
 
         metaX = GameViewport.WIDTH;
         crearTimers();
     }
 
-    /**
-     * Crea los timers pero NO los inicia.
-     */
     private void crearTimers() {
         timerMovimiento = new Timer(15, e -> {
             if (juegoTerminado || !juegoIniciado) return;
@@ -96,7 +95,7 @@ public class FondoAnimadoPanel extends JPanel {
     }
 
     /**
-     * Inicia el movimiento y el tiempo solo cuando empieza la partida.
+     * Inicia el flujo asociado a start game.
      */
     public void startGame() {
         if (juegoTerminado || juegoIniciado) {
@@ -116,6 +115,9 @@ public class FondoAnimadoPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Ejecuta la operacion publica `pauseGame`.
+     */
     public void pauseGame() {
         if (timerMovimiento != null) {
             timerMovimiento.stop();
@@ -125,6 +127,9 @@ public class FondoAnimadoPanel extends JPanel {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `resumeGame`.
+     */
     public void resumeGame() {
         if (juegoTerminado || !juegoIniciado) {
             return;
@@ -138,6 +143,9 @@ public class FondoAnimadoPanel extends JPanel {
         }
     }
 
+    /**
+     * Ejecuta la operacion publica `resetGame`.
+     */
     public void resetGame() {
         pauseGame();
 
@@ -153,44 +161,48 @@ public class FondoAnimadoPanel extends JPanel {
     }
 
     /**
-     * Obtiene el valor de {@code MetaX}.
-     *
-     * @return valor de {@code MetaX}
+     * Obtiene el valor asociado a `getMetaX`.
+     * @return resultado de la operacion documentada
      */
     public int getMetaX() {
         return metaX;
     }
 
     /**
-     * Indica si {@code MetaVisible}.
-     *
-     * @return true si se cumple la condicion evaluada; false en caso contrario
+     * Indica la condicion evaluada por `isMetaVisible`.
+     * @return resultado de la operacion documentada
      */
     public boolean isMetaVisible() {
         return mostrarMeta;
     }
 
     /**
-     * Indica si {@code JuegoTerminado}.
-     *
-     * @return true si se cumple la condicion evaluada; false en caso contrario
+     * Indica la condicion evaluada por `isJuegoTerminado`.
+     * @return resultado de la operacion documentada
      */
     public boolean isJuegoTerminado() {
         return juegoTerminado;
     }
 
+    /**
+     * Indica la condicion evaluada por `isJuegoIniciado`.
+     * @return resultado de la operacion documentada
+     */
     public boolean isJuegoIniciado() {
         return juegoIniciado;
     }
 
+    /**
+     * Obtiene el valor asociado a `getSegundosRestantes`.
+     * @return resultado de la operacion documentada
+     */
     public int getSegundosRestantes() {
         return segundosRestantes;
     }
 
     /**
-     * Ejecuta la operacion {@code terminarJuego}.
-     *
-     * @param ranking valor del parametro {@code ranking}
+     * Ejecuta la operacion publica `terminarJuego`.
+     * @param ranking valor del parametro `ranking`
      */
     public void terminarJuego(List<Player> ranking) {
         if (juegoTerminado) return;
@@ -247,7 +259,7 @@ public class FondoAnimadoPanel extends JPanel {
         }
 
         if (player.isFinishReached()) {
-            return "Llegó a la meta";
+            return "LlegÃ³ a la meta";
         }
 
         if (player.isAlive()) {
@@ -285,12 +297,6 @@ public class FondoAnimadoPanel extends JPanel {
         g.drawString("Tiempo: " + formatear(segundosRestantes), 20, 30);
     }
 
-    /**
-     * Ejecuta la operacion {@code formatear}.
-     *
-     * @param s valor del parametro {@code s}
-     * @return resultado de la operacion {@code formatear}
-     */
     private String formatear(int s) {
         int min = s / 60;
         int seg = s % 60;

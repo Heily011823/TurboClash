@@ -1,14 +1,16 @@
 package edu.autonoma.turboclash.exception;
 
 /**
- * Representa la responsabilidad de {@code UdpConnectionException} en el manejo de errores.
+ * Representa la clase `UdpConnectionException` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class UdpConnectionException extends RuntimeException {
 
     /**
-     * Crea una nueva instancia de {@code UdpConnectionException}.
-     *
-     * @param message valor del parametro {@code message}
+     * Crea una nueva instancia de `UdpConnectionException`.
+     * @param message valor del parametro `message`
      */
     public UdpConnectionException(String message) {
 

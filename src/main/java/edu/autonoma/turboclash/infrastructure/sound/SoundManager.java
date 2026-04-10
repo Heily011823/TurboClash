@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Administra la responsabilidad principal de {@code SoundManager} en la infraestructura de audio.
+ * Representa la clase `SoundManager` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class SoundManager implements IAudioService {
 
@@ -17,7 +20,7 @@ public class SoundManager implements IAudioService {
 
     @Override
     /**
-     * Reproduce {@code MenuMusic}.
+     * Reproduce el recurso asociado a play menu music.
      */
     public void playMenuMusic() {
         playBackground(Sound.MENU);
@@ -25,7 +28,7 @@ public class SoundManager implements IAudioService {
 
     @Override
     /**
-     * Reproduce {@code CoinSound}.
+     * Reproduce el recurso asociado a play coin sound.
      */
     public void playCoinSound() {
         playEffect(Sound.POINT);
@@ -33,31 +36,43 @@ public class SoundManager implements IAudioService {
 
     @Override
     /**
-     * Reproduce {@code BrakeSound}.
+     * Reproduce el recurso asociado a play brake sound.
      */
     public void playBrakeSound() {
         playEffect(Sound.BRAKE);
     }
 
     @Override
-    /**
-     * Detiene {@code Music}.
-     */
 
+    /**
+     * Reproduce el recurso asociado a play countdown sound.
+     */
     public void playCountdownSound() {
         playEffect(Sound.START);
     }
 
     @Override
+    /**
+     * Reproduce el recurso asociado a play win sound.
+     */
     public void playWinSound() {
         playEffect(Sound.WIN);
     }
 
+    /**
+     * Detiene el flujo asociado a stop music.
+     */
     public void stopMusic() {
         stopBackground();
     }
 
     // Enum de sonidos
+    /**
+     * Enumera las opciones disponibles para `Sound` dentro del sistema.
+     *
+     * @author 
+     * @version 1.0
+     */
     public enum Sound {
         COLLISION("CollisionSound.wav"),
         POINT("CoinSound.wav"),
@@ -73,6 +88,10 @@ public class SoundManager implements IAudioService {
             this.fileName = fileName;
         }
 
+        /**
+         * Obtiene el valor asociado a `getFileName`.
+         * @return resultado de la operacion documentada
+         */
         public String getFileName() {
             return fileName;
         }
@@ -81,9 +100,8 @@ public class SoundManager implements IAudioService {
     private SoundManager() {}
 
     /**
-     * Obtiene el valor de {@code Instance}.
-     *
-     * @return valor de {@code Instance}
+     * Obtiene el valor asociado a `getInstance`.
+     * @return resultado de la operacion documentada
      */
     public static SoundManager getInstance() {
         if (instance == null) {
@@ -92,11 +110,10 @@ public class SoundManager implements IAudioService {
         return instance;
     }
 
-    // Música en loop
+    // MÃºsica en loop
     /**
-     * Reproduce {@code Background}.
-     *
-     * @param sound valor del parametro {@code sound}
+     * Reproduce el recurso asociado a play background.
+     * @param sound valor del parametro `sound`
      */
     public void playBackground(Sound sound) {
         try {
@@ -105,7 +122,7 @@ public class SoundManager implements IAudioService {
             InputStream input = getClass().getResourceAsStream(BASE_PATH + sound.getFileName());
 
             if (input == null) {
-                System.err.println("No se encontró: " + BASE_PATH + sound.getFileName());
+                System.err.println("No se encontrÃ³: " + BASE_PATH + sound.getFileName());
                 return;
             }
 
@@ -120,9 +137,9 @@ public class SoundManager implements IAudioService {
         }
     }
 
-    // Detener música
+    // Detener mÃºsica
     /**
-     * Detiene {@code Background}.
+     * Detiene el flujo asociado a stop background.
      */
     public void stopBackground() {
         if (backgroundClip != null) {
@@ -134,9 +151,8 @@ public class SoundManager implements IAudioService {
 
     // Efectos
     /**
-     * Reproduce {@code Effect}.
-     *
-     * @param sound valor del parametro {@code sound}
+     * Reproduce el recurso asociado a play effect.
+     * @param sound valor del parametro `sound`
      */
     public void playEffect(Sound sound) {
         try {

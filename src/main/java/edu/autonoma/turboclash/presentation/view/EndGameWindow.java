@@ -5,9 +5,15 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 /**
- * Representa y organiza la vista {@code EndGameWindow} en la capa de presentacion.
+ * Representa la clase `EndGameWindow` y define su responsabilidad dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public class EndGameWindow {
+    /**
+     * Expone el atributo publico `panel1` para la colaboracion entre componentes del sistema.
+     */
     public JPanel panel1;
 
     private JLabel tituloLabel;
@@ -23,7 +29,7 @@ public class EndGameWindow {
     private JButton btnReiniciar;
 
     /**
-     * Crea una nueva instancia de {@code EndGameWindow}.
+     * Crea una nueva instancia de `EndGameWindow`.
      */
     public EndGameWindow() {
         panel1 = new JPanel(null);
@@ -63,9 +69,6 @@ public class EndGameWindow {
         panel1.add(btnReiniciar);
     }
 
-    /**
-     * Ejecuta la operacion {@code crearLabel}.
-     */
     private JLabel crearLabel(String texto, int x, int y, int w, int h, int fontSize, Color color) {
         JLabel label = new JLabel(texto, SwingConstants.CENTER);
         label.setBounds(x, y, w, h);
@@ -74,9 +77,6 @@ public class EndGameWindow {
         return label;
     }
 
-    /**
-     * Ejecuta la operacion {@code crearBotonImagen}.
-     */
     private JButton crearBotonImagen(String ruta, int x, int y, int w, int h) {
         JButton boton = new JButton();
         boton.setBounds(x, y, w, h);
@@ -91,14 +91,20 @@ public class EndGameWindow {
             Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
             boton.setIcon(new ImageIcon(imagenEscalada));
         } catch (Exception e) {
-            System.out.println("No se encontró la imagen del botón: " + ruta);
+            System.out.println("No se encontrÃ³ la imagen del botÃ³n: " + ruta);
         }
 
         return boton;
     }
 
     /**
-     * Actualiza los resultados finales.
+     * Actualiza el valor asociado a `setResultados`.
+     * @param ganador valor del parametro `ganador`
+     * @param tiempoTotal valor del parametro `tiempoTotal`
+     * @param primero valor del parametro `primero`
+     * @param segundo valor del parametro `segundo`
+     * @param tercero valor del parametro `tercero`
+     * @param cuarto valor del parametro `cuarto`
      */
     public void setResultados(String ganador,
                               String tiempoTotal,
@@ -117,14 +123,16 @@ public class EndGameWindow {
     }
 
     /**
-     * Ejecuta la operacion {@code addFinListener}.
+     * Agrega el elemento necesario para add fin listener.
+     * @param listener valor del parametro `listener`
      */
     public void addFinListener(ActionListener listener) {
         btnFin.addActionListener(listener);
     }
 
     /**
-     * Ejecuta la operacion {@code addReiniciarListener}.
+     * Agrega el elemento necesario para add reiniciar listener.
+     * @param listener valor del parametro `listener`
      */
     public void addReiniciarListener(ActionListener listener) {
         btnReiniciar.addActionListener(listener);

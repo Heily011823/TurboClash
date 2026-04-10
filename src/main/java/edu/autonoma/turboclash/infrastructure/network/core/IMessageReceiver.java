@@ -1,21 +1,13 @@
 package edu.autonoma.turboclash.infrastructure.network.core;
 
 /**
- * Define el contrato de {@code IMessageReceiver} en la infraestructura de red.
+ * Define el contrato de `IMessageReceiver` dentro del sistema.
+ *
+ * @author 
+ * @version 1.0
  */
 public interface IMessageReceiver {
-    /**
-     * Inicia la escucha de la operacion principal del metodo.
-     */
     void escuchar();
-    /**
-     * Detiene la operacion principal del metodo.
-     */
     void detener();
-    /**
-     * Actualiza el valor de {@code Listener}.
-     *
-     * @param listener valor del parametro {@code listener}
-     */
     void setListener(IMessageListener listener);
 }
