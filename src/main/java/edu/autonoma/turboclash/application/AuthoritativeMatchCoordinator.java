@@ -80,7 +80,7 @@ public class AuthoritativeMatchCoordinator {
      * @return resultado de la operacion documentada
      */
     public boolean isLocalHost() {
-        return match.getHostPort() == localPort;
+        return match.getAuthoritativeHostPort() == localPort;
     }
 
     /**
@@ -119,6 +119,7 @@ public class AuthoritativeMatchCoordinator {
         }
 
         if (System.currentTimeMillis() >= scheduledStartTime) {
+            match.lockAuthoritativeHostPort(localPort);
             match.setStarted(true);
             match.setRemainingMillis(MATCH_DURATION_MS);
             ensureSpawnerRunning();
@@ -138,6 +139,7 @@ public class AuthoritativeMatchCoordinator {
         }
 
         long scheduledStartTime = System.currentTimeMillis() + START_DELAY_MS;
+        match.lockAuthoritativeHostPort(localPort);
         match.setScheduledStartTime(scheduledStartTime);
         networkService.sendGameStart(match.getLocalPlayer(), localPort, scheduledStartTime,
                 match.getConnectedPlayerCount(), match.getMinPlayers(), match.getMaxPlayers());
@@ -152,6 +154,7 @@ public class AuthoritativeMatchCoordinator {
             return;
         }
 
+        match.lockAuthoritativeHostPort(payload.hostPort);
         match.registerKnownPort(payload.hostPort);
         match.setScheduledStartTime(payload.scheduledStartTime);
     }
@@ -165,6 +168,7 @@ public class AuthoritativeMatchCoordinator {
             return;
         }
 
+        match.lockAuthoritativeHostPort(snapshot.hostPort);
         match.registerKnownPort(snapshot.hostPort);
         match.setScheduledStartTime(snapshot.scheduledStartTime);
         match.setStarted(snapshot.started);
@@ -211,6 +215,7 @@ public class AuthoritativeMatchCoordinator {
             return;
         }
 
+        match.lockAuthoritativeHostPort(snapshot.hostPort);
         List<Player> ranking = new ArrayList<>();
         for (PlayerState state : snapshot.players) {
             Player player = match.findPlayerByIdOrName(state.playerId, state.playerName);

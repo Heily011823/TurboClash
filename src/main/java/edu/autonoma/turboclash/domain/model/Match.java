@@ -29,6 +29,7 @@ public class Match {
     private final Map<String, Long> lastSequenceByPlayer = new ConcurrentHashMap<>();
     private final Set<String> removedPlayers = ConcurrentHashMap.newKeySet();
     private final Set<Integer> knownPorts = ConcurrentHashMap.newKeySet();
+    private Integer authoritativeHostPort;
     private int minPlayers = 2;
     private int maxPlayers = 4;
 
@@ -397,6 +398,10 @@ public class Match {
      * @return resultado de la operacion documentada
      */
     public synchronized int getHostPort() {
+        if (authoritativeHostPort != null && authoritativeHostPort > 0) {
+            return authoritativeHostPort;
+        }
+
         int hostPort = Integer.MAX_VALUE;
 
         if (localPlayer != null && !isPlayerRemoved(localPlayer.getId(), localPlayer.getName())
@@ -421,6 +426,28 @@ public class Match {
         }
 
         return hostPort == Integer.MAX_VALUE ? -1 : hostPort;
+    }
+
+    /**
+     * Ejecuta la operacion publica `lockAuthoritativeHostPort`.
+     * @param port valor del parametro `port`
+     */
+    public synchronized void lockAuthoritativeHostPort(int port) {
+        if (port > 0 && authoritativeHostPort == null) {
+            authoritativeHostPort = port;
+            knownPorts.add(port);
+        }
+    }
+
+    /**
+     * Obtiene el valor asociado a `getAuthoritativeHostPort`.
+     * @return resultado de la operacion documentada
+     */
+    public synchronized int getAuthoritativeHostPort() {
+        if (authoritativeHostPort != null && authoritativeHostPort > 0) {
+            return authoritativeHostPort;
+        }
+        return getHostPort();
     }
 
     private void syncPlayerData(Player target, Player source) {

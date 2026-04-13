@@ -105,6 +105,9 @@ public class GameLoop {
     }
 
     private void shutdown(GameContext context, Player local) {
+        if (context == null || context.getMatch().isFinished()) {
+            return;
+        }
         context.getNetwork().sendLeave(local);
     }
 

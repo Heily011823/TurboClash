@@ -94,7 +94,7 @@ public class GameMessageHandler {
         }
 
         if ((msg.getType() == MessageType.SYNC || msg.getType() == MessageType.GAME_START || msg.getType() == MessageType.GAME_OVER)
-                && msg.getPort() != match.getHostPort()) {
+                && msg.getPort() != match.getAuthoritativeHostPort()) {
             return;
         }
 
@@ -139,7 +139,7 @@ public class GameMessageHandler {
         }
 
         int localPort = peer.getLocalPort();
-        return match.getHostPort() == localPort;
+        return match.getAuthoritativeHostPort() == localPort;
     }
 
     private boolean isLocalMessage(GameMessage msg, Player localPlayer) {

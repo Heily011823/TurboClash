@@ -32,6 +32,10 @@ public class LeaveStrategy implements IMessageStrategy {
             return;
         }
 
+        if (match.isFinished()) {
+            return;
+        }
+
         Player localPlayer = match.getLocalPlayer();
         String messagePlayerId = message.getPlayerId();
         String messagePlayerName = message.getPlayerName();
