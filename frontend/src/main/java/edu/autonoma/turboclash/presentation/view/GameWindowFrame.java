@@ -3,6 +3,7 @@ package edu.autonoma.turboclash.presentation.view;
 import edu.autonoma.turboclash.infrastructure.input.GameInputBinder;
 import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
+import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,15 +17,18 @@ import java.awt.*;
 public class GameWindowFrame extends JFrame {
 
     private final GameWindow view;
+    private final UdpPeer peer;
     private Runnable countdownAction;
 
     /**
      * Crea una nueva instancia de `GameWindowFrame`.
      * @param keyboardInput valor del parametro `keyboardInput`
      * @param mouseInput valor del parametro `mouseInput`
+     * @param peer valor del parametro `peer`
      */
-    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput) {
+    public GameWindowFrame(KeyboardInput keyboardInput, MouseInput mouseInput, UdpPeer peer) {
         this.view = new GameWindow();
+        this.peer = peer;
 
         setupFrameProperties();
         setupContentLayout(keyboardInput, mouseInput);
@@ -62,7 +66,7 @@ public class GameWindowFrame extends JFrame {
         gamePanel.setMaximumSize(screen);
 
         try {
-            FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png");
+            FondoAnimadoPanel fondo = new FondoAnimadoPanel("/image/Track.png", peer);
             fondo.setLayout(new BorderLayout());
             fondo.setPreferredSize(screen);
             fondo.setMinimumSize(screen);
@@ -77,7 +81,6 @@ public class GameWindowFrame extends JFrame {
             gamePanel.setOpaque(true);
             gamePanel.setBackground(Color.GRAY);
             setContentPane(gamePanel);
-            System.err.println("No se pudo cargar el fondo animado: " + e.getMessage());
         }
 
         int puerto = Integer.parseInt(System.getProperty("puerto", "5001"));

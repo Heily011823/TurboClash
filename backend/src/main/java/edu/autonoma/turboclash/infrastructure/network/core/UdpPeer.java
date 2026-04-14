@@ -40,7 +40,6 @@ public class UdpPeer {
         this.sender = sender;
         this.receiver = receiver;
         this.activo = true;
-
     }
 
     /**
@@ -81,7 +80,7 @@ public class UdpPeer {
                 peers.add(new PeerInfo(ip, puerto));
             }
         } catch (InvalidPortException e) {
-            System.err.println("Puerto invÃ¡lido: " + e.getMessage());
+            throw new IllegalArgumentException("Puerto inválido", e);
         }
     }
 
@@ -122,17 +121,33 @@ public class UdpPeer {
     /**
      * Ejecuta la operacion publica `cerrar`.
      */
-    public void cerrar() {
+    public synchronized void cerrar() {
+        if (!activo) {
+            return;
+        }
+
         activo = false;
-        receiver.detener();
 
-        if (receiverThread != null) {
-            receiverThread.interrupt();
+        try {
+            receiver.detener();
+        } catch (Exception e) {
         }
 
-        if (!socket.isClosed()) {
-            socket.close();
+        try {
+            if (receiverThread != null && receiverThread.isAlive()) {
+                receiverThread.interrupt();
+            }
+        } catch (Exception e) {
         }
+
+        try {
+            if (!socket.isClosed()) {
+                socket.close();
+            }
+        } catch (Exception e) {
+        }
+
+        peers.clear();
     }
 
     /**

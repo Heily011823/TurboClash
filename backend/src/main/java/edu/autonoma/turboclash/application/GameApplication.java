@@ -6,7 +6,6 @@ import edu.autonoma.turboclash.infrastructure.input.KeyboardInput;
 import edu.autonoma.turboclash.infrastructure.input.MouseInput;
 import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigEntry;
 import edu.autonoma.turboclash.infrastructure.network.config.PeerConfigLoader;
-import edu.autonoma.turboclash.presentation.view.FondoAnimadoPanel;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 import edu.autonoma.turboclash.presentation.view.GameWindowFrame;
 
@@ -44,10 +43,16 @@ public class GameApplication {
         KeyboardInput keyboard = new KeyboardInput();
         MouseInput mouse = new MouseInput();
 
-        GameWindowFrame mainFrame = new GameWindowFrame(keyboard, mouse);
+        GameContext context = bootstrap.init(puerto, playerName);
+
+        GameWindowFrame mainFrame = new GameWindowFrame(
+                keyboard,
+                mouse,
+                context.getPeer()
+        );
+
         GameWindow view = mainFrame.getGameView();
 
-        GameContext context = bootstrap.init(puerto, playerName);
         Player localPlayer = context.getLocalPlayer();
         view.setLocalPlayer(localPlayer);
 
@@ -61,7 +66,10 @@ public class GameApplication {
         context.getNetwork().connect(context, localPlayer);
         view.prepareRaceStart(context.getPlayers());
         view.updateCars(context.getPlayers());
-        view.showWaitingPlayers(context.getMatch().getConnectedPlayerCount(), context.getMatch().getMinPlayers());
+        view.showWaitingPlayers(
+                context.getMatch().getConnectedPlayerCount(),
+                context.getMatch().getMinPlayers()
+        );
         view.requestGameFocus();
 
         GameLoop loop = new GameLoop(config.getFrameDelay());

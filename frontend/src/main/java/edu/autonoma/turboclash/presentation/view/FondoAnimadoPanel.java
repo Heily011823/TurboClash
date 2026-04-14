@@ -1,6 +1,7 @@
 package edu.autonoma.turboclash.presentation.view;
 
 import edu.autonoma.turboclash.domain.model.Player;
+import edu.autonoma.turboclash.infrastructure.network.core.UdpPeer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,8 @@ import java.util.List;
 public class FondoAnimadoPanel extends JPanel {
 
     private static final int DURACION_PARTIDA_SEGUNDOS = 180;
+
+    private final UdpPeer peer;
 
     private Image carretera;
     private Image meta;
@@ -37,20 +40,19 @@ public class FondoAnimadoPanel extends JPanel {
     /**
      * Crea una nueva instancia de `FondoAnimadoPanel`.
      * @param ruta valor del parametro `ruta`
+     * @param peer valor del parametro `peer`
      */
-    public FondoAnimadoPanel(String ruta) {
+    public FondoAnimadoPanel(String ruta, UdpPeer peer) {
+        this.peer = peer;
+
         URL rutaCarretera = getClass().getResource(ruta);
         if (rutaCarretera != null) {
             carretera = new ImageIcon(rutaCarretera).getImage();
-        } else {
-            System.out.println("No se encontrÃ³ la imagen: " + ruta);
         }
 
         URL rutaMeta = getClass().getResource("/image/Finish.png");
         if (rutaMeta != null) {
             meta = new ImageIcon(rutaMeta).getImage();
-        } else {
-            System.out.println("No se encontrÃ³ la imagen: /image/Finish.png");
         }
 
         metaX = GameViewport.WIDTH;
@@ -59,7 +61,9 @@ public class FondoAnimadoPanel extends JPanel {
 
     private void crearTimers() {
         timerMovimiento = new Timer(15, e -> {
-            if (juegoTerminado || !juegoIniciado) return;
+            if (juegoTerminado || !juegoIniciado) {
+                return;
+            }
 
             x1 -= velocidad;
 
@@ -77,7 +81,9 @@ public class FondoAnimadoPanel extends JPanel {
         });
 
         timerTiempo = new Timer(1000, e -> {
-            if (juegoTerminado || !juegoIniciado) return;
+            if (juegoTerminado || !juegoIniciado) {
+                return;
+            }
 
             if (!tiempoTerminado) {
                 segundosRestantes--;
@@ -205,7 +211,9 @@ public class FondoAnimadoPanel extends JPanel {
      * @param ranking valor del parametro `ranking`
      */
     public void terminarJuego(List<Player> ranking) {
-        if (juegoTerminado) return;
+        if (juegoTerminado) {
+            return;
+        }
 
         juegoTerminado = true;
         juegoIniciado = false;
@@ -233,7 +241,7 @@ public class FondoAnimadoPanel extends JPanel {
             ventana.dispose();
         }
 
-        new EndGameWindowFrame(ganador, tiempoTotal, primero, segundo, tercero, cuarto);
+        new EndGameWindowFrame(ganador, tiempoTotal, primero, segundo, tercero, cuarto, peer);
     }
 
     private String formatRankingLine(int posicion, List<Player> ranking, int index) {
@@ -259,7 +267,7 @@ public class FondoAnimadoPanel extends JPanel {
         }
 
         if (player.isFinishReached()) {
-            return "LlegÃ³ a la meta";
+            return "Llegó a la meta";
         }
 
         if (player.isAlive()) {
