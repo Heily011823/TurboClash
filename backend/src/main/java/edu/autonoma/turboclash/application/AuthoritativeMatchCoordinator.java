@@ -119,7 +119,7 @@ public class AuthoritativeMatchCoordinator {
         }
 
         if (System.currentTimeMillis() >= scheduledStartTime) {
-            match.lockAuthoritativeHostPort(localPort);
+            match.lockAuthoritativeHostPort(5002);
             match.setStarted(true);
             match.setRemainingMillis(MATCH_DURATION_MS);
             ensureSpawnerRunning();
@@ -130,7 +130,7 @@ public class AuthoritativeMatchCoordinator {
      * Ejecuta la operacion publica `maybeScheduleGameStart`.
      */
     public void maybeScheduleGameStart() {
-        if (!isLocalHost() || match.isStarted() || match.getScheduledStartTime() > 0) {
+        if (match.isStarted() || match.getScheduledStartTime() > 0) {
             return;
         }
 
@@ -139,9 +139,12 @@ public class AuthoritativeMatchCoordinator {
         }
 
         long scheduledStartTime = System.currentTimeMillis() + START_DELAY_MS;
-        match.lockAuthoritativeHostPort(localPort);
+
+        int hostPort = 5002;
+
+        match.lockAuthoritativeHostPort(hostPort);
         match.setScheduledStartTime(scheduledStartTime);
-        networkService.sendGameStart(match.getLocalPlayer(), localPort, scheduledStartTime,
+        networkService.sendGameStart(match.getLocalPlayer(), hostPort, scheduledStartTime,
                 match.getConnectedPlayerCount(), match.getMinPlayers(), match.getMaxPlayers());
     }
 
@@ -289,7 +292,7 @@ public class AuthoritativeMatchCoordinator {
         match.finishGame(winner, ranking, reason);
         match.setStarted(false);
         stopSpawner();
-        networkService.sendGameOver(match, items, obstacles, ranking, reason, localPort);
+        networkService.sendGameOver(match, items, obstacles, ranking, reason, 5002);
     }
 
     private void ensureSpawnerRunning() {
