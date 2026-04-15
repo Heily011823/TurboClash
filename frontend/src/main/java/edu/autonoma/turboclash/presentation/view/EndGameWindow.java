@@ -11,15 +11,10 @@ import java.awt.event.ActionListener;
  * de la pantalla final: título, ganador, tiempo total, ranking
  * y botones de acción.</p>
  *
- * <p>Aquí se controlan:</p>
- * <ul>
- *   <li>Los textos que aparecen en pantalla.</li>
- *   <li>La posición de cada label.</li>
- *   <li>El tamaño y color de la fuente.</li>
- * </ul>
+ * <p>Incluye mejoras visuales como sombra en texto para mayor legibilidad.</p>
  *
  * @author Valerie Moreno Castaño
- * @version 1.1
+ * @version 1.2
  * @since 2025-04-09
  */
 public class EndGameWindow {
@@ -38,26 +33,30 @@ public class EndGameWindow {
     private JButton btnFin;
     private JButton btnReiniciar;
 
+    /**
+     * Constructor de la vista final.
+     */
     public EndGameWindow() {
+
         panel1 = new JPanel(null);
         panel1.setOpaque(false);
-
-        // Mejor alinear esto con el tamaño real del frame
         panel1.setPreferredSize(new Dimension(800, 600));
 
+        // Labels con sombra (ShadowLabel)
         tituloLabel = crearLabel("RESULTADOS FINALES", 170, 30, 460, 45, 30, Color.WHITE);
-        ganadorLabel = crearLabel("", 150, 85, 500, 35, 24, Color.YELLOW);
-        tiempoTotalLabel = crearLabel("", 130, 120, 540, 30, 20, Color.WHITE);
+        ganadorLabel = crearLabel("", 120, 85, 560, 35, 24, Color.YELLOW);
+        tiempoTotalLabel = crearLabel("", 120, 120, 560, 30, 20, Color.WHITE);
 
-        // Labels del ranking con más ancho y fuente más visible
-        primerLugarLabel = crearLabel("", 150, 185, 500, 40, 22, Color.YELLOW);
-        segundoLugarLabel = crearLabel("", 60, 245, 300, 40, 20, Color.WHITE);
-        tercerLugarLabel = crearLabel("", 430, 245, 300, 40, 20, new Color(255, 200, 120));
-        cuartoLugarLabel = crearLabel("", 150, 395, 500, 40, 20, Color.WHITE);
+        primerLugarLabel = crearLabel("", 140, 185, 520, 40, 22, Color.YELLOW);
+        segundoLugarLabel = crearLabel("", 40, 245, 320, 40, 20, Color.WHITE);
+        tercerLugarLabel = crearLabel("", 440, 245, 320, 40, 20, new Color(255, 200, 120));
+        cuartoLugarLabel = crearLabel("", 140, 395, 520, 40, 20, Color.WHITE);
 
+        // Botones
         btnFin = crearBotonImagen("/image/btn_fin.png", 500, 500, 180, 55);
         btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 100, 500, 180, 55);
 
+        // Fallback si no hay imágenes
         if (btnFin.getIcon() == null) {
             btnFin.setText("FIN");
             btnFin.setContentAreaFilled(true);
@@ -68,6 +67,7 @@ public class EndGameWindow {
             btnReiniciar.setContentAreaFilled(true);
         }
 
+        // Agregar componentes
         panel1.add(tituloLabel);
         panel1.add(ganadorLabel);
         panel1.add(tiempoTotalLabel);
@@ -79,14 +79,30 @@ public class EndGameWindow {
         panel1.add(btnReiniciar);
     }
 
+    /**
+     * Crea un label con sombra (ShadowLabel).
+     *
+     * @param texto texto inicial
+     * @param x posición horizontal
+     * @param y posición vertical
+     * @param w ancho
+     * @param h alto
+     * @param fontSize tamaño de fuente
+     * @param color color del texto
+     * @return label configurado
+     */
     private JLabel crearLabel(String texto, int x, int y, int w, int h, int fontSize, Color color) {
-        JLabel label = new JLabel(texto, SwingConstants.CENTER);
+        ShadowLabel label = new ShadowLabel(texto);
         label.setBounds(x, y, w, h);
         label.setForeground(color);
         label.setFont(new Font("SansSerif", Font.BOLD, fontSize));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
         return label;
     }
 
+    /**
+     * Crea un botón con imagen de fondo.
+     */
     private JButton crearBotonImagen(String ruta, int x, int y, int w, int h) {
         JButton boton = new JButton();
         boton.setBounds(x, y, w, h);
@@ -108,14 +124,14 @@ public class EndGameWindow {
     }
 
     /**
-     * Muestra los resultados finales en pantalla.
+     * Muestra los resultados finales.
      *
-     * @param ganador nombre del ganador
-     * @param tiempoTotal tiempo total de la partida
-     * @param primero texto del primer lugar
-     * @param segundo texto del segundo lugar
-     * @param tercero texto del tercer lugar
-     * @param cuarto texto del cuarto lugar
+     * @param ganador ganador del juego
+     * @param tiempoTotal tiempo total de partida
+     * @param primero primer lugar
+     * @param segundo segundo lugar
+     * @param tercero tercer lugar
+     * @param cuarto cuarto lugar (puede ser null)
      */
     public void setResultados(String ganador,
                               String tiempoTotal,
@@ -124,19 +140,33 @@ public class EndGameWindow {
                               String tercero,
                               String cuarto) {
 
-        ganadorLabel.setText("Ganador: " + ganador);
-        tiempoTotalLabel.setText("Tiempo total: " + tiempoTotal);
+        ganadorLabel.setText("Ganador: " + (ganador != null ? ganador : ""));
+        tiempoTotalLabel.setText("Tiempo total: " + (tiempoTotal != null ? tiempoTotal : ""));
 
-        primerLugarLabel.setText(primero);
-        segundoLugarLabel.setText(segundo);
-        tercerLugarLabel.setText(tercero);
-        cuartoLugarLabel.setText(cuarto);
+        primerLugarLabel.setText(primero != null ? primero : "");
+        segundoLugarLabel.setText(segundo != null ? segundo : "");
+        tercerLugarLabel.setText(tercero != null ? tercero : "");
+
+        // Ocultar cuarto lugar si no existe
+        if (cuarto == null || cuarto.isBlank()) {
+            cuartoLugarLabel.setText("");
+            cuartoLugarLabel.setVisible(false);
+        } else {
+            cuartoLugarLabel.setVisible(true);
+            cuartoLugarLabel.setText(cuarto);
+        }
     }
 
+    /**
+     * Listener botón finalizar.
+     */
     public void addFinListener(ActionListener listener) {
         btnFin.addActionListener(listener);
     }
 
+    /**
+     * Listener botón reiniciar.
+     */
     public void addReiniciarListener(ActionListener listener) {
         btnReiniciar.addActionListener(listener);
     }
