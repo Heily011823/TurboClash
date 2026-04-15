@@ -18,12 +18,12 @@ import edu.autonoma.turboclash.infrastructure.network.message.WorldObjectState;
 import edu.autonoma.turboclash.presentation.view.GameWindow;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
- * Representa la clase `AuthoritativeMatchCoordinator` y define su responsabilidad dentro del sistema.
- *@author Valerie Moreno Castaño</valerie.morenoc@autonoma.edu.co>
+ * Representa la clase AuthoritativeMatchCoordinator y define su responsabilidad dentro del sistema.
+ *
+ * @author Valerie Moreno Castaño <valerie.morenoc@autonoma.edu.co>
  * @version 1.0
  * @since 2025-04-09
  */
@@ -41,29 +41,20 @@ public class AuthoritativeMatchCoordinator {
     private final List<Obstacle> obstacles;
     private final GameSpawner spawner;
     private final int localPort;
+
     private boolean spawnerStarted;
 
-    /**
-     * Crea una nueva instancia de `AuthoritativeMatchCoordinator`.
-     * @param match valor del parametro `match`
-     * @param engine valor del parametro `engine`
-     * @param networkService valor del parametro `networkService`
-     * @param rulesManager valor del parametro `rulesManager`
-     * @param resultManager valor del parametro `resultManager`
-     * @param items valor del parametro `items`
-     * @param obstacles valor del parametro `obstacles`
-     * @param spawner valor del parametro `spawner`
-     * @param localPort valor del parametro `localPort`
-     */
-    public AuthoritativeMatchCoordinator(Match match,
-                                         GameEngine engine,
-                                         GameNetworkService networkService,
-                                         GameRulesManager rulesManager,
-                                         GameResultManager resultManager,
-                                         List<Item> items,
-                                         List<Obstacle> obstacles,
-                                         GameSpawner spawner,
-                                         int localPort) {
+    public AuthoritativeMatchCoordinator(
+            Match match,
+            GameEngine engine,
+            GameNetworkService networkService,
+            GameRulesManager rulesManager,
+            GameResultManager resultManager,
+            List<Item> items,
+            List<Obstacle> obstacles,
+            GameSpawner spawner,
+            int localPort
+    ) {
         this.match = match;
         this.engine = engine;
         this.networkService = networkService;
@@ -75,18 +66,10 @@ public class AuthoritativeMatchCoordinator {
         this.localPort = localPort;
     }
 
-    /**
-     * Indica la condicion evaluada por `isLocalHost`.
-     * @return resultado de la operacion documentada
-     */
     public boolean isLocalHost() {
         return match.getAuthoritativeHostPort() == localPort;
     }
 
-    /**
-     * Actualiza el estado relacionado con update host authority.
-     * @param window valor del parametro `window`
-     */
     public void updateHostAuthority(GameWindow window) {
         if (!isLocalHost() || match.isFinished()) {
             return;
@@ -98,6 +81,7 @@ public class AuthoritativeMatchCoordinator {
                 stopSpawner();
                 return;
             }
+
             maybeScheduleGameStart();
             maybeStartMatch();
             return;
@@ -109,28 +93,23 @@ public class AuthoritativeMatchCoordinator {
         checkGameOver(window);
     }
 
-    /**
-     * Ejecuta la operacion publica `maybeStartMatch`.
-     */
     public void maybeStartMatch() {
         long scheduledStartTime = match.getScheduledStartTime();
+
         if (match.isStarted() || scheduledStartTime <= 0L) {
             return;
         }
 
         if (System.currentTimeMillis() >= scheduledStartTime) {
-            match.lockAuthoritativeHostPort(5002);
+            match.lockAuthoritativeHostPort(localPort);
             match.setStarted(true);
             match.setRemainingMillis(MATCH_DURATION_MS);
             ensureSpawnerRunning();
         }
     }
 
-    /**
-     * Ejecuta la operacion publica `maybeScheduleGameStart`.
-     */
     public void maybeScheduleGameStart() {
-        if (match.isStarted() || match.getScheduledStartTime() > 0) {
+        if (!isLocalHost() || match.isStarted() || match.getScheduledStartTime() > 0) {
             return;
         }
 
@@ -140,18 +119,19 @@ public class AuthoritativeMatchCoordinator {
 
         long scheduledStartTime = System.currentTimeMillis() + START_DELAY_MS;
 
-        int hostPort = 5002;
-
-        match.lockAuthoritativeHostPort(hostPort);
+        match.lockAuthoritativeHostPort(localPort);
         match.setScheduledStartTime(scheduledStartTime);
-        networkService.sendGameStart(match.getLocalPlayer(), hostPort, scheduledStartTime,
-                match.getConnectedPlayerCount(), match.getMinPlayers(), match.getMaxPlayers());
+
+        networkService.sendGameStart(
+                match.getLocalPlayer(),
+                localPort,
+                scheduledStartTime,
+                match.getConnectedPlayerCount(),
+                match.getMinPlayers(),
+                match.getMaxPlayers()
+        );
     }
 
-    /**
-     * Aplica la logica correspondiente a apply game start.
-     * @param payload valor del parametro `payload`
-     */
     public void applyGameStart(GameStartPayload payload) {
         if (payload == null) {
             return;
@@ -162,10 +142,6 @@ public class AuthoritativeMatchCoordinator {
         match.setScheduledStartTime(payload.scheduledStartTime);
     }
 
-    /**
-     * Aplica la logica correspondiente a apply snapshot.
-     * @param snapshot valor del parametro `snapshot`
-     */
     public void applySnapshot(MatchSnapshot snapshot) {
         if (snapshot == null) {
             return;
@@ -178,10 +154,12 @@ public class AuthoritativeMatchCoordinator {
         match.setRemainingMillis(snapshot.remainingMillis);
 
         for (PlayerState state : snapshot.players) {
-            Player player = match.findPlayerByIdOrName(state.playerId, state.playerName);
+
             if (match.isPlayerRemoved(state.playerId, state.playerName)) {
                 continue;
             }
+
+            Player player = match.findPlayerByIdOrName(state.playerId, state.playerName);
 
             if (player == null) {
                 player = createPlayerFromState(state);
@@ -190,6 +168,7 @@ public class AuthoritativeMatchCoordinator {
 
             player.setNetworkPort(state.port);
             player.setLastProcessedSequence(state.sequence);
+
             player.syncFromNetwork(
                     state.posX,
                     state.posY,
@@ -209,19 +188,19 @@ public class AuthoritativeMatchCoordinator {
         }
     }
 
-    /**
-     * Aplica la logica correspondiente a apply game over.
-     * @param snapshot valor del parametro `snapshot`
-     */
     public void applyGameOver(MatchSnapshot snapshot) {
         if (snapshot == null) {
             return;
         }
 
         match.lockAuthoritativeHostPort(snapshot.hostPort);
+
         List<Player> ranking = new ArrayList<>();
+
         for (PlayerState state : snapshot.players) {
+
             Player player = match.findPlayerByIdOrName(state.playerId, state.playerName);
+
             if (player == null) {
                 player = createPlayerFromState(state);
                 match.addPlayer(player);
@@ -237,6 +216,7 @@ public class AuthoritativeMatchCoordinator {
                     state.finishOrder,
                     state.eliminationOrder
             );
+
             ranking.add(player);
         }
 
@@ -253,18 +233,19 @@ public class AuthoritativeMatchCoordinator {
         stopSpawner();
     }
 
-    /**
-     * Ejecuta la operacion publica `checkGameOver`.
-     * @param window valor del parametro `window`
-     */
     public void checkGameOver(GameWindow window) {
-        long remainingMillis = Math.max(0L, match.getScheduledStartTime() + MATCH_DURATION_MS - System.currentTimeMillis());
+        long remainingMillis = Math.max(
+                0L,
+                match.getScheduledStartTime() + MATCH_DURATION_MS - System.currentTimeMillis()
+        );
+
         match.setRemainingMillis(remainingMillis);
 
         boolean someoneReachedFinish = false;
         int activePlayers = 0;
 
         for (Player player : match.getPlayers()) {
+
             if (player == null) {
                 continue;
             }
@@ -278,21 +259,27 @@ public class AuthoritativeMatchCoordinator {
             }
         }
 
-        if (!someoneReachedFinish && activePlayers > 1 && remainingMillis > 0 && (window == null || !window.isBackgroundFinished())) {
+        if (!someoneReachedFinish
+                && activePlayers > 1
+                && remainingMillis > 0
+                && (window == null || !window.isBackgroundFinished())) {
             return;
         }
 
         List<Player> ranking = resultManager.calculateRanking(match.getPlayers());
         Player winner = ranking.isEmpty() ? null : ranking.get(0);
-        String reason = someoneReachedFinish ? "finish" :
-                remainingMillis <= 0 ? "timeout" :
-                (window != null && window.isBackgroundFinished()) ? "track_end" :
-                        "elimination";
+
+        String reason =
+                someoneReachedFinish ? "finish"
+                        : remainingMillis <= 0 ? "timeout"
+                          : (window != null && window.isBackgroundFinished()) ? "track_end"
+                            : "elimination";
 
         match.finishGame(winner, ranking, reason);
         match.setStarted(false);
         stopSpawner();
-        networkService.sendGameOver(match, items, obstacles, ranking, reason, 5002);
+
+        networkService.sendGameOver(match, items, obstacles, ranking, reason, localPort);
     }
 
     private void ensureSpawnerRunning() {
@@ -315,19 +302,28 @@ public class AuthoritativeMatchCoordinator {
         }
 
         int metaX = window.getMetaX();
+
         for (Player player : match.getPlayers()) {
-            if (player == null || player.getCar() == null || player.isFinishReached() || player.isEliminated()) {
+
+            if (player == null
+                    || player.getCar() == null
+                    || player.isFinishReached()
+                    || player.isEliminated()) {
                 continue;
             }
 
             int playerFront = (int) player.getCar().getX() + player.getCar().getWidth();
+
             if (playerFront >= metaX) {
                 rulesManager.applyFinishBonus(player);
             }
         }
     }
 
-    private void replaceWorldState(List<WorldObjectState> itemStates, List<WorldObjectState> obstacleStates) {
+    private void replaceWorldState(
+            List<WorldObjectState> itemStates,
+            List<WorldObjectState> obstacleStates
+    ) {
         replaceItems(itemStates);
         replaceObstacles(obstacleStates);
     }
@@ -341,13 +337,16 @@ public class AuthoritativeMatchCoordinator {
                 50,
                 "/image/Car_Blue.png"
         );
+
         Player player = new Player(state.playerId, state.playerName, car);
         player.setNetworkPort(state.port);
+
         return player;
     }
 
     private void replaceItems(List<WorldObjectState> itemStates) {
         items.clear();
+
         if (itemStates == null) {
             return;
         }
@@ -361,6 +360,7 @@ public class AuthoritativeMatchCoordinator {
 
     private void replaceObstacles(List<WorldObjectState> obstacleStates) {
         obstacles.clear();
+
         if (obstacleStates == null) {
             return;
         }
@@ -374,8 +374,10 @@ public class AuthoritativeMatchCoordinator {
                     state.height,
                     ObstacleType.valueOf(state.type)
             );
+
             obstacle.setVisible(state.visible);
             obstacle.setProcessed(state.processed);
+
             obstacles.add(obstacle);
         }
     }
