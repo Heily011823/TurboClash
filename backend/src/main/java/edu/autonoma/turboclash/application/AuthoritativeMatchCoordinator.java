@@ -21,29 +21,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Coordina la lógica autoritativa de una partida multijugador.
+ * Coordinador autoritativo de la partida multijugador.
  *
- * <p>Responsabilidades principales:</p>
+ * <p>Esta clase administra la lógica principal del modelo host-autoritativo:
+ * el host programa el inicio, actualiza el estado oficial del match,
+ * determina el fin de la partida y distribuye snapshots al resto de clientes.</p>
+ *
+ * <p>Los clientes no-host aplican la información recibida por red,
+ * pero no deben recalcular el resultado final ni sobrescribir
+ * el movimiento local del jugador propio con el snapshot remoto.</p>
+ *
+ * <p><strong>Correcciones aplicadas:</strong></p>
  * <ul>
- *   <li>Determinar si la instancia local actúa como host autoritativo.</li>
- *   <li>Programar y arrancar la partida cuando se cumplan las condiciones.</li>
- *   <li>Actualizar el estado global del juego desde el host.</li>
- *   <li>Aplicar snapshots recibidos desde red en clientes no host.</li>
- *   <li>Calcular y propagar el resultado final del match.</li>
+ *   <li>En {@code applySnapshot(...)} ya no se sobrescribe la posición del jugador local
+ *       con el snapshot del host, evitando tirones, saltos o sensación de lag
+ *       en clientes no-host.</li>
+ *   <li>En {@code applyGameOver(...)} el ganador se busca correctamente por ID,
+ *       evitando inconsistencias al resolver el jugador ganador.</li>
  * </ul>
  *
- * <p>En el modelo actual, el host autoritativo es el único que debe decidir
- * el ranking y el ganador final. Los clientes solo deben aplicar y mostrar
- * el resultado recibido por red.</p>
- *
  * @author Valerie Moreno Castaño
- * @version 1.1
+ * @version 1.2
  * @since 2025-04-09
  */
 public class AuthoritativeMatchCoordinator {
 
     /**
-     * Retraso entre que se detectan suficientes jugadores y el inicio real del match.
+     * Retraso antes de iniciar oficialmente la partida una vez se cumplen
+     * las condiciones mínimas de jugadores conectados.
      */
     private static final long START_DELAY_MS = 3000;
 
@@ -68,17 +73,17 @@ public class AuthoritativeMatchCoordinator {
     private boolean spawnerStarted;
 
     /**
-     * Construye un nuevo coordinador autoritativo del match.
+     * Crea una nueva instancia del coordinador autoritativo.
      *
-     * @param match partida actual
-     * @param engine motor principal del juego
-     * @param networkService servicio de red del juego
+     * @param match estado de la partida
+     * @param engine motor del juego
+     * @param networkService servicio de red
      * @param rulesManager gestor de reglas
-     * @param resultManager gestor de resultados y ranking
-     * @param items lista compartida de ítems del mundo
-     * @param obstacles lista compartida de obstáculos del mundo
+     * @param resultManager gestor de ranking y resultados
+     * @param items lista compartida de ítems
+     * @param obstacles lista compartida de obstáculos
      * @param spawner generador de objetos del mundo
-     * @param localPort puerto UDP local de esta instancia
+     * @param localPort puerto local de esta instancia
      */
     public AuthoritativeMatchCoordinator(
             Match match,
@@ -103,20 +108,20 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Indica si la instancia local es actualmente el host autoritativo.
+     * Indica si esta instancia es actualmente el host autoritativo.
      *
-     * @return true si el puerto local coincide con el host autoritativo del match
+     * @return true si el puerto local coincide con el host autoritativo
      */
     public boolean isLocalHost() {
         return match.getAuthoritativeHostPort() == localPort;
     }
 
     /**
-     * Ejecuta la actualización autoritativa del match.
+     * Ejecuta la lógica autoritativa del host.
      *
-     * <p>Solo el host autoritativo debe:
-     * programar el inicio, arrancar la partida, actualizar el motor,
-     * aplicar la llegada a meta por viewport y decidir el final del juego.</p>
+     * <p>Solo el host debe:
+     * iniciar la partida, actualizar el motor,
+     * aplicar la meta visible y decidir el final del juego.</p>
      *
      * @param window ventana principal del juego
      */
@@ -144,7 +149,7 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Inicia la partida si el tiempo programado ya fue alcanzado.
+     * Inicia el match si ya se cumplió el tiempo programado de arranque.
      */
     public void maybeStartMatch() {
         long scheduledStartTime = match.getScheduledStartTime();
@@ -162,9 +167,7 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Programa el inicio de la partida cuando hay suficientes jugadores.
-     *
-     * <p>Solo debe hacerlo el host autoritativo.</p>
+     * Programa el inicio del match si hay suficientes jugadores conectados.
      */
     public void maybeScheduleGameStart() {
         if (!isLocalHost() || match.isStarted() || match.getScheduledStartTime() > 0) {
@@ -191,9 +194,9 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Aplica la programación de inicio recibida desde red.
+     * Aplica el mensaje de inicio recibido desde el host.
      *
-     * @param payload datos del inicio sincronizado
+     * @param payload información del inicio sincronizado
      */
     public void applyGameStart(GameStartPayload payload) {
         if (payload == null) {
@@ -206,12 +209,17 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Aplica un snapshot autoritativo recibido desde el host.
+     * Aplica un snapshot autoritativo recibido desde red.
      *
-     * <p>Actualiza:
-     * jugadores, puertos, estado del match, tiempo restante y objetos del mundo.</p>
+     * <p>Corrección clave:</p>
+     * <ul>
+     *   <li>Los jugadores remotos sí se actualizan completamente con el snapshot.</li>
+     *   <li>El jugador local NO debe sobrescribir su posición local
+     *       con el snapshot del host, porque eso produce saltos,
+     *       temblores o movimiento bugueado en los clientes no-host.</li>
+     * </ul>
      *
-     * @param snapshot instantánea del estado del match
+     * @param snapshot snapshot recibido desde el host
      */
     public void applySnapshot(MatchSnapshot snapshot) {
         if (snapshot == null) {
@@ -224,9 +232,45 @@ public class AuthoritativeMatchCoordinator {
         match.setStarted(snapshot.started);
         match.setRemainingMillis(snapshot.remainingMillis);
 
+        Player localPlayer = match.getLocalPlayer();
+
         for (PlayerState state : snapshot.players) {
 
             if (match.isPlayerRemoved(state.playerId, state.playerName)) {
+                continue;
+            }
+
+            boolean isLocalPlayer =
+                    localPlayer != null &&
+                            (
+                                    (localPlayer.getId() != null && localPlayer.getId().equals(state.playerId)) ||
+                                            (localPlayer.getName() != null
+                                                    && state.playerName != null
+                                                    && localPlayer.getName().equalsIgnoreCase(state.playerName))
+                            );
+
+            /*
+             * No se debe sobrescribir la posición del jugador local con el snapshot
+             * remoto del host, porque el cliente ya está aplicando su propio input
+             * localmente. Si se hiciera, el carro "saltaría" o se sentiría bugueado.
+             *
+             * Sí se actualizan estados lógicos relevantes del jugador local:
+             * score, vidas, eliminación, llegada a meta y órdenes finales.
+             */
+            if (isLocalPlayer) {
+                localPlayer.setNetworkPort(state.port);
+                localPlayer.setLastProcessedSequence(state.sequence);
+                localPlayer.setScore(state.score);
+                localPlayer.setFinishReached(state.finishReached);
+                localPlayer.setEliminated(state.eliminated);
+                localPlayer.setFinishOrder(state.finishOrder);
+                localPlayer.setEliminationOrder(state.eliminationOrder);
+
+                if (localPlayer.getCar() != null) {
+                    localPlayer.getCar().setLives(state.lives);
+                    localPlayer.getCar().setFinishReached(state.finishReached);
+                }
+
                 continue;
             }
 
@@ -260,17 +304,12 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Aplica el resultado final recibido desde el host autoritativo.
+     * Aplica el resultado final recibido desde el host.
      *
-     * <p>Corrección aplicada:</p>
-     * <ul>
-     *   <li>El ganador se busca correctamente por su ID real.</li>
-     *   <li>Ya no se intenta buscar usando el ID también como nombre.</li>
-     *   <li>Si no se encuentra al ganador explícito, se usa el primer jugador
-     *       del ranking recibido como fallback consistente.</li>
-     * </ul>
+     * <p>Corrección incluida:
+     * el ganador se busca correctamente por ID, no usando el ID también como nombre.</p>
      *
-     * @param snapshot snapshot final con el resultado del match
+     * @param snapshot snapshot final del match
      */
     public void applyGameOver(MatchSnapshot snapshot) {
         if (snapshot == null) {
@@ -304,12 +343,6 @@ public class AuthoritativeMatchCoordinator {
             ranking.add(player);
         }
 
-        /*
-         * Corrección:
-         * antes se buscaba con (winnerId, winnerId), usando el ID también
-         * como nombre. Eso podía provocar que el ganador no se resolviera
-         * correctamente en algunos clientes.
-         */
         Player winner = null;
 
         if (snapshot.winnerId != null) {
@@ -330,9 +363,7 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Verifica si el match debe finalizar.
-     *
-     * <p>Solo debe ejecutarse en el host autoritativo.</p>
+     * Verifica si la partida debe terminar según el estado autoritativo.
      *
      * @param window ventana principal del juego
      */
@@ -386,7 +417,7 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Asegura que el spawner esté activo.
+     * Asegura que el spawner esté ejecutándose.
      */
     private void ensureSpawnerRunning() {
         if (!spawnerStarted) {
@@ -396,7 +427,7 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Detiene el spawner si está activo.
+     * Detiene el spawner si estaba activo.
      */
     private void stopSpawner() {
         if (spawnerStarted) {
@@ -406,8 +437,7 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Marca jugadores como llegados a la meta cuando el frente del carro
-     * alcanza la posición X de la meta visible.
+     * Marca llegada a meta usando la posición visible de la meta en la vista.
      *
      * @param window ventana principal del juego
      */
@@ -436,10 +466,10 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Reemplaza el estado completo de objetos del mundo.
+     * Reemplaza el estado del mundo recibido desde red.
      *
-     * @param itemStates estado de ítems
-     * @param obstacleStates estado de obstáculos
+     * @param itemStates lista de ítems serializados
+     * @param obstacleStates lista de obstáculos serializados
      */
     private void replaceWorldState(
             List<WorldObjectState> itemStates,
@@ -450,10 +480,10 @@ public class AuthoritativeMatchCoordinator {
     }
 
     /**
-     * Construye un jugador a partir de un estado recibido por red.
+     * Reconstruye un jugador a partir de un estado recibido por red.
      *
-     * @param state estado serializado del jugador
-     * @return nuevo jugador reconstruido
+     * @param state estado del jugador
+     * @return jugador reconstruido
      */
     private Player createPlayerFromState(PlayerState state) {
         Car car = new Car(
@@ -474,7 +504,7 @@ public class AuthoritativeMatchCoordinator {
     /**
      * Reemplaza la lista actual de ítems por la recibida en el snapshot.
      *
-     * @param itemStates estados de ítems del mundo
+     * @param itemStates estados de ítems
      */
     private void replaceItems(List<WorldObjectState> itemStates) {
         items.clear();
@@ -493,7 +523,7 @@ public class AuthoritativeMatchCoordinator {
     /**
      * Reemplaza la lista actual de obstáculos por la recibida en el snapshot.
      *
-     * @param obstacleStates estados de obstáculos del mundo
+     * @param obstacleStates estados de obstáculos
      */
     private void replaceObstacles(List<WorldObjectState> obstacleStates) {
         obstacles.clear();
