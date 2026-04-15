@@ -1,6 +1,6 @@
 ﻿# TurboClash
 
- [Repositorio en GitHub](https://github.com/Heily011823/TurboClash.git)
+[Repositorio en GitHub](https://github.com/Heily011823/TurboClash.git)
 
 TurboClash es un juego de carreras multijugador desarrollado en Java Swing, con comunicación UDP entre peers.
 La versión actual implementa un esquema **host-autoritativo mínimo**, donde uno de los clientes asume la autoridad lógica de la partida y sincroniza inicio, estado de jugadores, mundo, colisiones y final del match para reducir divergencias.
@@ -65,25 +65,65 @@ mvn -s .mvn-settings.xml clean compile
 
 ## Arquitectura del proyecto
 
-El proyecto está organizado en capas para separar responsabilidades:
+El proyecto está organizado en una arquitectura **modular frontend-backend**, donde cada módulo mantiene una estructura interna por capas para separar responsabilidades.
 
-* **application**: coordinación del flujo del juego y lógica del match.
+---
+
+### Módulos principales
+
+* **backend**: contiene la lógica del juego, sincronización en red y estado autoritativo del match.
+* **frontend**: contiene la interfaz gráfica (Swing) y la representación visual del juego.
+
+---
+
+### Backend (lógica y red)
+
+Dentro del backend se mantiene una arquitectura por capas:
+
+* **application**: coordinación del flujo del juego y lógica del match (host-autoritativo).
 * **domain**: modelo del juego, reglas y servicios.
 * **infrastructure**: red UDP, audio, entradas y fábricas.
-* **presentation**: interfaz gráfica (Swing) y sincronización visual.
 * **config**: configuración general (puertos, constantes, spawn points).
+
+---
+
+### Frontend (interfaz gráfica)
+
+El frontend se encarga de:
+
+* Renderizar el juego en pantalla.
+* Mostrar jugadores, mapa y resultados finales.
+* Capturar input del usuario.
+* Sincronizar la vista con el estado recibido desde el backend.
+
+---
 
 ### Estructura del proyecto
 
 ```text
-src/main/java/edu/autonoma/turboclash
+backend/src/main/java/edu/autonoma/turboclash
 ├── application
 ├── config
 ├── domain
 ├── infrastructure
-├── main
+└── exception
+
+frontend/src/main/java/edu/autonoma/turboclash
 └── presentation
+    ├── navigation
+    └── view
 ```
+
+---
+
+### Relación entre frontend y backend
+
+El sistema sigue el flujo:
+
+Jugador → Input → Backend → Snapshot → Frontend
+
+* El **backend calcula el estado del juego**.
+* El **frontend solo lo representa visualmente**.
 
 ---
 
