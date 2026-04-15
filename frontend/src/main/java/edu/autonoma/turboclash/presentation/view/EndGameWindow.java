@@ -5,48 +5,58 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 /**
- * Representa la clase `EndGameWindow` y define su responsabilidad dentro del sistema.
- *@author Valerie Moreno Castaño</valerie.morenoc@autonoma.edu.co>
- * @version 1.0
+ * Vista de resultados finales del juego.
+ *
+ * <p>Esta clase construye y organiza los componentes visuales
+ * de la pantalla final: título, ganador, tiempo total, ranking
+ * y botones de acción.</p>
+ *
+ * <p>Aquí se controlan:</p>
+ * <ul>
+ *   <li>Los textos que aparecen en pantalla.</li>
+ *   <li>La posición de cada label.</li>
+ *   <li>El tamaño y color de la fuente.</li>
+ * </ul>
+ *
+ * @author Valerie Moreno Castaño
+ * @version 1.1
  * @since 2025-04-09
  */
 public class EndGameWindow {
-    /**
-     * Expone el atributo publico `panel1` para la colaboracion entre componentes del sistema.
-     */
+
     public JPanel panel1;
 
     private JLabel tituloLabel;
     private JLabel ganadorLabel;
     private JLabel tiempoTotalLabel;
 
-    private JLabel PrimerLugar;
-    private JLabel SegundoLugar;
-    private JLabel TercerLugar;
-    private JLabel CuartoLugar;
+    private JLabel primerLugarLabel;
+    private JLabel segundoLugarLabel;
+    private JLabel tercerLugarLabel;
+    private JLabel cuartoLugarLabel;
 
     private JButton btnFin;
     private JButton btnReiniciar;
 
-    /**
-     * Crea una nueva instancia de `EndGameWindow`.
-     */
     public EndGameWindow() {
         panel1 = new JPanel(null);
         panel1.setOpaque(false);
-        panel1.setPreferredSize(new Dimension(1000, 700));
 
-        tituloLabel = crearLabel("RESULTADOS FINALES", 200, 35, 400, 40, 28, new Color(255, 255, 255));
-        ganadorLabel = crearLabel("", 160, 90, 500, 35, 22, new Color(255, 215, 0));
-        tiempoTotalLabel = crearLabel("", 220, 125, 350, 30, 18, new Color(230, 230, 230));
+        // Mejor alinear esto con el tamaño real del frame
+        panel1.setPreferredSize(new Dimension(800, 600));
 
-        PrimerLugar = crearLabel("", 170, 190, 460, 40, 20, new Color(255, 215, 0));
-        SegundoLugar = crearLabel("", 120, 245, 320, 40, 18, new Color(230, 230, 230));
-        TercerLugar = crearLabel("", 360, 245, 320, 40, 18, new Color(205, 127, 50));
-        CuartoLugar = crearLabel("", 170, 405, 460, 40, 18, new Color(220, 220, 220));
+        tituloLabel = crearLabel("RESULTADOS FINALES", 170, 30, 460, 45, 30, Color.WHITE);
+        ganadorLabel = crearLabel("", 150, 85, 500, 35, 24, Color.YELLOW);
+        tiempoTotalLabel = crearLabel("", 130, 120, 540, 30, 20, Color.WHITE);
 
-        btnFin = crearBotonImagen("/image/btn_fin.png", 520, 500, 180, 55);
-        btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 80, 500, 180, 55);
+        // Labels del ranking con más ancho y fuente más visible
+        primerLugarLabel = crearLabel("", 150, 185, 500, 40, 22, Color.YELLOW);
+        segundoLugarLabel = crearLabel("", 60, 245, 300, 40, 20, Color.WHITE);
+        tercerLugarLabel = crearLabel("", 430, 245, 300, 40, 20, new Color(255, 200, 120));
+        cuartoLugarLabel = crearLabel("", 150, 395, 500, 40, 20, Color.WHITE);
+
+        btnFin = crearBotonImagen("/image/btn_fin.png", 500, 500, 180, 55);
+        btnReiniciar = crearBotonImagen("/image/btn_reiniciar.png", 100, 500, 180, 55);
 
         if (btnFin.getIcon() == null) {
             btnFin.setText("FIN");
@@ -61,10 +71,10 @@ public class EndGameWindow {
         panel1.add(tituloLabel);
         panel1.add(ganadorLabel);
         panel1.add(tiempoTotalLabel);
-        panel1.add(PrimerLugar);
-        panel1.add(SegundoLugar);
-        panel1.add(TercerLugar);
-        panel1.add(CuartoLugar);
+        panel1.add(primerLugarLabel);
+        panel1.add(segundoLugarLabel);
+        panel1.add(tercerLugarLabel);
+        panel1.add(cuartoLugarLabel);
         panel1.add(btnFin);
         panel1.add(btnReiniciar);
     }
@@ -73,7 +83,7 @@ public class EndGameWindow {
         JLabel label = new JLabel(texto, SwingConstants.CENTER);
         label.setBounds(x, y, w, h);
         label.setForeground(color);
-        label.setFont(new Font("Arial", Font.BOLD, fontSize));
+        label.setFont(new Font("SansSerif", Font.BOLD, fontSize));
         return label;
     }
 
@@ -91,20 +101,21 @@ public class EndGameWindow {
             Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
             boton.setIcon(new ImageIcon(imagenEscalada));
         } catch (Exception e) {
-            System.out.println("No se encontrÃ³ la imagen del botÃ³n: " + ruta);
+            System.out.println("No se encontró la imagen del botón: " + ruta);
         }
 
         return boton;
     }
 
     /**
-     * Actualiza el valor asociado a `setResultados`.
-     * @param ganador valor del parametro `ganador`
-     * @param tiempoTotal valor del parametro `tiempoTotal`
-     * @param primero valor del parametro `primero`
-     * @param segundo valor del parametro `segundo`
-     * @param tercero valor del parametro `tercero`
-     * @param cuarto valor del parametro `cuarto`
+     * Muestra los resultados finales en pantalla.
+     *
+     * @param ganador nombre del ganador
+     * @param tiempoTotal tiempo total de la partida
+     * @param primero texto del primer lugar
+     * @param segundo texto del segundo lugar
+     * @param tercero texto del tercer lugar
+     * @param cuarto texto del cuarto lugar
      */
     public void setResultados(String ganador,
                               String tiempoTotal,
@@ -114,26 +125,18 @@ public class EndGameWindow {
                               String cuarto) {
 
         ganadorLabel.setText("Ganador: " + ganador);
-        tiempoTotalLabel.setText("Tiempo total de partida: " + tiempoTotal);
+        tiempoTotalLabel.setText("Tiempo total: " + tiempoTotal);
 
-        PrimerLugar.setText(primero);
-        SegundoLugar.setText(segundo);
-        TercerLugar.setText(tercero);
-        CuartoLugar.setText(cuarto);
+        primerLugarLabel.setText(primero);
+        segundoLugarLabel.setText(segundo);
+        tercerLugarLabel.setText(tercero);
+        cuartoLugarLabel.setText(cuarto);
     }
 
-    /**
-     * Agrega el elemento necesario para add fin listener.
-     * @param listener valor del parametro `listener`
-     */
     public void addFinListener(ActionListener listener) {
         btnFin.addActionListener(listener);
     }
 
-    /**
-     * Agrega el elemento necesario para add reiniciar listener.
-     * @param listener valor del parametro `listener`
-     */
     public void addReiniciarListener(ActionListener listener) {
         btnReiniciar.addActionListener(listener);
     }
